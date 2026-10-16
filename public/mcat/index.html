@@ -845,16 +845,12 @@ const RES_BASE = [
   { id: 'phys', grp: 'AAMC official', name: 'Physics Question Pack', kind: 'qs', total: 120, secs: ['C/P'], url: 'https://www.mcatofficialprep.org/', kw: ['Physics Question Pack', 'Phys QP'] },
   { id: 'iqb', grp: 'AAMC official', name: 'Independent Question Bank', kind: 'qs', total: 150, secs: ['C/P', 'B/B', 'P/S'], url: 'https://www.mcatofficialprep.org/', kw: ['Independent Question Bank', 'IQB'] },
   { id: 'free', grp: 'AAMC official', name: 'Content Outline course questions', kind: 'qs', total: 130, secs: ['C/P', 'CARS', 'B/B', 'P/S'], note: 'Free.', url: 'https://www.mcatofficialprep.org/', kw: ['Content Outline course'] },
-  { id: 'cqp', grp: 'AAMC official', name: 'CARS Question Packs vol. 1 & 2 (old)', kind: 'qs', total: 120, secs: ['CARS'], note: 'No longer sold; now inside the CARS Question Bank. Tick only if you still have access and not the Bank.', url: 'https://www.mcatofficialprep.org/', kw: ['CARS Question Pack'] },
-  { id: 'cdt', grp: 'AAMC official', name: 'CARS Diagnostic Tool (old)', kind: 'qs', total: 0, secs: ['CARS'], note: 'No longer sold; now inside the CARS Question Bank.', url: 'https://www.mcatofficialprep.org/', kw: ['CARS Diagnostic'] },
   { id: 'uw', grp: 'Question banks', name: 'UWorld MCAT QBank', kind: 'qs', total: 0, secs: ['C/P', 'CARS', 'B/B', 'P/S'], note: 'Enter your total.', url: 'https://www.uworld.com/', kw: ['UWorld'] },
   { id: 'bpq', grp: 'Question banks', name: 'Blueprint QBank', kind: 'qs', total: 0, secs: ['C/P', 'CARS', 'B/B', 'P/S'], note: 'Enter your total.', url: 'https://blueprintprep.com/mcat', kw: ['Blueprint QBank'] },
   { id: 'kqb', grp: 'Question banks', name: 'Kaplan QBank', kind: 'qs', total: 0, secs: ['C/P', 'CARS', 'B/B', 'P/S'], note: 'Enter your total.', url: 'https://www.kaptest.com/mcat', kw: ['Kaplan QBank'] },
   { id: 'jwq', grp: 'Question banks', name: 'Jack Westin QBank', kind: 'qs', total: 3846, secs: ['C/P', 'CARS', 'B/B', 'P/S'], note: 'Free with an account. Counted Oct 2026: AAMC-style 2,941 passage + 905 discrete questions (used here); also 735 fundamental passages, 1,567 fundamental discretes, 387 diagnostic. It grows, so edit the total now and then.', url: 'https://jackwestin.com/qbank', kw: ['Jack Westin QBank', 'JW QBank'] },
   { id: 'tpr', grp: 'Question banks', name: 'The Princeton Review', kind: 'ps', total: 321, secs: ['C/P', 'CARS', 'B/B', 'P/S'], note: 'Count from your catalogue.', url: 'https://www.princetonreview.com/medical/mcat-test-prep', kw: ['Princeton Review passage', 'TPR passage'] },
   { id: 'ka', grp: 'Question banks', name: 'Khan Academy', kind: 'ps', total: 339, note: 'Free access is promised only through 2026; check it’s still up before you plan 2027 around it.', secs: ['C/P', 'B/B', 'P/S'], url: 'https://www.khanacademy.org/test-prep/mcat', kw: ['Khan Academy passage', 'KA passage'] },
-  { id: 'jw', grp: 'Question banks', name: 'Jack Westin', kind: 'ps', total: 286, secs: ['C/P', 'CARS', 'B/B', 'P/S'], url: 'https://jackwestin.com/', kw: ['Jack Westin', 'daily passage'] },
-  { id: 'kap', grp: 'Question banks', name: 'Kaplan', kind: 'ps', total: 72, secs: ['C/P', 'B/B', 'P/S'], url: 'https://www.kaptest.com/mcat', kw: ['Kaplan passage'] },
   { id: 'kbooks', grp: 'Content review', name: 'Kaplan MCAT Review books', kind: 'book' },
   { id: 'tbooks', grp: 'Content review', name: 'Princeton Review MCAT books', kind: 'book' },
   { id: 'kavid', grp: 'Content review', name: 'Khan Academy videos', kind: 'book', note: 'Promised only through 2026. The videos are also on YouTube.', url: 'https://www.khanacademy.org/test-prep/mcat', kw: ['Khan Academy video', 'KA video'] },
@@ -1062,6 +1058,8 @@ const flClash = (wd = +D.set.flDay) => commitList().filter(c => c.days.includes(
 const flBetter = () => [5, 6, 4, 3, 2, 1, 0].filter(i => !flClash(i).length).sort((a, b) => (+D.set.hours[b] || 0) - (+D.set.hours[a] || 0) || (b >= 5) - (a >= 5))[0];
 function ensureSetup(){
   const S = D.set;
+  // Oct 16: old CARS products live inside the CARS Question Bank; Jack Westin passages are part of the JW QBank
+  if (S.own) { if (S.own.cqp || S.own.cdt) S.own.cqb = 1; if (S.own.jw) S.own.jwq = 1; ['cqp', 'cdt', 'jw', 'kap'].forEach(k => delete S.own[k]); }
   // plan version bump: rebuild once
   if (S.template === 'my_plan' && S.planV !== 4) { S.planV = 4; S.goal = 508; S.floor = 500; D.resAdj = D.resAdj || {}; if (D.resAdj.iqb == null) D.resAdj.iqb = 150; D.plan = null; }
   // duplicate custom resources (same name and type) collapse into one
@@ -1251,7 +1249,7 @@ function sample(){
     set: { testDate: dayOff(150), startDate: dayOff(-7), goal: 510, floor: 500, baseline: 500, hours: [2, 3, 3.5, 5, 1.5, 0, 0.25], dayStart: '09:30', flDay: 3, blankWhen: 'start', carsN: 1, bedtime: '23:30', template: '', buffers: true,
       shape: { content: 0.36, practice: 0.22, mix: 0.25, qbank: true, cars: 3, flTotal: 8, flWeekly: 6, diag: false, flex: 1 },
       ankiMin: 30, deck: 'My deck', ankiTotal: 0, ankiMature: 0, ankiStop: 21,
-      own: { pe: 1, sample: 1, sb1: 1, sb2: 1, cqp: 1, cqb: 1, bio: 1, chem: 1, phys: 1, iqb: 1, free: 1, jw: 1, ka: 1, kavid: 1, fl_bp: 1, fl_tpr: 1, fl_kap: 1, c_boot: 1, c_yt: 1, c_ak: 1, c_bemo: 1 }, tot: {}, flc: { fl_bp: 1, fl_tpr: 4, fl_kap: 3 },
+      own: { pe: 1, sample: 1, sb1: 1, sb2: 1, cqb: 1, bio: 1, chem: 1, phys: 1, iqb: 1, free: 1, jwq: 1, ka: 1, kavid: 1, fl_bp: 1, fl_tpr: 1, fl_kap: 1, c_boot: 1, c_yt: 1, c_ak: 1, c_bemo: 1 }, tot: {}, flc: { fl_bp: 1, fl_tpr: 4, fl_kap: 3 },
       custom: [
         { id: 'c_boot', grp: 'My resources', name: 'MCAT Bootcamp', kind: 'qs', total: 0, secs: ['C/P', 'CARS', 'B/B', 'P/S'] },
         { id: 'c_yt', grp: 'My resources', name: 'YouTube subject reviews', kind: 'book', total: 0, secs: ['C/P', 'B/B', 'P/S'] },
@@ -1263,7 +1261,7 @@ function sample(){
     passages: [
       { id: 'ps1', label: 'Passage 1', src: 'Jack Westin', sec: 'CARS', ref: 'JW Daily CARS', date: dayOff(0), img: '', text: 'In ¶1 the author calls the museum’s new open-storage policy “overdue”, then spends ¶3 on two risks: damage to fragile pieces and a thinner curatorial voice. ¶4 jokes that visitors may now “curate themselves into exhaustion”. ¶5 ends: the policy is “promising, if handled carefully”. (Sample text written for this preview.)' },
       { id: 'ps2', label: 'Passage 1', src: 'The Princeton Review', sec: 'C/P', ref: 'TPR Gen Chem p.52–60', date: dayOff(-1), img: '', text: 'Buffer experiment: a table of four acids with pKa values and the target pH of each solution. (Sample notes written for this preview.)' },
-    ], hours: {}, anki: {}, skip: {}, closed: {}, resAdj: { tpr: 188, ka: 151, jw: 120, c_bemo: 30, kap: 72, sb1: -50, iqb: 150 },
+    ], hours: {}, anki: {}, skip: {}, closed: {}, resAdj: { tpr: 188, ka: 151, jwq: 120, c_bemo: 30, sb1: -50, iqb: 150 },
     practice: [
       { id: 'p1', date: dayOff(0), src: 'Jack Westin', sec: 'CARS', kind: 'ps', ref: 'JW Daily CARS', ps: 1, min: 9.5, ok: 4, n: 5, per: '', note: 'Missed the author-attitude question' },
       { id: 'p2', date: dayOff(0), src: 'The Princeton Review', sec: 'C/P', kind: 'ps', ref: 'TPR Gen Chem p.52–60', ps: 4, min: 36, ok: 17, n: 24, per: '4/6, 5/6, 3/6, 5/6', note: '' },
@@ -1338,6 +1336,7 @@ function cloudInit(){
   // storageKey matches Morae Planner, so signing in to one signs in to both
   Cloud.client = window.supabase.createClient(cfg.supabaseUrl, cfg.supabaseKey, { auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: true, storageKey: 'morae-planner/v1/auth' } });
   Cloud.client.auth.onAuthStateChange((ev, session) => {
+    if (ev === 'PASSWORD_RECOVERY') setTimeout(newPassword, 300);
     const u = session ? session.user : null, first = Cloud.status === 'checking';
     if (!first && (u && u.id) === (Cloud.user && Cloud.user.id)) return;
     Cloud.user = u; Cloud.creator = false;
@@ -1389,6 +1388,15 @@ function cloudLabel(){
 }
 function paintCloud(){ const t = document.getElementById('cloudTag'); if (t && Cloud.on) { t.textContent = Cloud.status === 'error' ? 'Not saved · tap to retry' : cloudLabel(); t.classList.toggle('bad', Cloud.status === 'error'); }
   const a = document.getElementById('acctStatus'); if (a) a.textContent = cloudLabel(); }
+const TEMP_MAIL = /@(mailinator|guerrillamail|sharklasers|10minutemail|temp-?mail|tempmail|yopmail|trashmail|getnada|dispostable|maildrop|throwawaymail|fakeinbox|mintemail|mohmal|emailondeck|tempr|moakt|spamgourmet|burnermail)\./i;
+function newPassword(){
+  openModal(`<div class="modal-head"><h2>Choose a new password</h2><button class="x" data-close aria-label="Close">×</button></div>
+    <label class="field"><span>New password <small class="muted">8 or more characters</small></span><input type="password" id="npw" autocomplete="new-password" minlength="8"></label>
+    <div class="modal-foot"><button class="btn" data-close>Cancel</button><button class="btn btn-primary" id="npwSave">Save password</button></div>`, m => {
+    m.querySelector('#npwSave').onclick = async () => { const pw = m.querySelector('#npw').value; if (pw.length < 8) return toast('Use 8 or more characters');
+      const { error } = await Cloud.client.auth.updateUser({ password: pw }); if (error) return toast(error.message); closeModal(); toast('Password changed'); };
+    m.querySelector('#npw').focus(); });
+}
 function accountCard(){
   if (!Cloud.on) return '';
   const u = Cloud.user;
@@ -1399,8 +1407,8 @@ function accountCard(){
       <div class="btns" style="justify-content:flex-start"><button class="btn" id="acSync">Sync now</button><button class="btn" id="acOut">Sign out</button></div>`
     : `<p class="muted small">Sign in with your Morae Planner account to keep your plan and logs on every device. Without an account, everything stays in this browser.</p>
       <form class="form" id="acForm"><label class="field f3"><span>Email</span><input type="email" id="acE" autocomplete="email" required></label>
-      <label class="field f3"><span>Password</span><input type="password" id="acP" autocomplete="current-password" minlength="6" required></label>
-      <div class="field f6 btns" style="justify-content:flex-start"><button class="btn btn-primary" type="submit">Sign in</button><button class="btn" type="button" id="acNew">Create account</button>${D.app && D.app.guest ? '<button class="btn" type="button" id="acLeave">Leave guest mode</button>' : ''}</div></form>`}
+      <label class="field f3"><span>Password</span><input type="password" id="acP" autocomplete="current-password" minlength="8" required></label>
+      <div class="field f6 btns" style="justify-content:flex-start"><button class="btn btn-primary" type="submit">Sign in</button><button class="btn" type="button" id="acNew">Create account</button><button class="btn" type="button" id="acForgot">Forgot password?</button>${D.app && D.app.guest ? '<button class="btn" type="button" id="acLeave">Leave guest mode</button>' : ''}</div></form>`}
   </section>`;
 }
 function bindAccount(){
@@ -1408,9 +1416,15 @@ function bindAccount(){
   if ($('#acForm')) $('#acForm').onsubmit = async e => { e.preventDefault();
     const { error } = await Cloud.client.auth.signInWithPassword({ email: $('#acE').value.trim(), password: $('#acP').value });
     toast(error ? (/invalid/i.test(error.message) ? 'Wrong email or password' : error.message) : 'Signed in'); };
-  if ($('#acNew')) $('#acNew').onclick = async () => { const em = $('#acE').value.trim(), pw = $('#acP').value; if (!em || pw.length < 6) return toast('Type an email and a password of 6+ characters first');
-    const { data, error } = await Cloud.client.auth.signUp({ email: em, password: pw, options: { emailRedirectTo: location.href.split('#')[0] } });
-    toast(error ? (/not allowed|disabled/i.test(error.message) ? 'New accounts are closed during the beta' : error.message) : data.session ? 'Account created' : 'Check your email to confirm, then sign in'); };
+  if ($('#acNew')) $('#acNew').onclick = () => { const em = $('#acE').value.trim(), pw = $('#acP').value;
+    if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(em) || pw.length < 8) return toast('Type your email and a password of 8+ characters first');
+    if (TEMP_MAIL.test(em)) return toast('Please use a regular email address, not a temporary inbox');
+    askConfirm(`Send the confirmation email to ${em}?`, 'Check the spelling: the account only works once that email is confirmed.', 'Yes, send it', async () => {
+      const { data, error } = await Cloud.client.auth.signUp({ email: em, password: pw, options: { emailRedirectTo: location.href.split('#')[0] } });
+      toast(error ? (/not allowed|disabled/i.test(error.message) ? 'New accounts are closed during the beta' : error.message) : data.session ? 'Account created' : `Check ${em} for the confirmation link, then sign in`); }); };
+  if ($('#acForgot')) $('#acForgot').onclick = async () => { const em = $('#acE').value.trim(); if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(em)) return toast('Type your email first, then press Forgot password');
+    const { error } = await Cloud.client.auth.resetPasswordForEmail(em, { redirectTo: location.href.split('#')[0] });
+    toast(error ? error.message : `If ${em} has an account, a reset link is on its way`); };
   if ($('#acLeave')) $('#acLeave').onclick = () => { const fl = D.flags; D = freshData(); D.flags = fl; store.set(D); renderHead(); renderIndex(); render(); };
   if ($('#acSync')) $('#acSync').onclick = () => { Cloud.sent = {}; cloudPush(); };
   if ($('#acOut')) $('#acOut').onclick = () => askConfirm('Sign out?', 'Your data stays in your account. This browser goes back to a blank start.', 'Sign out', async () => {
@@ -1749,7 +1763,7 @@ function buildPlan(){
   const book = RES().find(r => r.kind === 'book' && owned(r.id));
   const psSrc = RES().filter(r => r.kind === 'ps' && owned(r.id));
   const qbSrc = sh.qbank ? RES().filter(r => r.kind === 'qs' && r.grp !== 'AAMC official' && owned(r.id)) : [];
-  const carsSrc = ph => ph === 'aamc' && owned('cqb') ? 'CARS Question Bank' : ph === 'aamc' && owned('cqp') ? 'CARS Question Packs vol. 1 & 2 (old)' : owned('jw') ? 'Jack Westin' : (psSrc.find(r => r.secs.includes('CARS')) || {}).name || 'CARS passages';
+  const carsSrc = ph => ph === 'aamc' && owned('cqb') ? 'CARS Question Bank' : owned('jwq') ? 'Jack Westin QBank' : (psSrc.find(r => r.secs.includes('CARS')) || {}).name || 'CARS passages';
   const aQ = [];
   const chunk = (id, secs, size) => { const r = resById(id); if (!owned(id)) return; const per = Math.floor(resTotal(r) / secs.length); secs.forEach(sec => { for (let a = 1; a <= per; a += size) aQ.push({ src: r.name, sec, n: Math.min(per, a + size - 1) - a + 1, t: `${r.name} · ${sec} · Q${a}–${Math.min(per, a + size - 1)}` }); }); };
   const inter = list => { const b = {}; list.forEach(x => (b[x.sec] = b[x.sec] || []).push(x)); const out = []; let any = true; while (any) { any = false; order.forEach(s => { if (b[s] && b[s].length) { out.push(b[s].shift()); any = true; } }); } return out; };
@@ -3239,6 +3253,12 @@ V.settings.bind = () => {
 
 /* ---------- shared plans (file for now; a library once accounts exist) ---------- */
 function exportSetup(){
+  const sp = activeSpec();
+  if (sp) { const name = String(sp.name || 'my-plan').replace(/[^\w\- ]+/g, '').trim().replace(/\s+/g, '-') + '.morae-plan.json', data = JSON.stringify({ morae: 'mcat-spec', v: 1, spec: sp });
+    (async () => { const dl = window.claude && window.claude.use ? await window.claude.use('downloads').catch(() => null) : null;
+      if (dl) { try { await dl.save({ filename: name, data }); toast('Plan file saved'); } catch (e) { if (!e || e.code !== 'declined') toast('Saving isn’t available here'); } return; }
+      const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([data], { type: 'application/json' })); a.download = name; a.click(); setTimeout(() => URL.revokeObjectURL(a.href), 2000); })();
+    return; }
   const S = D.set, t = TEMPLATES.concat(S.myTemplates || []).find(x => x.id === S.template);
   const out = { morae: 'mcat-plan', v: 1, name: (t && t.name) || 'My MCAT plan', author: '', result: '', desc: (t && t.desc) || '', weeks: Math.round(diff(S.startDate > TODAY ? S.startDate : TODAY, S.testDate) / 7), hours: S.hours.slice(), shape: { ...shape() }, carsN: S.carsN, flDay: S.flDay, resources: RES().filter(r => owned(r.id)).map(r => r.name) };
   const name = out.name.replace(/[^\w\- ]+/g, '').trim().replace(/\s+/g, '-') + '.morae-plan.json', data = JSON.stringify(out, null, 2);
@@ -3248,8 +3268,18 @@ function exportSetup(){
     const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([data], { type: 'application/json' })); a.download = name; a.click(); setTimeout(() => URL.revokeObjectURL(a.href), 2000);
   })();
 }
+function cleanSpec(sp){ // a plan file is someone else's data: keep links to https only
+  const walk = v => { if (Array.isArray(v)) return v.map(walk); if (v && typeof v === 'object') { const o = {}; Object.entries(v).forEach(([k, x]) => { if (k === 'url' && !(typeof x === 'string' && /^https:\/\//i.test(x))) return; o[k] = walk(x); }); return o; } return v; };
+  const c = walk(sp); if (c.src && !c.src.url) delete c.src; return c;
+}
 async function importSetup(file){
   let j; try { j = JSON.parse(await file.text()); } catch (e) { return toast('That file isn’t a Morae plan'); }
+  const specs = j && j.morae === 'mcat-spec' && j.spec ? [j.spec] : j && Array.isArray(j.mySpecs) ? j.mySpecs : null;
+  if (specs) {
+    const ok = specs.filter(x => x && x.kind === 'spec' && x.id && Array.isArray(x.phases) && x.test && x.start).map(cleanSpec);
+    if (!ok.length) return toast('That file isn’t a Morae plan');
+    D.mySpecs = (D.mySpecs || []).filter(x => !ok.some(o => o.id === x.id)).concat(ok); save(); render(); return toast(`“${ok[0].name}” added to Your plans`);
+  }
   if (!j || j.morae !== 'mcat-plan' || !j.shape || !Array.isArray(j.hours) || j.hours.length !== 7) return toast('That file isn’t a Morae plan');
   const cl = (x, a, b) => Math.max(a, Math.min(b, +x || 0));
   const sh = { content: cl(j.shape.content, 0, .9), practice: cl(j.shape.practice, 0, .9), mix: cl(j.shape.mix, 0, 1), qbank: !!j.shape.qbank, cars: cl(j.shape.cars, 0, 6), flTotal: cl(j.shape.flTotal, 0, 15), flWeekly: cl(j.shape.flWeekly, 0, 12), diag: !!j.shape.diag, flex: j.shape.flex ? 1 : 0, ...(Array.isArray(j.shape.qn) ? { qn: j.shape.qn.slice(0, 2).map(x => cl(x, 5, 100)) } : {}) };
@@ -3365,14 +3395,17 @@ const suStyle = () => { const S = D.set, sh = shape(), w = shapeWeeks(sh), sp = 
   const tCard = (t, mine) => `<div class="tpl ${S.template === t.id ? 'on' : ''}"><div class="tpl-h"><b>${esc(t.name)}</b>${t.weeks ? `<span class="chip">${t.weeks} weeks</span>` : ''}${t.hours ? `<span class="chip">${sum(t.hours)} h/week</span>` : ''}${t.shared ? '<span class="chip pill-ok">Shared</span>' : ''}</div>
     ${t.author || t.result ? `<p class="small"><b>${esc(t.author || 'Someone')}</b>${t.result ? ` · ${esc(t.result)}` : ''}</p>` : ''}<p>${esc(t.desc || 'Your saved setup.')}</p>${t.src ? `<a class="small" href="${t.src.url}" target="_blank" rel="noopener">Based on: ${esc(t.src.label)}</a>` : t.from ? `<span class="small muted">${esc(t.from)}</span>` : ''}
     <div class="btns" style="justify-content:flex-start"><button class="btn btn-sm ${S.template === t.id ? '' : 'btn-primary'}" data-tpl="${t.id}">${S.template === t.id ? 'Chosen' : 'Choose'}</button>${mine ? `<button class="linkish small" data-tdel="${t.id}">Delete</button>` : ''}</div></div>`;
-  return `${allSpecs().length ? `<section class="card s12 myplan ${sp ? 'on' : ''}"><div class="card-head"><h3>Your plans</h3>${sp ? '<span class="chip pill-ok">Chosen</span>' : ''}</div>
-      ${allSpecs().map(x => `<div class="mp"><div><b class="mp-t">${esc(x.name)}</b><p>${esc(x.desc)}</p>${x.src ? `<a class="small" href="${x.src.url}" target="_blank" rel="noopener">From ${esc(x.src.label)}</a>` : ''}</div>${S.template === x.id ? '' : `<button class="btn btn-primary" data-tpl="${x.id}">Choose</button>`}</div>`).join('')}
+  const custom = !sp && !S.template;
+  return `<section class="card s12 myplan ${custom ? 'on' : ''}"><div class="card-head"><h3>Build from your own resources</h3>${custom ? '<span class="chip pill-ok">Chosen</span>' : ''}</div>
+      <div class="mp"><div><p>Morae spreads the resources you ticked over the hours you set, around your commitments: content first, then question banks and passages, then AAMC material and full lengths. Adjust the mix under Fine-tune.</p></div>${custom ? '' : '<button class="btn btn-primary" data-custom="1">Use my resources</button>'}</div></section>
+    ${allSpecs().length ? `<section class="card s12 myplan ${sp ? 'on' : ''}"><div class="card-head"><h3>Your plans</h3>${sp ? '<span class="chip pill-ok">Chosen</span>' : ''}</div>
+      ${allSpecs().map(x => `<div class="mp"><div><b class="mp-t">${esc(x.name)}</b><p>${esc(x.desc)}</p>${x.src && /^https:/.test(x.src.url || '') ? `<a class="small" href="${esc(x.src.url)}" target="_blank" rel="noopener">From ${esc(x.src.label || 'source')}</a>` : ''}</div>${S.template === x.id ? '' : `<button class="btn btn-primary" data-tpl="${x.id}">Choose</button>`}</div>`).join('')}
       <p class="muted small">A plan written for one person, with dated phases and full lengths. Your commitments, days off and resources still apply.</p></section>` : ''}
-    <section class="card s12"><div class="card-head"><h3>Suggested setups</h3><span class="muted small">Your test is about ${weeksLeft} weeks away; a setup stretches or shrinks to fit.</span></div>
+    <section class="card s12"><div class="card-head"><h3>Shortcuts <small class="muted">optional</small></h3><span class="muted small">Ready-made mixes from well-known schedules. Pick one to fill in Fine-tune, then change anything. Your test is about ${weeksLeft} weeks away; a shortcut stretches or shrinks to fit.</span></div>
       <div class="tpls">${TEMPLATES.map(t => tCard(t)).join('')}</div></section>
     <section class="card s12"><div class="card-head"><h3>Saved and shared setups</h3><span class="btns"><label class="btn btn-sm" style="cursor:pointer">Import a plan file<input type="file" id="tImp" accept=".json,application/json" hidden></label><button class="btn btn-sm" id="tExp">Share my setup</button></span></div>
       ${(S.myTemplates || []).length ? `<div class="tpls">${S.myTemplates.map(t => tCard(t, true)).join('')}</div>` : '<p class="muted small">None yet. Save your own below, or import a plan someone shared with you.</p>'}
-      <p class="muted small">“Share my setup” saves a small file (weekly hours, plan shape, resources) that a friend can import. Coming with accounts: a library where people share plans that worked for them, like “510 in 4 months with a full-time job”.</p></section>
+      <p class="muted small">Import takes a setup someone shared or a personal plan file (dated phases and full lengths). “Share my setup” saves a small file (weekly hours, plan shape, resources) that a friend can import. Coming with accounts: a library where people share plans that worked for them, like “510 in 4 months with a full-time job”.</p></section>
     ${sp ? '' : `<section class="card s12"><div class="card-head"><h3>Fine-tune</h3><span class="muted small">${S.template ? 'From “' + esc((TEMPLATES.concat(S.myTemplates || []).find(t => t.id === S.template) || {}).name || 'custom') + '”, edited freely' : 'Custom'}</span></div>
       <div class="shape-bar" aria-hidden="true"><span class="content" style="flex:${w.c || .001}">Content ${w.c.toFixed(1)} wk</span><span class="practice" style="flex:${w.p || .001}">Questions ${w.p.toFixed(1)} wk</span><span class="aamc" style="flex:${w.a || .001}">AAMC ${w.a.toFixed(1)} wk</span><span class="taper" style="flex:.7">Taper</span></div>
       <div class="form">
@@ -3425,7 +3458,7 @@ V.setup.bind = () => {
   if ($('#suBack')) $('#suBack').onclick = () => goStep(SU.step - 1);
   if ($('#suNext')) $('#suNext').onclick = () => goStep(SU.step + 1);
   if ($('#suSkip')) $('#suSkip').onclick = buildGo;
-  $('#page .grid').addEventListener('change', e => { if (['ankiFile', 'tName', 'tImp'].includes(e.target.id)) return; suRead(); if (/^sh[CPFWX]|^sTest|^sStart|^sBed|^sDay|^sDeck|^spBuf/.test(e.target.id || '') || e.target.dataset.h) keepY(); });
+  $('#page .grid').addEventListener('change', e => { if (['ankiFile', 'tName', 'tImp'].includes(e.target.id)) return; suRead(); if (/^sh[CPFWX]|^sTest|^sStart|^sBed|^sDay|^sDeck|^spBuf|^sFl/.test(e.target.id || '') || e.target.dataset.h) keepY(); });
   document.querySelectorAll('[data-cnew]').forEach(b => b.onclick = () => commitEditor(null, b.dataset.cnew, keepY));
   document.querySelectorAll('[data-cedit]').forEach(b => b.onclick = () => commitEditor(b.dataset.cedit, null, keepY));
   if ($('#offAdd')) $('#offAdd').onclick = () => offEditor(null, keepY);
@@ -3442,6 +3475,7 @@ V.setup.bind = () => {
     catch (err) { $('#ankiOut').innerHTML = `<p class="note-box">${err.message === 'nocollection' ? 'That file doesn’t look like an Anki deck package (.apkg or .colpkg).' : err.message === 'lib' ? 'The reader couldn’t load. Check your internet connection and try again.' : 'That file couldn’t be read. Export again with scheduling information included.'}</p>`; }
   };
   if ($('#ankiUse')) $('#ankiUse').onclick = () => { S.ankiTotal = D.ankiStats.total - D.ankiStats.susp; S.ankiMature = D.ankiStats.mature; save(); keepY(); toast('Anki numbers filled in'); };
+  document.querySelectorAll('[data-custom]').forEach(b => b.onclick = () => { suRead(); D.set.template = ''; save(); keepY(); toast('Your plan uses your own resources and hours'); });
   document.querySelectorAll('[data-tpl]').forEach(b => b.onclick = () => {
     suRead(); const spx = allSpecs().find(x => x.id === b.dataset.tpl);
     if (spx) { S.template = spx.id; S.testDate = spx.test; S.startDate = spx.start; S.goal = spx.goal; S.floor = spx.floor; if (!commitList().length) S.commit = specCommits(spx); save(); renderHead(); keepY(); return toast(`“${spx.name}” chosen. Its dates are filled in.`); }

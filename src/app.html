@@ -1065,6 +1065,7 @@ async function initSync(){
   }
   if (!hasSupabase()) { setSync('file'); return; }
   try {
+    sbClient().auth.onAuthStateChange(ev => { if (ev === 'PASSWORD_RECOVERY') setTimeout(newPasswordPrompt, 300); });
     const { data } = await sbClient().auth.getSession();
     const u = data && data.session && data.session.user;
     if (!u) { setSync('signedout'); signInPrompt(); return; }
@@ -1084,23 +1085,41 @@ function renderAccount(){
   const box = $('#accountBox'); if (!box) return;
   if (!hasSupabase()) { box.innerHTML = ''; return; }
   if (Sync.backend && Sync.backend.kind === 'supabase') {
-    box.innerHTML = `<div class="srow"><label>Account<span class="hint">Signed in as ${esc(Account.email)}</span></label><button class="btn btn-sm" id="signOut">Sign out</button></div>`;
+    box.innerHTML = `<div class="srow"><label>Account<span class="hint">Signed in as ${esc(Account.email)}</span></label><button class="btn btn-sm" id="signOut">Sign out</button></div>
+      <div class="srow"><label>Morae MCAT<span class="hint">MCAT study planner, same account</span></label><a class="btn btn-sm" href="${esc((CFG.siteUrl || './') + 'mcat/')}" target="_blank" rel="noopener">Open ↗</a></div>`;
     $('#signOut').onclick = signOut; return;
   }
   box.innerHTML = `<form class="acct-form" id="acctForm">
       <p class="notif-status" style="margin:0">Sign in to sync your phone and laptop. Use the same email and password on both.</p>
       <input type="email" id="acctEmail" autocomplete="username" placeholder="Email" aria-label="Email" required>
       <input type="password" id="acctPass" autocomplete="current-password" placeholder="Password (8 or more characters)" aria-label="Password" minlength="8" required>
-      <div class="acct-btns"><button class="btn btn-primary btn-sm" type="submit" data-mode="in">Sign in</button><button class="btn btn-sm" type="submit" data-mode="up">Create account</button></div>
+      <div class="acct-btns"><button class="btn btn-primary btn-sm" type="submit" data-mode="in">Sign in</button><button class="btn btn-sm" type="submit" data-mode="up">Create account</button><button class="btn btn-sm" type="button" id="acctForgot">Forgot password?</button></div>
       <p class="acct-msg" id="acctMsg" role="status">${esc(Account.msg)}</p>
     </form>`;
   $('#acctForm').addEventListener('submit', onAcctSubmit);
+  $('#acctForgot').onclick = async () => {
+    const email = $('#acctEmail').value.trim(), m = $('#acctMsg');
+    if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) { m.textContent = 'Type your email first, then press Forgot password.'; return; }
+    const { error } = await sbClient().auth.resetPasswordForEmail(email, { redirectTo: CFG.siteUrl || (location.origin + location.pathname) });
+    m.textContent = error ? error.message : `If ${email} has an account, a reset link is on its way. Open it on this device.`;
+  };
+}
+const TEMP_MAIL = /@(mailinator|guerrillamail|sharklasers|10minutemail|temp-?mail|tempmail|yopmail|trashmail|getnada|dispostable|maildrop|throwawaymail|fakeinbox|mintemail|mohmal|emailondeck|tempr|moakt|spamgourmet|burnermail)\./i;
+async function newPasswordPrompt(){
+  const pw = window.prompt('Choose a new password (8 or more characters):');
+  if (!pw) return; if (pw.length < 8) { alert('Use 8 or more characters. Open the reset link again to retry.'); return; }
+  const { error } = await sbClient().auth.updateUser({ password: pw });
+  toast(error ? error.message : 'Password changed. You’re signed in.');
 }
 async function onAcctSubmit(e){
   e.preventDefault();
   const mode = (e.submitter && e.submitter.dataset.mode) || 'in';
   const email = $('#acctEmail').value.trim(), password = $('#acctPass').value;
   const msg = t => { Account.msg = t; const m = $('#acctMsg'); if (m) m.textContent = t; };
+  if (mode === 'up') {
+    if (TEMP_MAIL.test(email)) { msg('Please use a regular email address (temporary inboxes can’t receive account emails for long).'); return; }
+    if (!window.confirm(`Send the confirmation email to ${email}?\n\nCheck the spelling: the account only works once that email is confirmed.`)) { msg('Fix the email, then press Create account again.'); return; }
+  }
   msg(mode === 'up' ? 'Creating your account…' : 'Signing in…');
   try {
     const auth = sbClient().auth;
