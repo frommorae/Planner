@@ -1,0 +1,120 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Privacy Policy · Planner</title>
+<meta name="robots" content="noindex">
+<link rel="icon" href="icons/favicon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --paper:#F2F4F7; --sheet:#FFFFFF; --ink:#1E2532; --ink-2:#556074; --ink-3:#8A93A3;
+  --rule:#E3E7ED; --accent:#355C8C; --accent-soft:#E3EBF5; --warn-soft:#FBF1D9; --warn:#C98A1B;
+  --f-display:'Bricolage Grotesque','IBM Plex Sans',system-ui,sans-serif;
+  --f-body:'IBM Plex Sans',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;
+}
+@media (prefers-color-scheme: dark){
+  :root{
+    --paper:#13161B; --sheet:#1A1E25; --ink:#E5E8ED; --ink-2:#A6AEBB; --ink-3:#6F7888;
+    --rule:#292F39; --accent:#93B3DB; --accent-soft:#233041; --warn-soft:#3A3220; --warn:#E0B25A;
+    color-scheme:dark;
+  }
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--paper);color:var(--ink);font:16px/1.65 var(--f-body);-webkit-font-smoothing:antialiased}
+main{max-width:720px;margin:0 auto;padding:32px 16px 64px}
+.sheet{background:var(--sheet);border:1px solid var(--rule);border-radius:12px;padding:28px clamp(18px,4vw,40px)}
+h1{font-family:var(--f-display);font-weight:600;font-size:clamp(26px,5vw,34px);line-height:1.15;margin:0 0 6px;letter-spacing:-.01em}
+h2{font-family:var(--f-display);font-weight:600;font-size:19px;margin:32px 0 8px}
+p,li{color:var(--ink-2)} strong{color:var(--ink)}
+ul{padding-left:20px} li{margin:4px 0}
+a{color:var(--accent)}
+.meta{color:var(--ink-3);font-size:14px;margin:0 0 20px}
+.draft{background:var(--warn-soft);border-left:3px solid var(--warn);border-radius:8px;padding:10px 14px;margin:0 0 24px;font-size:14px;color:var(--ink)}
+.summary{background:var(--accent-soft);border-radius:10px;padding:14px 18px;margin:0 0 8px}
+.summary ul{margin:6px 0 0}
+.summary li{color:var(--ink)}
+table{width:100%;border-collapse:collapse;font-size:14.5px;margin:8px 0}
+th,td{text-align:left;padding:8px 10px;border-bottom:1px solid var(--rule);vertical-align:top}
+th{color:var(--ink);font-weight:600}
+td{color:var(--ink-2)}
+.back{display:inline-block;margin-bottom:16px;font-size:14px;text-decoration:none}
+@media (max-width:520px){ table,thead,tbody,tr,th,td{display:block} thead{display:none} tr{border-bottom:1px solid var(--rule);padding:6px 0} td{border:0;padding:2px 0} td:first-child{font-weight:600;color:var(--ink)} }
+</style>
+</head>
+<body>
+<main>
+  <a class="back" href="./">← Back to the planner</a>
+  <div class="sheet">
+    <div class="draft"><strong>Draft.</strong> This policy is still being written and will be finalized before the planner is shared publicly.</div>
+    <h1>Privacy Policy</h1>
+    <p class="meta">Morae Planner · Last updated: <span id="updated">DRAFT</span></p>
+
+    <div class="summary">
+      <strong>The short version</strong>
+      <ul>
+        <li>Your planner data belongs to you. It's used only to run the planner and sync it between your devices.</li>
+        <li>No ads, no tracking or analytics, and your data is never sold or shared for marketing.</li>
+        <li>You can use the planner without an account, in which case your data stays on your device.</li>
+        <li>You can ask for your account and data to be deleted at any time.</li>
+      </ul>
+    </div>
+
+    <h2>Who we are</h2>
+    <p>Planner is a study and work planner with time boxing, a focus timer and daily reflection. It is made and run by an independent developer (“we”, “us”). You can reach us through the contact form inside the app (Settings → Contact &amp; feedback).</p>
+
+    <h2>What we collect</h2>
+    <table>
+      <thead><tr><th>What</th><th>Why</th><th>When</th></tr></thead>
+      <tbody>
+        <tr><td>Email address</td><td>To create your account, let you sign in and reset your password.</td><td>Only if you create an account to sync.</td></tr>
+        <tr><td>Password</td><td>To sign you in. It is stored only as a secure hash by our sign-in provider; we can never see it.</td><td>Only if you create an account.</td></tr>
+        <tr><td>Planner data</td><td>Your tasks, time blocks, timer sessions, reflections, habits and settings, so they can sync between your devices.</td><td>Only if you sign in. Without an account it stays on your device.</td></tr>
+        <tr><td>Contact messages</td><td>The message, topic and (optional) reply email you send through the contact form, plus the app version and platform, so we can answer and fix problems.</td><td>Only when you send a message.</td></tr>
+      </tbody>
+    </table>
+    <p>We do <strong>not</strong> collect your location, contacts, photos, advertising ID, or browsing activity, and we don't use analytics or tracking cookies.</p>
+
+    <h2>Where your data is stored</h2>
+    <ul>
+      <li><strong>On your device.</strong> The planner keeps a copy of your data in your browser or app storage so it works offline. Clearing your browser data or uninstalling the app removes this copy.</li>
+      <li><strong>Supabase</strong> stores account and synced planner data. Each account can only read and change its own data. Supabase servers may be located outside your country.</li>
+      <li><strong>GitHub Pages</strong> hosts the website. Like any web host, it may keep standard server logs (such as IP addresses) for security.</li>
+      <li><strong>Web3Forms</strong> delivers contact-form messages to our inbox by email.</li>
+    </ul>
+
+    <h2>Android app permissions</h2>
+    <ul>
+      <li><strong>Notifications</strong>: to tell you when a focus session or break ends.</li>
+      <li><strong>Alarms and reminders</strong>: so those notifications arrive on time even when the app is in the background.</li>
+      <li><strong>Keep screen on</strong>: optional, so the timer stays visible while you focus.</li>
+      <li><strong>Internet</strong>: to sync your data when you are signed in.</li>
+    </ul>
+
+    <h2>How we use your data</h2>
+    <p>Only to run the planner: signing you in, syncing your data, answering your messages and fixing bugs. We don't use your data for advertising or sell it, and we only share it with the service providers listed above, who process it on our behalf to run the planner.</p>
+
+    <h2>Keeping and deleting your data</h2>
+    <p>We keep your account and synced data while your account exists. To delete your account and all synced data, send a request through the contact form using the email address on your account. We'll confirm when it's done. Contact messages are kept only as long as needed to respond and follow up.</p>
+
+    <h2>Your rights</h2>
+    <p>You can ask to see, correct, export or delete the personal information we hold about you, and you can withdraw your consent by deleting your account. You can also export your planner data at any time from Settings. If you are unhappy with how we handle your information, you can contact us, or the privacy regulator where you live (in Canada, the Office of the Privacy Commissioner).</p>
+
+    <h2>Security</h2>
+    <p>Data is sent over encrypted connections (HTTPS), passwords are hashed, and database rules make sure each account can only access its own data. No system is perfectly secure, so please use a password you don't use elsewhere.</p>
+
+    <h2>Children</h2>
+    <p>The planner is not directed at children under 13, and we don't knowingly collect their personal information. If you believe a child has created an account, contact us and we'll delete it.</p>
+
+    <h2>Changes to this policy</h2>
+    <p>If we change this policy, we'll update the date at the top of this page. For significant changes, we'll also let you know in the app.</p>
+
+    <h2>Contact</h2>
+    <p>Questions or requests: use <strong>Settings → Contact &amp; feedback</strong> in the planner.</p>
+  </div>
+</main>
+</body>
+</html>

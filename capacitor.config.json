@@ -1,0 +1,9 @@
+{
+  "appId": "io.github.frommorae.planner",
+  "appName": "Morae Planner",
+  "webDir": "web",
+  "android": { "allowMixedContent": false },
+  "plugins": {
+    "LocalNotifications": { "smallIcon": "ic_stat_planner", "iconColor": "#355C8C" }
+  }
+}
