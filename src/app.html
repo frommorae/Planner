@@ -145,7 +145,11 @@ input[type=color]{width:34px;height:34px;padding:2px;border:1px solid var(--rule
 .pc{cursor:crosshair;touch-action:none}
 .pc.past{opacity:.82}
 .pc.now,.ac.now{box-shadow:inset 0 0 0 2px var(--accent)}
-.ac{background-repeat:no-repeat}
+.ac{background-repeat:no-repeat;cursor:copy;touch-action:none}
+.ac.sel{box-shadow:inset 0 0 0 2px var(--accent);background-color:var(--accent-soft)}
+.act-pop .upd-in{text-align:left;justify-items:stretch}.act-pop label{display:grid;gap:4px;font-size:13px;color:var(--ink-2)}
+.act-pop input,.act-pop select{font:inherit;font-size:15px;padding:8px 10px;border:1px solid var(--rule-2);border-radius:8px;background:var(--sheet);color:var(--ink)}
+.act-pop .row2{display:grid;grid-template-columns:1fr 1fr;gap:8px}.act-pop .chk{display:flex;gap:8px;align-items:center;color:var(--ink)}
 .grid-hint{font-size:12.5px;color:var(--ink-3);margin:12px 0 0}
 .legend-day{display:flex;justify-content:space-between;align-items:baseline;gap:8px;flex-wrap:wrap;margin-bottom:4px}
 
@@ -1443,7 +1447,7 @@ function renderGrid(){
         style = ` style="background-image:linear-gradient(to right, ${col} ${pct}%, transparent ${pct}%)"`;
         title += ` · ${esc(catById(a.cat).name)} · ${Math.round(a.frac*10)} min`;
       }
-      h += `<div class="ac c${j}${first}${i === nowSlot ? ' now' : ''}" title="${title}"${style}></div>`;
+      h += `<div class="ac c${j}${first}${i === nowSlot ? ' now' : ''}" data-a="${i}" title="${title} · tap or drag to add what you did"${style}></div>`;
     }
   });
   tgrid.innerHTML = h;
@@ -1487,6 +1491,51 @@ tgrid.addEventListener('pointerup', endPaint);
 tgrid.addEventListener('pointercancel', endPaint);
 tgrid.addEventListener('lostpointercapture', endPaint);
 function afterPlanChange(){} // hook for later stages
+/* v1.8: tap or drag on the Actual column to log time you didn't plan (an existing task, a category, or a new task) */
+let actSel = null;
+function markAct(){ const lo = Math.min(actSel.a, actSel.b), hi = Math.max(actSel.a, actSel.b); tgrid.querySelectorAll('.ac').forEach(c => c.classList.toggle('sel', +c.dataset.a >= lo && +c.dataset.a <= hi)); }
+tgrid.addEventListener('pointerdown', e => {
+  const c = e.target.closest('.ac'); if (!c || e.button > 0) return;
+  if (UI.day > todayKey()) { toast('Actual is for time that already happened.'); return; }
+  e.preventDefault(); actSel = { a: +c.dataset.a, b: +c.dataset.a }; markAct();
+  try { tgrid.setPointerCapture(e.pointerId); } catch (_) {}
+});
+tgrid.addEventListener('pointermove', e => { if (!actSel) return; const t = document.elementFromPoint(e.clientX, e.clientY), c = t && t.closest && t.closest('.ac'); if (c) { actSel.b = +c.dataset.a; markAct(); } });
+function endAct(){ if (!actSel) return; const lo = Math.min(actSel.a, actSel.b), hi = Math.max(actSel.a, actSel.b); actSel = null; tgrid.querySelectorAll('.ac.sel').forEach(c => c.classList.remove('sel')); actualDialog(UI.day, lo, hi + 1); }
+tgrid.addEventListener('pointerup', endAct); tgrid.addEventListener('pointercancel', () => { actSel = null; renderGrid(); });
+const hhmm = ms => { const d = new Date(ms); return `${pad(d.getHours())}:${pad(d.getMinutes())}`; };
+function actualDialog(k, s0, s1){
+  const base = dayStartMs(k); let start = base + s0 * 600e3, end = base + s1 * 600e3;
+  if (k === todayKey() && end > Date.now()) end = Math.floor(Date.now() / 60e3) * 60e3;
+  if (end <= start) { toast('That time hasn’t happened yet.'); return; }
+  const tasks = S.tasks.filter(t => t.day === k);
+  let d = document.getElementById('actPop');
+  if (!d) { d = document.createElement('dialog'); d.id = 'actPop'; d.className = 'upd-pop act-pop'; document.body.appendChild(d); }
+  d.innerHTML = `<form class="upd-in" method="dialog" id="actForm">
+    <h2>Add what you did</h2>
+    <div class="row2"><label>From<input type="time" id="actFrom" value="${hhmm(start)}" required></label><label>To<input type="time" id="actTo" value="${hhmm(end)}" required></label></div>
+    <label>What<select id="actWhat"><option value="new">New task…</option>${tasks.length ? `<optgroup label="Tasks">${tasks.map(t => `<option value="t:${esc(t.id)}">${esc(t.name)}</option>`).join('')}</optgroup>` : ''}<optgroup label="Category only">${S.categories.map(c => `<option value="c:${esc(c.id)}">${esc(c.name)}</option>`).join('')}</optgroup></select></label>
+    <div id="actNew" style="display:grid;gap:8px"><label>Task name<input type="text" id="actName" maxlength="80" placeholder="e.g. Called the clinic, orgo reading"></label>
+      <label>Category<select id="actCat">${S.categories.map(c => `<option value="${esc(c.id)}">${esc(c.name)}</option>`).join('')}</select></label>
+      <label class="chk"><input type="checkbox" id="actDone" checked> Mark it done</label></div>
+    <div class="upd-btns"><button class="btn" type="button" id="actCancel">Cancel</button><button class="btn btn-primary" type="submit">Add</button></div></form>`;
+  const $d = q => d.querySelector(q), sync = () => { $d('#actNew').style.display = $d('#actWhat').value === 'new' ? 'grid' : 'none'; };
+  $d('#actWhat').onchange = sync; sync();
+  $d('#actCancel').onclick = () => d.close();
+  $d('#actForm').onsubmit = e => {
+    e.preventDefault();
+    const dh = S.settings.dayStartHour, a = base + (inputToHours($d('#actFrom').value) - dh) * 3600e3, b = base + (inputToHours($d('#actTo').value) - dh) * 3600e3;
+    if (!(b > a)) { toast('The end time needs to be after the start time.'); return; }
+    if (k === todayKey() && b > Date.now() + 60e3) { toast('That ends in the future.'); return; }
+    const v = $d('#actWhat').value; let task = v.startsWith('t:') ? S.tasks.find(x => x.id === v.slice(2)) : null, cat = v.startsWith('c:') ? v.slice(2) : null;
+    if (v === 'new') { const n = $d('#actName').value.trim(); if (!n) { toast('Name the task first.'); return; } task = addTask(k, n, $d('#actCat').value, Math.round((b - a) / 60e3)); }
+    S.sessions.push({ id: uid('ses'), day: k, taskId: task ? task.id : null, taskName: task ? task.name : null, categoryId: task ? task.categoryId : cat, start: a, end: b, manual: true, updatedAt: Date.now() });
+    if (v === 'new' && $d('#actDone').checked) { task.done = true; task.doneAt = b; task.actualMin = Math.round((b - a) / 60e3); task.updatedAt = Date.now(); }
+    ensureDay(k); save(); d.close(); toast(`Logged ${fmtDur((b - a) / 60000)}.`); renderView();
+  };
+  try { d.showModal(); } catch (e) { d.setAttribute('open', ''); }
+  setTimeout(() => { const n = $d('#actName'); if (n && $d('#actWhat').value === 'new') n.focus(); }, 50);
+}
 
 /* ---------- plan: time budget ---------- */
 function renderBudget(){
@@ -2541,7 +2590,9 @@ $('#diaryForm').addEventListener('submit', e => {
   const rec = { id: (reviewFor(k) || {}).id || uid('rev'), day: k, diary: $('#diary').value.trim(),
     plannedMin: Math.round(st.P), actualMin: Math.round(st.A), focusPct: st.pct == null ? null : Math.round(st.pct * 100),
     perCategory: per, tasksPlanned: st.tasks.length, tasksDone: st.done.length, savedAt: Date.now(), updatedAt: Date.now() };
-  S.reviews = S.reviews.filter(r => r.day !== k); S.reviews.push(rec); ensureDay(k); save();
+  S.reviews = S.reviews.filter(r => r.day !== k); S.reviews.push(rec); ensureDay(k);
+  const rt = S.tasks.find(t => t.id === 'tsk_rv_' + k); if (rt && !rt.done) { rt.done = true; rt.doneAt = Date.now(); rt.updatedAt = Date.now(); }
+  save();
   clearBanner('review'); toast('Review saved. Now add tomorrow’s tasks.'); renderReview(); $('#nextName').focus();
 });
 $('#manualForm').addEventListener('submit', e => {
@@ -2703,7 +2754,12 @@ function ensureRoutine(k){
   ensureCommits(k);
   const r = S.settings.routine;
   if (!r.on || k < todayKey() || !S.categories.some(c => c.id === 'review')) return;
-  ensureDay(k); if (S.days[k].routine) return;
+  ensureDay(k);
+  if (!S.days[k].routineTask) { // v1.8: the evening review is also a task, ticked when the review is saved
+    if (!S.tasks.some(t => t.id === 'tsk_rv_' + k)) S.tasks.push({ id: 'tsk_rv_' + k, day: k, name: 'Review today + plan tomorrow', categoryId: 'review', estMin: Math.max(10, Math.round(r.len)), done: false, doneAt: null, actualMin: null, routine: true, createdAt: Date.now(), updatedAt: Date.now() });
+    S.days[k].routineTask = true; save();
+  }
+  if (S.days[k].routine) return;
   const a = getSlots(k), s0 = Math.round((r.at - S.settings.dayStartHour) * 6), n = Math.max(1, Math.round(r.len / 10));
   for (let i = s0; i < s0 + n; i++) if (i >= 0 && i < SLOTS && !a[i]) a[i] = 'review';
   S.days[k].routine = true; setSlots(k, a);
