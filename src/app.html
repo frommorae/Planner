@@ -840,7 +840,7 @@ function normalize(d){
   if (!Array.isArray(s.ddays)) out.settings.ddays = s.examDate ? [{ id: 'exam', title: 'MCAT', date: s.examDate }] : [];
   delete out.settings.examDate;
   if ((d.schema || 1) < 2) { // v1 → v2: plain "Work", add "Review & plan"
-    const w = out.categories.find(c => c.id === 'work'); if (w && w.name === 'Work (interpreting)') w.name = 'Work';
+    const w = out.categories.find(c => c.id === 'work'); if (w && /^Work \(/.test(w.name)) w.name = 'Work';
     if (!out.categories.some(c => c.id === 'review')) {
       const i = out.categories.findIndex(c => c.id === 'other');
       out.categories.splice(i < 0 ? out.categories.length : i, 0, { id: 'review', name: 'Review & plan', color: '#D3DCE8' });
