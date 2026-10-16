@@ -533,6 +533,26 @@ tr.upcoming td{color:var(--ink-3)}
 .shape-bar .practice{background:color-mix(in oklab,var(--cp) 35%,var(--sheet))}
 .shape-bar .aamc{background:color-mix(in oklab,var(--accent) 45%,var(--sheet))}
 .shape-bar .taper{background:color-mix(in oklab,var(--ps) 30%,var(--sheet))}
+.seq{display:grid;gap:4px}.seq small{font-size:11.5px}
+.shape-bar.mini{height:8px;gap:2px;border-radius:4px}
+.shape-bar.mini span{padding:0}
+.tpl-meta{display:flex;flex-wrap:wrap;gap:5px}
+.fit-why{list-style:none;margin:0;padding:0;display:grid;gap:3px;font-size:12.5px}
+.fit-why li{padding-left:14px;position:relative;color:var(--ink-2)}
+.fit-why li::before{content:"";position:absolute;left:2px;top:.55em;width:6px;height:6px;border-radius:50%;background:var(--rule-2)}
+.fit-why li.bad::before{background:var(--bad)}.fit-why li.warn::before{background:var(--warn)}
+.based summary{cursor:pointer;font-size:12.5px;font-weight:600;color:var(--accent)}
+.based ul{margin:6px 0 0;padding-left:16px;display:grid;gap:4px;font-size:12.5px;color:var(--ink-2)}
+.kit{display:flex;flex-wrap:wrap;gap:8px;margin-top:4px}
+.kit-c{display:flex;gap:8px;align-items:flex-start;border:1px solid var(--rule);border-radius:10px;padding:8px 12px;background:var(--sheet);cursor:pointer}
+.kit-c input{width:18px;height:18px;accent-color:var(--accent);margin:1px 0 0}
+.kit-c span{display:grid;gap:1px;font-size:13.5px}.kit-c small{font-size:11.5px}
+.kit-c:has(input:checked){border-color:var(--accent)}
+.fitcheck{border-left:4px solid var(--ok)}
+.fitcheck.warn{border-left-color:var(--warn)}.fitcheck.soft{border-left-color:var(--rule-2)}
+.fitcheck p{max-width:72ch;color:var(--ink-2)}.fitcheck b{color:var(--ink)}
+.fit-opts{display:grid;gap:8px;margin-top:10px}
+.fit-opts>div{display:flex;flex-wrap:wrap;gap:4px 12px;align-items:center}
 .anki-in{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
 .anki-rep{display:grid;gap:12px;border:1px solid var(--rule);border-radius:10px;padding:12px;background:var(--paper)}
 .ab{display:flex;height:14px;border-radius:7px;overflow:hidden;background:var(--rule)}
@@ -1130,6 +1150,14 @@ const freeH = i => {
   const busy = sum(commitList().filter(c => c.days.includes(i)), c => Math.max(0, Math.min(bt, toMin(c.e)) - Math.max(ds, toMin(c.s))));
   return Math.max(0, (bt - ds - busy) / 60);
 };
+// study that really fits in a day: windows of 75+ min between commitments, less the 15-min gaps between blocks and lunch
+const usableH = i => {
+  const ds = toMin(D.set.dayStart || '08:00'), bt = (b => b < 240 ? b + 1440 : b)(toMin(D.set.bedtime || '23:00'));
+  const cs = commitList().filter(c => c.days.includes(i)).map(c => [Math.max(ds, toMin(c.s)), Math.min(bt, toMin(c.e))]).filter(([a, b]) => b > a).sort((a, b) => a[0] - b[0]);
+  let t = ds, tot = 0; const win = e => { const w = (e - t) / 60; if (w >= 1.25) tot += (w - 0.25) / 1.2; };
+  cs.forEach(([a, b]) => { if (a > t) win(a); t = Math.max(t, b + 15); }); if (bt > t) win(bt);
+  return Math.max(0, Math.floor((tot - (tot > 6 ? 0.6 : 0)) * 2) / 2);
+};
 const commitH = () => sum(commitList(), c => c.days.length * (toMin(c.e) - toMin(c.s))) / 60;
 
 
@@ -1439,7 +1467,7 @@ function freshData(){
   const s = sample();
   Object.assign(s, { plan: null, days: {}, sess: {}, planned: {}, ankiStats: null, done: {}, passages: [], hours: {}, anki: {}, skip: {}, closed: {}, resAdj: {}, practice: [], errors: [], blank: [], fls: [], cm: {}, cmEdit: {}, cat: [], view: 'setup' });
   Object.assign(s.set, { testDate: addDays(TODAY, 119), startDate: TODAY, goal: 510, floor: null, baseline: null, hours: [3, 3, 3, 3, 3, 5, 0], dayStart: '09:00', bedtime: '23:00', flDay: 5, carsN: 1, template: '', buffers: false,
-    shape: { ...TEMPLATES[3].shape }, deck: 'My own deck', ankiTotal: 0, ankiMature: 0, ankiMin: 30, own: { pe: 1, sample: 1, free: 1 }, tot: {}, flc: {}, custom: [], myTemplates: [], commit: [], off: [], setupDone: false, finalized: null, links: {} });
+    shape: { ...TEMPLATES.find(t => t.id === 'sy4').shape }, deck: 'My own deck', ankiTotal: 0, ankiMature: 0, ankiMin: 30, own: { pe: 1, sample: 1, free: 1 }, tot: {}, flc: {}, custom: [], myTemplates: [], commit: [], off: [], setupDone: false, finalized: null, links: {} });
   return s;
 }
 const hostTheme = document.documentElement.getAttribute('data-theme');
@@ -1453,30 +1481,72 @@ function applyTheme(){
 /* =========================================================
    Suggested setups (study methods) + plan builder
    ========================================================= */
-const SRC_SDN = { label: 'Student Doctor Network, 3-month MCAT schedules', url: 'https://www.studentdoctor.net/?p=5478' };
-const SRC_UCONN = { label: 'UConn Pre-Medical Advising, MCAT Study Plan Database', url: 'https://premed.media.uconn.edu/wp-content/uploads/sites/216/2024/10/MCAT-Study-Plan-Database.pdf' };
+/* Shortcut library: each plan is described by its requirements (length, hours, resources, full lengths) and its sequence
+   (content → questions → AAMC → taper as shares of the time before the taper). Every one is built from real plans that
+   are credited below; we use their structure, never their written schedules. Research notes: project doc mcat-plan-research.md. */
+const SRC = {
+  sdn: ['Student Doctor Network, 3-month MCAT schedules', 'https://www.studentdoctor.net/3-month-mcat-study-schedule/'],
+  uconn: ['UConn Pre-Medical Advising, MCAT Study Plan Database', 'https://premed.media.uconn.edu/wp-content/uploads/sites/216/2024/10/MCAT-Study-Plan-Database.pdf'],
+  bp6: ['Blueprint, 6-month MCAT study schedule', 'https://blog.blueprintprep.com/mcat/the-ultimate-6-month-mcat-study-schedule/'],
+  shem: ['Shemmassian, MCAT study schedule templates', 'https://www.shemmassianconsulting.com/blog/mcat-study-schedule'],
+  kap3: ['Kaplan, 3-month MCAT study plan', 'https://www.kaptest.com/study/mcat/mcat-study-guide-and-schedule-3-months/'],
+  ml516: ['MedLife Mastery interview: retake 509 → 516', 'https://medlifemastery.com/mcat/success-stories/500-519-retake-score/'],
+  ml515: ['MedLife Mastery interview: retake to 515 in under 7 weeks', 'https://medlifemastery.com/mcat/success-stories/mcat-retake-499-to-515-on-the-mcat-in-7-weeks/'],
+  ml517: ['MedLife Mastery interview: 517 while working 40 h a week', 'https://medlifemastery.com/?p=556667'],
+  aamc: ['AAMC, How to Create an MCAT Study Plan', 'https://uh.edu/pre-health/areas/medicine/aamc-mcat-study-plan.pdf'],
+};
+const by = (k, note) => ({ label: SRC[k][0], url: SRC[k][1], note });
 // shape: content/practice = share of the days before the taper; mix = share of content-phase blocks that are practice;
 // cars = CARS passages a day; flTotal = full lengths in all; flWeekly = weekly full lengths at the end; diag = diagnostic first; flex = catch-up day each week
+// range = weeks the plan was built for; needs = resources it can't do without; nice = resources it works best with; adds = free resources it ticks
 const TEMPLATES = [
-  { id: 'ft100', name: '100-day full-time', weeks: 14, hours: [7, 7, 7, 7, 7, 8, 0], src: SRC_SDN,
+  { id: 'ft100', name: 'Full-time, 3 months', who: 'Not working or in class: about 6–7 hours a day, 5–6 days a week.', weeks: 12, range: [10, 14], hours: [6.5, 6.5, 6.5, 6.5, 6.5, 5, 0], needs: ['aamc', 'qbank'], nice: ['uw'],
     desc: 'About 5 weeks of content with Anki and daily CARS, 3 weeks moving into question banks and AAMC packs, then section banks with a full length every week for the last 6 weeks.',
+    based: [by('sdn', 'Full-time 12-week plan: 7–8 full lengths, at least 5 AAMC'), by('uconn', '525 in 3 months: a month of content, then questions, a full length every weekend for 8 weeks'), by('uconn', '509 → 519 in 2 months: UWorld 2–3 sections a day, 6 full lengths from 6 weeks out')],
     shape: { content: 0.36, practice: 0.22, mix: 0.25, qbank: true, cars: 3, flTotal: 8, flWeekly: 6, diag: false, flex: 1 } },
-  { id: 'pt300', name: 'Part-time, about 300 hours', weeks: 12, hours: [3, 3, 3, 3, 3, 5, 0], src: SRC_SDN,
-    desc: 'First half about 70% content and 30% practice, second half flipped. A diagnostic first, 5–6 full lengths, one flexible catch-up day a week.',
-    shape: { content: 0.5, practice: 0.25, mix: 0.3, qbank: true, cars: 2, flTotal: 6, flWeekly: 3, diag: true, flex: 1 } },
-  { id: 'hi', name: 'Practice-heavy refinement', weeks: 12, hours: [5, 5, 5, 5, 5, 6, 0], src: SRC_SDN,
-    desc: 'For a strong content base: a diagnostic in week 1, then weekly AAMC full lengths, section banks and CARS, with only targeted content.',
-    shape: { content: 0.08, practice: 0.25, mix: 0.5, qbank: true, cars: 3, flTotal: 9, flWeekly: 8, diag: true, flex: 1 } },
-  { id: 'sy4', name: '4 months alongside school or work', weeks: 17, hours: [3, 3, 3, 3, 3, 6, 4], src: SRC_UCONN,
+  { id: 'ft4', name: 'Full-time, 4 months', who: 'Full-time study with more room: about 5 hours a day, weekends lighter.', weeks: 16, range: [14, 18], hours: [5, 5, 5, 5, 5, 4, 0], needs: ['aamc'], nice: ['uw'],
+    desc: 'A diagnostic first, then about 2 months of content with questions after each topic, a month of question banks with a full length every two weeks, and AAMC material with weekly full lengths for the last 5 weeks.',
+    based: [by('uconn', '510 → 525 in about 3.5 months: weakness-first review, 4 spaced full lengths'), by('uconn', '503 → 519 in about 4 months: 2.5 months content, 1.5 months practice, weekly AAMC tests'), by('shem', '4-month template: a relaxed 3-month plan, 300–360 hours')],
+    shape: { content: 0.45, practice: 0.2, mix: 0.25, qbank: true, cars: 2, flTotal: 7, flWeekly: 5, diag: true, flex: 1 } },
+  { id: 'pt6', busy: true, name: 'Part-time with a job, 6 months', who: 'Working full-time: 2 hours on weekday evenings, a long session on weekends.', weeks: 26, range: [22, 30], hours: [2, 2, 2, 2, 0, 5, 3], flDay: 5, needs: ['aamc'], nice: ['paidq'],
+    desc: 'Month 1 is mostly content after a diagnostic. Months 2–4 flip to questions, with a weekend full length every 2–3 weeks and its review over the next days. Months 5–6 move to AAMC material and one full length a week, never more.',
+    based: [by('bp6', '12–20 h a week; a full length every 2–3 weeks, then weekly for the last 5'), by('shem', '6-month template: 2–2.5 h each evening for full-time workers, 6+ full lengths'), by('ml517', '517 while working 40 h a week: mornings, lunch breaks and evenings; AAMC material over books')],
+    shape: { content: 0.35, practice: 0.3, mix: 0.3, qbank: true, cars: 1, flTotal: 8, flWeekly: 5, diag: true, flex: 1 } },
+  { id: 'school', busy: true, name: 'Student during classes', who: 'In class most weekdays: short sessions on school days, more on weekends.', weeks: 30, range: [20, 40], hours: [1.5, 1.5, 1.5, 1.5, 0, 4, 2], flDay: 5, needs: ['aamc'], nice: [],
+    desc: 'A slow, thorough content pass (about a chapter every two days) alongside classes, then question banks, then weekly AAMC full lengths for the last 6 weeks, ideally after classes end.',
+    based: [by('uconn', '516 over 6 months in the spring semester: content first, then weekly practice tests for the last 6–8 weeks'), by('uconn', '518 over 6 months in school: a chapter about every 2 days, then a review pass'), by('shem', '6-month template: 2–2.5 h a day, content first')],
+    shape: { content: 0.45, practice: 0.25, mix: 0.2, qbank: true, cars: 1, flTotal: 6, flWeekly: 5, diag: true, flex: 1 } },
+  { id: 'sy4', busy: true, name: '4 months alongside school or work', who: 'A lighter load next to classes or a part-time job.', weeks: 17, range: [15, 19], hours: [2.5, 2.5, 2.5, 2.5, 2, 5, 3], needs: ['aamc'], nice: ['uw'],
     desc: 'About 2.5 months of thorough content review with Anki, then 1.5 months of question banks and AAMC material with a full length every week.',
+    based: [by('uconn', '503 → 519 in about 4 months during the fall semester: Kaplan, Khan Academy, Anki, UWorld, about 6 weekly AAMC tests')],
     shape: { content: 0.6, practice: 0.15, mix: 0.2, qbank: true, cars: 2, flTotal: 6, flWeekly: 6, diag: false, flex: 1 } },
-  { id: 'six', name: '6-week intensive', weeks: 6, hours: [7, 7, 7, 7, 7, 7, 0], src: SRC_UCONN,
+  { id: 'm6', name: 'UWorld-centred, 6 months', who: 'A steady 3 hours on weekdays, built around UWorld blocks.', weeks: 26, range: [22, 28], hours: [3, 3, 3, 3, 3, 4, 0], needs: ['uw', 'aamc'], nice: [],
+    desc: 'Months 1–2: deep content review with CARS a few times a week, light questions after each topic and daily Anki. Months 3–4: questions first, a UWorld block each session growing from 40 to 59 questions (timed, then reviewed in tutor mode), daily CARS and a third-party full length every two weeks. Months 5–6: AAMC, one full length a week with section banks and question packs between. Final week: no new material.',
+    based: [by('sdn', 'UWorld blocks in the middle weeks, AAMC banks and weekly full lengths at the end'), by('bp6', 'Full lengths every 2–3 weeks in the middle months, weekly AAMC at the end')],
+    shape: { content: 0.34, practice: 0.33, mix: 0.15, qbank: true, cars: 2, flTotal: 11, flWeekly: 7, diag: false, flex: 1, qn: [40, 59] } },
+  { id: 'pt300', name: 'Part-time, about 300 hours', who: 'About 3–4 hours most days for 12 weeks.', weeks: 12, range: [10, 14], hours: [3.5, 3.5, 3.5, 3.5, 3, 6, 2], needs: ['aamc'], nice: ['qbank'],
+    desc: 'First half about 70% content and 30% practice, second half flipped. A diagnostic first, 5–6 full lengths, one flexible catch-up day a week.',
+    based: [by('sdn', 'Part-time 300-hour plan: 20–25 h a week, 5–6 full lengths, a weekly flexible day'), by('shem', '3-month template: about 25 h a week, 6 weeks content then 6 weeks practice')],
+    shape: { content: 0.5, practice: 0.25, mix: 0.3, qbank: true, cars: 2, flTotal: 6, flWeekly: 3, diag: true, flex: 1 } },
+  { id: 'hi', name: 'Practice-heavy: AAMC final weeks', who: 'Content mostly done (or a strong science base): questions and full lengths from week 1.', weeks: 9, range: [7, 12], hours: [4.5, 4.5, 4.5, 4.5, 4, 6, 0], needs: ['aamc'], nice: [],
+    desc: 'A diagnostic in week 1, then weekly AAMC full lengths, section banks, packs and the CARS Question Bank, with content only where your error log points.',
+    based: [by('sdn', 'Practice-heavy 12-week plan: diagnostic, weekly AAMC full lengths, 7–9 in all'), by('bp6', 'Final phase: AAMC material, one full length a week, benchmarks a month and two weeks out')],
+    shape: { content: 0.08, practice: 0.25, mix: 0.5, qbank: true, cars: 3, flTotal: 8, flWeekly: 7, diag: true, flex: 1 } },
+  { id: 'retake', name: 'Retaker', who: 'You took the MCAT before: fix what held you back instead of re-reading everything.', weeks: 10, range: [7, 12], hours: [4, 4, 4, 4, 4, 6, 0], needs: ['aamc'], nice: ['paidq'],
+    desc: 'A diagnostic full length first, then content only for categories your misses point to, daily CARS (4 passages), and more full lengths with a full rest-and-review gap between each.',
+    based: [by('ml516', '509 → 516: more full lengths with more rest between, content review after each exam, CARS 4–5 passages a day'), by('ml515', '508 → 515 in under 7 weeks: daily CARS, Anki for every unfamiliar term from practice, timing work')],
+    shape: { content: 0.15, practice: 0.35, mix: 0.5, qbank: true, cars: 4, flTotal: 8, flWeekly: 6, diag: true, flex: 1 } },
+  { id: 'six', name: '6-week intensive', who: 'Full days, 6 days a week, with little room for anything else.', weeks: 6, range: [5, 7], hours: [7, 7, 7, 7, 7, 7, 0], needs: ['aamc', 'qbank'], nice: ['uw'],
     desc: 'Anki-driven review for about 3 weeks while starting questions, then AAMC practice with a full length every 7–10 days.',
+    based: [by('uconn', '502 → 513 in 6 weeks: 3–4 weeks content, then practice, 5 full lengths'), by('uconn', '496 → 514 in 5 weeks: an hour of content then related questions, AAMC via Fee Assistance'), by('uconn', '501 → 519 in 1.5 months: 8 full lengths every 7–10 days')],
     shape: { content: 0.45, practice: 0.15, mix: 0.4, qbank: true, cars: 3, flTotal: 5, flWeekly: 4, diag: false, flex: 0 } },
+  { id: 'free', name: 'Free resources only', who: 'No budget for prep: Khan Academy, Jack Westin, AAMC’s free items and free full lengths.', weeks: 16, range: [12, 20], hours: [3, 3, 3, 3, 3, 5, 2], needs: [], nice: [], free: true, adds: ['ka', 'kavid', 'jwq', 'sample', 'free'],
+    desc: 'Content from Khan Academy videos and a free Anki deck, practice from Khan Academy passages and the Jack Westin QBank, and free full lengths from Blueprint, Kaplan and others, with the AAMC Sample Test near the end. Free resources run out faster than paid ones, so pace them.',
+    basis: 'Built from free resources; no public plan with a score used only free material. Most students who said “free” had the AAMC bundle through AAMC Fee Assistance, which is worth applying for.',
+    shape: { content: 0.45, practice: 0.3, mix: 0.3, qbank: true, cars: 2, flTotal: 5, flWeekly: 3, diag: true, flex: 1 } },
 ];
-TEMPLATES.push({ id: 'm6', name: '6 months, steady pace', weeks: 26, hours: [3, 3, 3, 3, 3, 4, 0], from: 'A steady 6-month pace',
-  desc: 'Months 1–2: deep content review with CARS a few times a week, light questions after each topic and daily Anki. Months 3–4: questions first, a UWorld block each session growing from 40 to 59 questions (timed, then reviewed in tutor mode), daily CARS and a third-party full length every two weeks. Months 5–6: AAMC, one full length a week with section banks and question packs between. Final week: no new material.',
-  shape: { content: 0.34, practice: 0.33, mix: 0.15, qbank: true, cars: 2, flTotal: 11, flWeekly: 7, diag: false, flex: 1, qn: [40, 59] } });
+const tplById = id => TEMPLATES.concat((D && D.set && D.set.myTemplates) || []).find(t => t.id === id);
+const tplTotal = t => t.total || Math.round((t.weeks || 0) * sum(t.hours || []) / 10) * 10;
 const DEFAULT_SHAPE = TEMPLATES[0].shape;
 const shape = () => ({ ...DEFAULT_SHAPE, ...(D.set.shape || {}) });
 
@@ -3150,13 +3220,13 @@ V.settings = () => {
   const sp = activeSpec(), offN = (S.off || []).length;
   const tName = sp ? sp.name : ((TEMPLATES.concat(S.myTemplates || []).find(t => t.id === S.template) || {}).name || 'Custom setup');
   const planTab = `
-    <section class="card s12 cta"><div><b>${S.setupDone ? 'Change your plan' : 'Set up your plan'}</b><p class="muted small">Step by step: dates, commitments, study time, resources and plan style, then a preview to finalize. Your logs and scores stay.</p></div><button class="btn btn-primary" data-su="0">${S.setupDone ? 'Open plan setup' : 'Start setup'}</button></section>
-    ${[['Dates', `Test ${fmtLong(S.testDate)} · start ${fmtDay(S.startDate)} · goal ${S.goal}${S.floor ? ` · floor ${S.floor}` : ''}`, 0],
-       ['Commitments', commitList().length ? commitList().map(c => `${esc(c.t)} <span class="muted">${c.days.map(d => WD[d]).join(' ')} ${c.s}–${c.e}</span>`).join('<br>') : 'None yet. Add classes or shifts so study goes around them.', 1],
-       ['Study time', `${sp ? 'Weekly times from your plan' : `${sum(S.hours)} h a week`} · day ${t5(S.dayStart || '08:00')}–${t5(S.bedtime || '23:00')}${offN ? ` · ${offN} day${offN > 1 ? 's' : ''} off or light` : ''}${sp && S.buffers ? ' · buffer weeks on' : ''}`, 2],
-       ['Resources', `${RES().filter(r => owned(r.id)).length} resources · ${S.carsN} CARS a day · Anki ${S.ankiMin} min (${esc(S.deck)})`, 3],
-       ['Plan', `${esc(tName)}${S.finalized ? ` · finalized ${fmtDay(S.finalized)}` : ''}`, 4]].map(([h, txt, i]) => `<section class="card s6 su-card"><div class="card-head"><h3>${h}</h3><button class="linkish small" data-su="${i}">Edit</button></div><p class="small">${txt}</p></section>`).join('')}
-    <section class="card s6 su-card"><div class="card-head"><h3>Preview</h3><button class="linkish small" data-su="5">Open</button></div><p class="small">Hours per week, full lengths, and what each resource gets.</p></section>`;
+    <section class="card s12 cta"><div><b>${S.setupDone ? 'Change your plan' : 'Set up your plan'}</b><p class="muted small">Three quick questions pick a plan that fits, then dates, commitments, study time and resources, and a preview to finalize. Your logs and scores stay.</p></div><button class="btn btn-primary" data-su="0">${S.setupDone ? 'Open plan setup' : 'Start setup'}</button></section>
+    ${[['Dates', `Test ${fmtLong(S.testDate)} · start ${fmtDay(S.startDate)} · goal ${S.goal}${S.floor ? ` · floor ${S.floor}` : ''}`, 1],
+       ['Commitments', commitList().length ? commitList().map(c => `${esc(c.t)} <span class="muted">${c.days.map(d => WD[d]).join(' ')} ${c.s}–${c.e}</span>`).join('<br>') : 'None yet. Add classes or shifts so study goes around them.', 2],
+       ['Study time', `${sp ? 'Weekly times from your plan' : `${sum(S.hours)} h a week`} · day ${t5(S.dayStart || '08:00')}–${t5(S.bedtime || '23:00')}${offN ? ` · ${offN} day${offN > 1 ? 's' : ''} off or light` : ''}${sp && S.buffers ? ' · buffer weeks on' : ''}`, 3],
+       ['Resources', `${RES().filter(r => owned(r.id)).length} resources · ${S.carsN} CARS a day · Anki ${S.ankiMin} min (${esc(S.deck)})`, 4],
+       ['Plan', `${esc(tName)}${S.finalized ? ` · finalized ${fmtDay(S.finalized)}` : ''}`, 5]].map(([h, txt, i]) => `<section class="card s6 su-card"><div class="card-head"><h3>${h}</h3><button class="linkish small" data-su="${i}">Edit</button></div><p class="small">${txt}</p></section>`).join('')}
+    <section class="card s6 su-card"><div class="card-head"><h3>Preview</h3><button class="linkish small" data-su="6">Open</button></div><p class="small">Hours per week, full lengths, and what each resource gets.</p></section>`;
   const appTab = `${accountCard()}
     <section class="card s6">
       <h3>Appearance</h3>
@@ -3265,10 +3335,14 @@ function weekHours(){
 
 /* ---------- the guided setup ---------- */
 let SU = { step: 0 };
-const SU_STEPS = ['Dates', 'Commitments', 'Study time', 'Resources', 'Plan', 'Preview'];
+const SU_STEPS = ['Start', 'Dates', 'Commitments', 'Study time', 'Resources', 'Plan', 'Preview'];
 function openSetup(step){ SU.step = step || 0; go('setup'); }
 function suRead(){
   const S = D.set, v = id => { const el = document.getElementById(id); return el ? el.value : null; }, has = id => !!document.getElementById(id);
+  if (has('qStart')) { const Q = quick(); S.startDate = v('qStart') || TODAY; Q.booked = !document.getElementById('qNoDate').checked; if (Q.booked) S.testDate = v('qTest') || S.testDate; Q.hpw = Math.max(1, Math.min(80, Math.round(+v('qHpw') || Q.hpw))); }
+  document.querySelectorAll('[data-kit]').forEach(i => { const ids = KIT.find(x => x[0] === i.dataset.kit)[2];
+    if (!i.checked) ids.forEach(id => delete S.own[id]); else if (!ids.some(owned)) (i.dataset.kit === 'books' ? ids.slice(0, 1) : ids).forEach(id => { S.own[id] = 1; }); });
+  if (has('sTest') && v('sTest') && v('sTest') !== S.testDate) quick().booked = true;
   if (has('sTest')) { S.testDate = v('sTest') || S.testDate; S.startDate = v('sStart') || TODAY; S.goal = Math.min(528, Math.max(472, +v('sGoal') || 515)); S.baseline = +v('sBase') || null; S.floor = +v('sFloor') || null; }
   document.querySelectorAll('[data-h]').forEach(i => S.hours[+i.dataset.h] = Math.max(0, Math.min(14, +i.value || 0)));
   if (has('sDay')) S.dayStart = v('sDay') || '08:00';
@@ -3308,9 +3382,9 @@ const suCommit = () => `<section class="card s12"><h3>Other commitments</h3>
     <div class="btns" style="justify-content:flex-start">${['Class', 'Work shift', 'Volunteering', 'Commute', 'Lab'].map(n => `<button class="btn btn-sm" data-cnew="${n}">+ ${n}</button>`).join('')}<button class="btn btn-sm btn-primary" data-cnew="">+ Other</button></div>
     <p class="muted small">${commitList().length ? `${commitH().toFixed(1)} h a week of commitments.` : ''} Google Calendar sync comes with the full app.</p></section>`;
 const suTime = () => { const S = D.set, sp = activeSpec(), sh = shape();
-  return `<section class="card s12"><h3>When can you study?</h3>
-    ${sp ? `<p class="lead">${esc(sp.name)} sets its own weekly times for each phase, so there’s no hours grid here. Days off and light weeks below still apply.</p>` : `<p class="lead">Hours of MCAT study you want on each weekday. “Free” is what’s left between your day start and bedtime after commitments.</p>
-    <div class="hours">${WD.map((d, i) => { const f = freeH(i), h = +S.hours[i] || 0; return `<label class="field"><span>${d}</span><input type="number" min="0" max="14" step="0.5" data-h="${i}" value="${h}"><small class="${h > f - 0.5 ? 'bad' : 'muted'}">free ${f.toFixed(1)} h</small></label>`; }).join('')}</div>
+  return `${sp ? '' : fitCard()}<section class="card s12"><h3>When can you study?</h3>
+    ${sp ? `<p class="lead">${esc(sp.name)} sets its own weekly times for each phase, so there’s no hours grid here. Days off and light weeks below still apply.</p>` : `<p class="lead">Hours of MCAT study you want on each weekday. “Room” is how much study fits between your day start, bedtime and commitments, counting short breaks between blocks.</p>
+    <div class="hours">${WD.map((d, i) => { const f = usableH(i), h = +S.hours[i] || 0; return `<label class="field"><span>${d}</span><input type="number" min="0" max="14" step="0.5" data-h="${i}" value="${h}"><small class="${h > f ? 'bad' : 'muted'}" title="${freeH(i).toFixed(1)} h free; the rest goes to gaps between blocks">room ${f.toFixed(1)} h</small></label>`; }).join('')}</div>
     <p class="muted small">${sum(S.hours).toFixed(1)} h a week.</p>`}
     <div class="form">
       <label class="field f2"><span>Day starts at</span><input type="time" id="sDay" value="${t5(S.dayStart || '08:00')}"></label>
@@ -3348,21 +3422,159 @@ const suRes = () => { const S = D.set, grps = [...new Set(RES().map(r => r.grp))
       <div id="ankiOut">${ankiReport(D.ankiStats)}${D.ankiStats ? '<button class="btn btn-sm" id="ankiUse">Use these numbers</button>' : ''}</div>
     </section>
     <details class="card s12 su-free"><summary><b>Free resources you could add</b> <span class="muted small">full lengths, review sheets, videos, decks</span></summary><div class="grid">${freeLibrary()}</div></details>`; };
-const suStyle = () => { const S = D.set, sh = shape(), w = shapeWeeks(sh), sp = activeSpec(), weeksLeft = Math.round(daysLeft() / 7);
-  const tFit = t => { if (!t.weeks || !t.hours) return '';
-    const tot = Math.round(t.weeks * sum(t.hours)), wl = weeksLeft, off = Math.abs(wl - t.weeks) / t.weeks > 0.3, fit = addDays(S.startDate > TODAY ? S.startDate : TODAY, t.weeks * 7 + 5);
-    return `<p class="small ${off ? 'bad' : 'muted'}">Built for ${t.weeks} weeks at ${sum(t.hours)} h a week (about ${tot} h).${off ? ` Your test is ${wl} weeks away, so it would ${wl > t.weeks ? 'stretch' : 'squeeze'} to fit. <button class="linkish" data-fitdate="${fit}">Set my test date to ${fmtDay(fit)}</button>` : ''}</p>`; };
-  const tCard = (t, mine) => `<div class="tpl ${S.template === t.id ? 'on' : ''}"><div class="tpl-h"><b>${esc(t.name)}</b>${t.weeks ? `<span class="chip">${t.weeks} weeks</span>` : ''}${t.hours ? `<span class="chip">${sum(t.hours)} h/week</span>` : ''}${t.shared ? '<span class="chip pill-ok">Shared</span>' : ''}</div>
-    ${t.author || t.result ? `<p class="small"><b>${esc(t.author || 'Someone')}</b>${t.result ? ` · ${esc(t.result)}` : ''}</p>` : ''}<p>${esc(t.desc || 'Your saved setup.')}</p>${tFit(t)}${t.src ? `<a class="small" href="${t.src.url}" target="_blank" rel="noopener">Based on: ${esc(t.src.label)}</a>` : t.from ? `<span class="small muted">${esc(t.from)}</span>` : ''}
-    <div class="btns" style="justify-content:flex-start"><button class="btn btn-sm ${S.template === t.id ? '' : 'btn-primary'}" data-tpl="${t.id}">${S.template === t.id ? 'Chosen' : 'Choose'}</button>${mine ? `<button class="linkish small" data-tdel="${t.id}">Delete</button>` : ''}</div></div>`;
+/* ---------- plan-first: three questions, shortcuts ranked by fit, then a fit check after commitments ---------- */
+const NEEDS = {
+  aamc: { ok: () => ['pe', 'sb1', 'sb2', 'cqb'].some(owned), chip: 'Needs the AAMC bundle', tip: 'free with AAMC Fee Assistance if you qualify' },
+  uw: { ok: () => owned('uw'), chip: 'Needs UWorld', soft: 'Works best with UWorld' },
+  qbank: { ok: () => ['uw', 'kqb', 'bpq', 'jwq'].some(owned), chip: 'Needs a question bank', tip: 'the Jack Westin QBank is free', soft: 'Works best with a question bank (Jack Westin’s is free)' },
+  paidq: { ok: () => ['uw', 'kqb', 'bpq'].some(owned), soft: 'Works best with a paid question bank' },
+};
+const KIT = [
+  ['aamc', 'AAMC Official Prep bundle', ['pe', 'sb1', 'sb2', 'cqb', 'bio', 'chem', 'phys', 'iqb'], 'full lengths, section banks, CARS bank, packs'],
+  ['uw', 'UWorld QBank', ['uw']],
+  ['kqb', 'Kaplan QBank', ['kqb']],
+  ['bpq', 'Blueprint QBank', ['bpq']],
+  ['books', 'Content books', ['kbooks', 'tbooks'], 'Kaplan or Princeton Review'],
+];
+const kitOn = k => (KIT.find(x => x[0] === k) || [, , []])[2].some(owned);
+const planStart = () => D.set.startDate > TODAY ? D.set.startDate : TODAY;
+const satOnOrAfter = k => { let d = k; while (wdOf(d) !== 5) d = addDays(d, 1); return d; };
+const quick = () => { const S = D.set; S.quick = { booked: true, hpw: null, ...(S.quick || {}) }; if (S.quick.hpw == null) S.quick.hpw = Math.round(sum(S.hours)) || 20; return S.quick; };
+const freeWeek = () => sum(WD.map((_, i) => usableH(i)));
+// how well a shortcut fits: issues are 'bad' (missing a resource), 'warn' (time) or 'soft' (a note); higher score = better fit
+function tplFit(t){
+  const Q = quick(), H = sum(t.hours || []), tot = tplTotal(t), [lo, hi] = t.range || [t.weeks, t.weeks], issues = []; let score = 0;
+  (t.needs || []).forEach(n => { if (!NEEDS[n].ok()) { issues.push({ lvl: 'bad', chip: NEEDS[n].chip, txt: NEEDS[n].chip, tip: NEEDS[n].tip }); score -= 60; } });
+  (t.nice || []).forEach(n => { if (!NEEDS[n].ok()) { issues.push({ lvl: 'soft', txt: NEEDS[n].soft }); score -= 1; } });
+  const busy = [0, 1, 2, 3, 4].filter(i => sum(commitList().filter(c => c.days.includes(i)), c => toMin(c.e) - toMin(c.s)) >= 300).length >= 4;
+  if (busy && t.busy) score += 2;
+  if (t.free && ['uw', 'kqb', 'bpq', 'sb1', 'cqb'].some(owned)) { issues.push({ lvl: 'soft', txt: 'You have paid resources this plan leaves out' }); score -= 8; }
+  const hpw = Math.max(0, +Q.hpw || 0);
+  if (Q.booked) {
+    const w = diff(planStart(), D.set.testDate) / 7, study = Math.max(0.5, w - 5 / 7), need = tot / study;
+    if (w < lo - 0.5) { issues.push({ lvl: 'warn', chip: `Built for ${lo}+ weeks`, txt: `Built for at least ${lo} weeks; your test is ${Math.max(0, Math.round(w))} weeks away` }); score -= (lo - w) * 4; }
+    else if (w > hi + 0.5) { issues.push({ lvl: 'soft', txt: `Built for ${lo}–${hi} weeks; your test is ${Math.round(w)} weeks away, so you could start later or go lighter` }); score -= (w - hi) * 1.2; }
+    if (hpw < need * 0.94 - 0.3) { const more = Math.ceil(need - hpw), wks = hpw > 0 ? Math.ceil(tot / hpw + 5 / 7 - w) : 0;
+      issues.push({ lvl: 'warn', chip: `Needs ${more} more h/week`, txt: `About ${tot} h in all: that’s ${Math.ceil(need)} h a week until your test${wks > 0 && wks < 40 ? `, or ${wks} more week${wks > 1 ? 's' : ''} at ${hpw} h` : ''}` }); score -= more * 1.5; }
+    score -= Math.abs(w - (t.weeks || w)) * 0.3 + Math.abs(need - hpw) * 0.1;
+  } else {
+    const wks = hpw > 0 ? Math.ceil(tot / hpw + 5 / 7) : 99;
+    if (hpw + 0.5 < H * 0.85) {
+      if (wks <= Math.round(hi * 1.35)) issues.push({ lvl: 'soft', txt: `At ${hpw} h a week it takes about ${wks} weeks instead of ${t.weeks}` });
+      else issues.push({ lvl: 'warn', chip: `Needs ${Math.ceil(H - hpw)} more h/week`, txt: `Built for about ${H} h a week (${tot} h in all)` });
+      score -= (H - hpw) * 0.6;
+    }
+    score -= Math.abs(H - hpw) * 0.15;
+  }
+  const top = issues.find(i => i.lvl === 'bad') || issues.find(i => i.lvl === 'warn');
+  return { score, issues, ok: !top, chip: top ? top.chip : 'Fits', lvl: top ? top.lvl : 'ok' };
+}
+const rankTpls = () => TEMPLATES.map(t => [t, tplFit(t)]).sort((a, b) => b[1].score - a[1].score);
+// spread a weekly total over a plan's weekly pattern, within the free time each day
+function weekPattern(base, target){
+  const B = sum(base) || 1, free = WD.map((_, i) => usableH(i));
+  const h = base.map((x, i) => Math.min(free[i], Math.round(x * target / B * 2) / 2));
+  for (let g = 0; sum(h) > target + 0.01 && g < 100; g++) { const j = h.indexOf(Math.max(...h)); h[j] = Math.max(0, h[j] - 0.5); }
+  let left = Math.round((target - sum(h)) * 2) / 2, guard = 0;
+  while (left >= 0.5 && guard++ < 300) {
+    const pick = h.map((x, j) => [free[j] - x, j]).filter(([r, j]) => r >= 0.5 && base[j] > 0).sort((a, b) => b[0] - a[0])[0];
+    if (!pick) break; h[pick[1]] += 0.5; left -= 0.5;
+  }
+  return { hours: h, short: Math.max(0, left) };
+}
+const seqBar = sh => { const c = Math.round(sh.content * 100), p = Math.round(sh.practice * 100), a = Math.max(0, 100 - c - p), parts = [['content', 'Content', c], ['practice', 'Questions', p], ['aamc', 'AAMC', a]].filter(x => x[2]);
+  return `<div class="seq"><div class="shape-bar mini" aria-hidden="true">${parts.map(([k, , v]) => `<span class="${k}" style="flex:${v}"></span>`).join('')}<span class="taper" style="flex:7"></span></div><small class="muted">${parts.map(([, n, v]) => `${n} ${v}%`).join(' → ')} → taper week</small></div>`; };
+const fitChip = f => `<span class="chip ${f.lvl === 'ok' ? 'pill-ok' : f.lvl === 'bad' ? 'pill-bad' : 'pill-warn'}">${esc(f.chip)}</span>`;
+function tplCard(t, mine, f){
+  const S = D.set, on = S.template === t.id, H = sum(t.hours || []), tot = tplTotal(t), r = t.range;
+  const why = f ? f.issues : [];
+  return `<div class="tpl ${on ? 'on' : ''}"><div class="tpl-h"><b>${esc(t.name)}</b>${f ? fitChip(f) : ''}${t.shared ? '<span class="chip pill-ok">Shared</span>' : ''}</div>
+    ${t.who ? `<p class="small muted">${esc(t.who)}</p>` : ''}
+    <div class="tpl-meta">${r ? `<span class="chip">${r[0]}–${r[1]} weeks</span>` : t.weeks ? `<span class="chip">${t.weeks} weeks</span>` : ''}${H ? `<span class="chip">~${H} h/week</span>` : ''}${tot ? `<span class="chip">~${tot} h in all</span>` : ''}${t.shape ? `<span class="chip">${t.shape.flTotal} full lengths</span>` : ''}</div>
+    ${why.length ? `<ul class="fit-why">${why.map(i => `<li class="${i.lvl}">${esc(i.txt)}${i.tip ? ` <small class="muted">(${esc(i.tip)})</small>` : ''}</li>`).join('')}</ul>` : ''}
+    ${t.author || t.result ? `<p class="small"><b>${esc(t.author || 'Someone')}</b>${t.result ? ` · ${esc(t.result)}` : ''}</p>` : ''}
+    <p>${esc(t.desc || 'Your saved setup.')}</p>${t.shape ? seqBar(t.shape) : ''}
+    ${(t.based || []).length ? `<details class="based"><summary>Based on ${t.based.length} real plan${t.based.length > 1 ? 's' : ''}</summary><ul>${t.based.map(b => `<li>${esc(b.note)} · <a href="${esc(b.url)}" target="_blank" rel="noopener noreferrer">${esc(b.label)} ↗</a></li>`).join('')}</ul></details>` : t.basis ? `<p class="small muted">${esc(t.basis)}</p>` : t.from ? `<span class="small muted">${esc(t.from)}</span>` : ''}
+    <div class="btns" style="justify-content:flex-start"><button class="btn btn-sm ${on ? '' : 'btn-primary'}" data-tpl="${t.id}">${on ? 'Chosen' : 'Use this plan'}</button>${mine ? `<button class="linkish small" data-tdel="${t.id}">Delete</button>` : ''}</div></div>`;
+}
+// choosing a shortcut fills dates, hours and resources; the fit check then covers commitments
+function applyTpl(t){
+  const S = D.set, Q = quick(), H = sum(t.hours || []);
+  S.template = t.id; S.shape = { ...t.shape }; delete S.trimmed;
+  (t.adds || []).forEach(id => { S.own[id] = 1; });
+  const can = Math.max(1, +Q.hpw || H), tot = tplTotal(t), study = Math.max(0.5, diff(planStart(), S.testDate) / 7 - 5 / 7);
+  const want = Q.booked ? Math.min(can, Math.max(H, Math.ceil(tot / study * 2) / 2)) : Math.min(can, H);
+  const wp = t.hours ? weekPattern(t.hours, want) : null; if (wp) S.hours = wp.hours;
+  if (!Q.booked && t.weeks) S.testDate = satOnOrAfter(addDays(planStart(), Math.max(t.weeks, Math.ceil(tot / Math.max(1, sum(S.hours)) + 5 / 7)) * 7 - 1));
+  if (t.flDay != null && (+S.hours[t.flDay] > 0 || freeH(t.flDay) >= 8)) S.flDay = t.flDay;
+  S.carsN = t.shape.cars ?? S.carsN;
+  return wp;
+}
+function fitInfo(){
+  const S = D.set, t = !activeSpec() && S.template ? tplById(S.template) : null; if (!t || !t.hours) return null;
+  const w = diff(planStart(), S.testDate) / 7, study = Math.max(0.5, w - 5 / 7), set = sum(S.hours), hpw = sum(S.hours.map((h, i) => Math.min(+h || 0, usableH(i)))), have = Math.round(hpw * study), need = tplTotal(t);
+  const free = sum(WD.map((_, i) => (+t.hours[i] > 0 || +S.hours[i] > 0) ? usableH(i) : 0));
+  return { t, w, study, set, hpw, have, need, ratio: need ? have / need : 1, free };
+}
+function fitCard(){
+  const F = fitInfo(); if (!F) return '';
+  const S = D.set, r = F.ratio, opts = [], trimmed = S.trimmed ? ` Trimmed to fit: ${S.trimmed.to} full lengths instead of ${S.trimmed.from}.` : '';
+  let cls = 'ok', msg;
+  if (r < 0.9) {
+    cls = 'warn'; msg = `About <b>${F.have} h</b> of study fit before your taper week. ${esc(F.t.name)} is about <b>${F.need} h</b>, so you’d get ${Math.round(r * 100)}% of it.${trimmed}`;
+    const wkNeed = Math.ceil(F.need / Math.max(1, F.hpw) + 5 / 7), newTest = satOnOrAfter(addDays(planStart(), wkNeed * 7 - 1));
+    opts.push(`<button class="btn btn-sm" data-fit="stretch" data-v="${newTest}">Move the test to ${fmtLong(newTest)}</button><small class="muted">Keeps the whole plan at ${F.hpw} h a week.</small>`);
+    const want = Math.ceil(F.need / F.study * 2) / 2, can = Math.min(F.free, want);
+    if (can > F.hpw + 0.9) opts.push(`<button class="btn btn-sm" data-fit="hours" data-v="${can}">Study ${can} h a week</button><small class="muted">${can >= want ? 'Fits the whole plan in your free time.' : 'All your free time after commitments; still a little short.'}</small>`);
+    if (!S.trimmed) opts.push(`<button class="btn btn-sm" data-fit="trim">Keep the date, trim the plan</button><small class="muted">Fewer full lengths; every phase gets proportionally fewer days.</small>`);
+  } else if (r > 1.6) {
+    cls = 'soft'; msg = `Plenty of time: about <b>${F.have} h</b> available, and ${esc(F.t.name)} needs about <b>${F.need} h</b>. The extra becomes catch-up time if you keep it.`;
+    const wkNeed = Math.ceil(F.need / Math.max(1, F.hpw) + 5 / 7) + 1, newStart = addDays(S.testDate, -wkNeed * 7);
+    if (newStart > planStart()) opts.push(`<button class="btn btn-sm" data-fit="later" data-v="${newStart}">Start on ${fmtDay(newStart)} instead</button><small class="muted">Same hours a week, a shorter plan.</small>`);
+    const lower = Math.max(1, Math.ceil(F.need / F.study * 1.15 * 2) / 2);
+    if (lower < F.hpw - 0.9) opts.push(`<button class="btn btn-sm" data-fit="hours" data-v="${lower}">Go lighter: ${lower} h a week</button><small class="muted">Same dates, more breathing room.</small>`);
+  } else msg = `Fits: about <b>${F.have} h</b> of study before your taper week, and ${esc(F.t.name)} is about <b>${F.need} h</b>.${trimmed}`;
+  if (F.set - F.hpw >= 0.5) { if (cls === 'ok') cls = 'warn'; msg = `Only <b>${F.hpw} of your ${F.set} h</b> a week fit around your commitments (blocks need gaps, and a lunch break). ` + msg;
+    if (!opts.some(o => o.includes('data-fit="hours"'))) opts.unshift(`<button class="btn btn-sm" data-fit="hours" data-v="${Math.min(F.set, F.free)}">Fit my hours to my free time</button><small class="muted">Moves study to days with room.</small>`); }
+  return `<section class="card s12 fitcheck ${cls}"><div class="card-head"><h3>Does ${esc(F.t.name)} fit?</h3><span class="muted small">${F.hpw} h a week · ${Math.round(F.w)} weeks · after your commitments</span></div>
+    <p>${msg}</p>${opts.length ? `<div class="fit-opts">${opts.map(o => `<div>${o}</div>`).join('')}</div>` : ''}</section>`;
+}
+// imported plans with dates: move them to your start, in whole weeks so every weekday stays the same
+const shiftDates = (v, n) => Array.isArray(v) ? v.map(x => shiftDates(x, n)) : v && typeof v === 'object' ? Object.fromEntries(Object.entries(v).map(([k, x]) => [k, shiftDates(x, n)])) : typeof v === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(v) ? addDays(v, n) : v;
+const specShift = sp => { const d = diff(sp.start, planStart()); return Math.abs(d) < 7 ? 0 : (d > 0 ? Math.ceil(d / 7) : Math.round(d / 7)) * 7; };
+function reanchorSpec(id){
+  const i = (D.mySpecs || []).findIndex(x => x.id === id); if (i < 0) return null;
+  const sp = D.mySpecs[i], n = specShift(sp); if (!n) return sp;
+  const moved = { ...shiftDates(sp, n), id: sp.id, name: sp.name, desc: sp.desc, moved: (sp.moved || 0) + n };
+  D.mySpecs[i] = moved; return moved;
+}
+const suStart = () => { const S = D.set, Q = quick(), w = Math.max(0, Math.round(diff(planStart(), S.testDate) / 7)), fw = freeWeek();
+  const sp = activeSpec();
+  return `${sp ? `<section class="card s12 cta"><div><b>You’re using “${esc(sp.name)}”</b><p class="muted small">Your own plan stays chosen. Picking a shortcut below replaces it, and your plan stays under Plan → Your plans to switch back.</p></div><button class="btn" data-sustep="5">Go to my plan</button></section>` : ''}<section class="card s12"><h3>Three quick questions</h3>
+    <p class="lead">Answer these and the plans below sort themselves by how well they fit you. You can change everything afterwards.</p>
+    <div class="form">
+      <label class="field f2"><span>Start studying from</span><input type="date" id="qStart" value="${S.startDate}"></label>
+      <label class="field f2"><span>Test date</span><input type="date" id="qTest" value="${S.testDate}" ${Q.booked ? '' : 'disabled'}></label>
+      <div class="field f2"><span>No date yet?</span><label class="checkline"><input type="checkbox" id="qNoDate" ${Q.booked ? '' : 'checked'}> Suggest one from the plan I pick</label></div>
+      <label class="field f2"><span>Hours a week you can study</span><input type="number" id="qHpw" min="1" max="80" step="1" value="${Q.hpw}"></label>
+    </div>
+    <p class="muted small">${Q.booked ? `<b>${w} weeks</b> from your start to test day.` : 'Each plan’s own length sets the test date. Book a real date close to it.'}${commitList().length ? ` Around your commitments there’s room for about ${Math.round(fw)} h of study a week.` : ''}</p>
+    <div class="kit" role="group" aria-label="What you have">${KIT.map(([k, n, , d]) => `<label class="kit-c"><input type="checkbox" data-kit="${k}" ${kitOn(k) ? 'checked' : ''}><span><b>${esc(n)}</b>${d ? `<small class="muted">${esc(d)}</small>` : ''}</span></label>`).join('')}</div>
+    <p class="muted small">Nothing ticked means free resources only. Fine-tune every resource later in Resources.</p></section>
+    <section class="card s12"><div class="card-head"><h3>Plans that fit you</h3><span class="muted small">built from real study plans · best fit first</span></div>
+      <div class="tpls">${rankTpls().map(([t, f]) => tplCard(t, false, f)).join('')}</div></section>
+    <section class="card s12 cta"><div><b>Rather do it your way?</b><p class="muted small">Build from your own resources: Morae spreads what you ticked over your hours. Or use a plan file someone shared with you.</p></div>
+      <span class="btns"><button class="btn" data-custom="go">Build from my resources</button><button class="btn" data-sustep="5">Plan files and more</button></span></section>`; };
+const suStyle = () => { const S = D.set, sh = shape(), w = shapeWeeks(sh), sp = activeSpec();
+  const tCard = (t, mine) => tplCard(t, mine);
   const custom = !sp && !S.template;
-  return `<section class="card s12 myplan ${custom ? 'on' : ''}"><div class="card-head"><h3>Build from your own resources</h3>${custom ? '<span class="chip pill-ok">Chosen</span>' : ''}</div>
+  return `${fitCard()}<section class="card s12 myplan ${custom ? 'on' : ''}"><div class="card-head"><h3>Build from your own resources</h3>${custom ? '<span class="chip pill-ok">Chosen</span>' : ''}</div>
       <div class="mp"><div><p>Morae spreads the resources you ticked over the hours you set, around your commitments: content first, then question banks and passages, then AAMC material and full lengths. Adjust the mix under Fine-tune.</p></div>${custom ? '' : '<button class="btn btn-primary" data-custom="1">Use my resources</button>'}</div></section>
     ${allSpecs().length ? `<section class="card s12 myplan ${sp ? 'on' : ''}"><div class="card-head"><h3>Your plans</h3>${sp ? '<span class="chip pill-ok">Chosen</span>' : ''}</div>
-      ${allSpecs().map(x => `<div class="mp"><div><b class="mp-t">${esc(x.name)}</b><p>${esc(x.desc)}</p>${x.src && /^https:/.test(x.src.url || '') ? `<a class="small" href="${esc(x.src.url)}" target="_blank" rel="noopener">From ${esc(x.src.label || 'source')}</a>` : ''}</div>${S.template === x.id ? '' : `<button class="btn btn-primary" data-tpl="${x.id}">Choose</button>`}</div>`).join('')}
+      ${allSpecs().map(x => `<div class="mp"><div><b class="mp-t">${esc(x.name)}</b><p>${esc(x.desc)}</p>${x.src && /^https:/.test(x.src.url || '') ? `<a class="small" href="${esc(x.src.url)}" target="_blank" rel="noopener">From ${esc(x.src.label || 'source')}</a>` : ''}</div><span class="btns">${specShift(x) && (D.mySpecs || []).some(m => m.id === x.id) ? `<button class="btn" data-spshift="${x.id}" title="Moves every date by ${Math.abs(specShift(x) / 7)} week${Math.abs(specShift(x)) > 7 ? 's' : ''}; weekdays stay the same">Move it to start ${fmtDay(addDays(x.start, specShift(x)))}</button>` : ''}${S.template === x.id ? '' : `<button class="btn btn-primary" data-tpl="${x.id}">Choose</button>`}</span></div>`).join('')}
       <p class="muted small">A plan written for one person, with dated phases and full lengths. Your commitments, days off and resources still apply.</p></section>` : ''}
-    <section class="card s12"><div class="card-head"><h3>Shortcuts <small class="muted">optional</small></h3><span class="muted small">Ready-made mixes from well-known schedules. Pick one to fill in Fine-tune, then change anything. Your test is about ${weeksLeft} weeks away; a shortcut stretches or shrinks to fit.</span></div>
-      <div class="tpls">${TEMPLATES.map(t => tCard(t)).join('')}</div></section>
+    <section class="card s12"><div class="card-head"><h3>Shortcuts <small class="muted">built from real plans</small></h3><span class="muted small">Best fit first, from your answers on Start. Choosing one fills in your hours and Fine-tune; change anything after.</span></div>
+      <div class="tpls">${rankTpls().map(([t, f]) => tplCard(t, false, f)).join('')}</div></section>
     <section class="card s12"><div class="card-head"><h3>Saved and shared setups</h3><span class="btns"><label class="btn btn-sm" style="cursor:pointer">Import a plan file<input type="file" id="tImp" accept=".json,application/json" hidden></label><button class="btn btn-sm" id="tExp">Share my setup</button></span></div>
       ${(S.myTemplates || []).length ? `<div class="tpls">${S.myTemplates.map(t => tCard(t, true)).join('')}</div>` : '<p class="muted small">None yet. Save your own below, or import a plan someone shared with you.</p>'}
       <p class="muted small">Import takes a setup someone shared or a personal plan file (dated phases and full lengths). “Share my setup” saves a small file (weekly hours, plan shape, resources) that a friend can import. Coming with accounts: a library where people share plans that worked for them, like “510 in 4 months with a full-time job”.</p></section>
@@ -3386,7 +3598,8 @@ const suPreview = () => { const S = D.set, p = D.plan;
   const first7 = Array.from({ length: 7 }, (_, i) => addDays(start, i)).filter(k => k < S.testDate);
   const tight = wk.filter(x => x.h > 0).length ? null : 'No study hours planned.';
   const drop = {}; (p.dropped || []).forEach(x => drop[wdOf(x.k)] = (drop[wdOf(x.k)] || 0) + 1);
-  const warn = [tight, (p.dropped || []).length ? `${p.dropped.length} block${p.dropped.length > 1 ? 's' : ''} didn’t fit before bedtime: ${Object.entries(drop).map(([d, n]) => `${WD[d]} ×${n}`).join(', ')}. Lower those days’ hours in Study time, or move a commitment.` : null,
+  const F = fitInfo(), fitW = F && F.ratio < 0.9 ? `${F.t.name} is about ${F.need} h; about ${F.have} h fit before your taper week. Plan → “Does it fit?” has options.` : null;
+  const warn = [tight, fitW, (p.dropped || []).length ? `${p.dropped.length} block${p.dropped.length > 1 ? 's' : ''} didn’t fit before bedtime: ${Object.entries(drop).map(([d, n]) => `${WD[d]} ×${n}`).join(', ')}. Lower those days’ hours in Study time, or move a commitment.` : null,
     !activeSpec() && flClash().length && (p.fls || []).length ? `Full lengths fall on ${WD[+S.flDay]}, when you have ${flClash().map(c => c.t).join(', ')}. Change the full-length day in Study time.` : null,
     ...pace.filter(x => x.tot && x.n > x.left + 0.5 && x.left > 0).map(x => `${x.r.name}: the plan asks for ${x.n} ${x.unit}, ${x.left} left. Later blocks can repeat or switch source.`)].filter(Boolean);
   return `<section class="card s12 su-sum">
@@ -3404,21 +3617,21 @@ const suPreview = () => { const S = D.set, p = D.plan;
     <section class="card s12"><div class="card-head"><h3>Your first week</h3><span class="muted small">Change any day on Today: drag, resize, delete</span></div>
       <div class="su-week">${first7.map(k => `<div class="su-day"><b>${parse(k).toLocaleDateString('en-CA', { weekday: 'short', month: 'short', day: 'numeric' })}</b>${planDay(k).filter(b => b.kind !== 'blank').map(b => `<div class="su-b ${b.kind === 'fixed' ? 'fx' : ''}" style="--c:${b.sec ? `var(${SECS[b.sec]})` : 'var(--rule-2)'}"><span class="mono">${b.s || ''}</span>${esc(b.t)}</div>`).join('') || '<span class="muted small">—</span>'}</div>`).join('')}</div></section>
     <section class="card s12 cta"><div><b>Happy with it?</b><p class="muted small">It’s a suggestion. Finalize it, then tweak single days on Today or the Study plan whenever you like. Rebuilding later keeps your logs.</p></div>
-      <span class="btns"><button class="btn" data-sustep="4">Back to change</button><button class="btn btn-primary" id="suFin">${S.finalized ? 'Save changes' : 'Finalize my plan'}</button></span></section>`; };
+      <span class="btns"><button class="btn" data-sustep="5">Back to change</button><button class="btn btn-primary" id="suFin">${S.finalized ? 'Save changes' : 'Finalize my plan'}</button></span></section>`; };
 V.setup = () => { const st = SU.step;
   return `<div class="page-head"><h2>${D.set.setupDone ? 'Plan setup' : 'Set up your plan'}</h2><p>A few questions, then Morae spreads your resources over the days you have. Everything stays editable.</p></div>
   <ol class="su-steps">${SU_STEPS.map((l, i) => `<li><button data-sustep="${i}" ${i === st ? 'aria-current="step"' : ''} class="${i < st ? 'done' : ''}"><span>${i < st ? '✓' : i + 1}</span>${l}</button></li>`).join('')}</ol>
-  <div class="grid">${[suDates, suCommit, suTime, suRes, suStyle, suPreview][st]()}</div>
-  ${st < 5 ? `<div class="su-foot">${st ? '<button class="btn" id="suBack">Back</button>' : ''}<span class="sp"></span>${D.set.setupDone && st < 4 ? '<button class="btn" id="suSkip">Rebuild and preview</button>' : ''}<button class="btn btn-primary" id="suNext">${st === 4 ? 'Build and preview' : 'Next'}</button></div>` : ''}`; };
+  <div class="grid">${[suStart, suDates, suCommit, suTime, suRes, suStyle, suPreview][st]()}</div>
+  ${st < 6 ? `<div class="su-foot">${st ? '<button class="btn" id="suBack">Back</button>' : ''}<span class="sp"></span>${D.set.setupDone && st < 5 ? '<button class="btn" id="suSkip">Rebuild and preview</button>' : ''}<button class="btn btn-primary" id="suNext">${st === 5 ? 'Build and preview' : st === 0 ? 'Next: dates' : 'Next'}</button></div>` : ''}`; };
 V.setup.bind = () => {
   const S = D.set, keepY = () => { const y = window.scrollY; render(); window.scrollTo(0, y); };
-  const buildGo = () => { suRead(); if (diff(TODAY, S.testDate) < 0) { SU.step = 0; render(); return toast('The test date is in the past'); } buildPlan(); save(); SU.step = 5; render(); window.scrollTo({ top: 0 }); };
-  const goStep = n => { suRead(); if (n === 5) return buildGo(); SU.step = n; render(); window.scrollTo({ top: 0 }); };
+  const buildGo = () => { suRead(); if (diff(TODAY, S.testDate) < 0) { SU.step = 1; render(); return toast('The test date is in the past'); } buildPlan(); save(); SU.step = 6; render(); window.scrollTo({ top: 0 }); };
+  const goStep = n => { suRead(); if (n === 6) return buildGo(); SU.step = n; render(); window.scrollTo({ top: 0 }); };
   document.querySelectorAll('[data-sustep]').forEach(b => b.onclick = () => goStep(+b.dataset.sustep));
   if ($('#suBack')) $('#suBack').onclick = () => goStep(SU.step - 1);
   if ($('#suNext')) $('#suNext').onclick = () => goStep(SU.step + 1);
   if ($('#suSkip')) $('#suSkip').onclick = buildGo;
-  $('#page .grid').addEventListener('change', e => { if (['ankiFile', 'tName', 'tImp'].includes(e.target.id)) return; suRead(); if (/^sh[CPFWX]|^sTest|^sStart|^sBed|^sDay|^sDeck|^spBuf|^sFl/.test(e.target.id || '') || e.target.dataset.h) keepY(); });
+  $('#page .grid').addEventListener('change', e => { if (['ankiFile', 'tName', 'tImp'].includes(e.target.id)) return; suRead(); if (/^sh[CPFWX]|^sTest|^sStart|^sBed|^sDay|^sDeck|^spBuf|^sFl|^q[A-Z]/.test(e.target.id || '') || e.target.dataset.h || e.target.dataset.kit) keepY(); });
   document.querySelectorAll('[data-cnew]').forEach(b => b.onclick = () => commitEditor(null, b.dataset.cnew, keepY));
   document.querySelectorAll('[data-cedit]').forEach(b => b.onclick = () => commitEditor(b.dataset.cedit, null, keepY));
   if ($('#offAdd')) $('#offAdd').onclick = () => offEditor(null, keepY);
@@ -3435,14 +3648,25 @@ V.setup.bind = () => {
     catch (err) { $('#ankiOut').innerHTML = `<p class="note-box">${err.message === 'nocollection' ? 'That file doesn’t look like an Anki deck package (.apkg or .colpkg).' : err.message === 'lib' ? 'The reader couldn’t load. Check your internet connection and try again.' : 'That file couldn’t be read. Export again with scheduling information included.'}</p>`; }
   };
   if ($('#ankiUse')) $('#ankiUse').onclick = () => { S.ankiTotal = D.ankiStats.total - D.ankiStats.susp; S.ankiMature = D.ankiStats.mature; save(); keepY(); toast('Anki numbers filled in'); };
-  document.querySelectorAll('[data-fitdate]').forEach(b => b.onclick = () => { suRead(); D.set.testDate = b.dataset.fitdate; save(); renderHead(); keepY(); toast(`Test date set to ${fmtLong(b.dataset.fitdate)}. Book a real date close to it.`); });
-  document.querySelectorAll('[data-custom]').forEach(b => b.onclick = () => { suRead(); D.set.template = ''; save(); keepY(); toast('Your plan uses your own resources and hours'); });
+  document.querySelectorAll('[data-custom]').forEach(b => b.onclick = () => { suRead(); D.set.template = ''; delete D.set.trimmed; save(); if (b.dataset.custom === 'go') goStep(1); else keepY(); toast('Your plan uses your own resources and hours'); });
   document.querySelectorAll('[data-tpl]').forEach(b => b.onclick = () => {
-    suRead(); const spx = allSpecs().find(x => x.id === b.dataset.tpl);
-    if (spx) { S.template = spx.id; S.testDate = spx.test; S.startDate = spx.start; S.goal = spx.goal; S.floor = spx.floor; if (!commitList().length) S.commit = specCommits(spx); save(); renderHead(); keepY(); return toast(`“${spx.name}” chosen. Its dates are filled in.`); }
+    suRead(); let spx = allSpecs().find(x => x.id === b.dataset.tpl); let movedBy = 0;
+    if (spx && spx.test < addDays(TODAY, 7) && specShift(spx) > 0) { movedBy = specShift(spx); spx = reanchorSpec(spx.id) || spx; }
+    if (spx) { S.template = spx.id; S.testDate = spx.test; S.startDate = spx.start; S.goal = spx.goal; S.floor = spx.floor; if (!commitList().length) S.commit = specCommits(spx); save(); renderHead(); keepY(); return toast(movedBy ? `“${spx.name}” chosen and moved ${movedBy / 7} weeks so it starts ${fmtDay(spx.start)}. Test day: ${fmtLong(spx.test)}.` : `“${spx.name}” chosen. Its dates are filled in.`); }
     const t = TEMPLATES.concat(S.myTemplates || []).find(x => x.id === b.dataset.tpl); if (!t) return;
-    S.template = t.id; S.shape = { ...t.shape }; let capped = 0; if (t.hours) S.hours = t.hours.map((h, i) => { const f = Math.max(0, Math.floor(freeH(i) * 2) / 2); if (h > f) capped += h - f; return Math.min(h, f); }); S.carsN = t.shape.cars ?? S.carsN; save(); keepY(); toast(capped ? `“${t.name}” chosen. ${capped.toFixed(1)} h a week didn’t fit around your commitments, so those days are lighter.` : `“${t.name}” chosen. Its weekly hours are in Study time.`);
+    const wasBooked = quick().booked, wp = applyTpl(t); save(); renderHead();
+    const msg = `“${t.name}” chosen.${wasBooked ? '' : ` Test date set to ${fmtLong(S.testDate)}; book a real date close to it.`}${wp && wp.short ? ` ${wp.short} h a week didn’t fit around your commitments.` : ''}`;
+    if (SU.step === 0) { goStep(2); toast(`${msg} Next: your commitments, then we check it fits.`); } else { keepY(); toast(msg); }
   });
+  document.querySelectorAll('[data-fit]').forEach(b => b.onclick = () => { suRead(); const k = b.dataset.fit, val = b.dataset.v;
+    if (k === 'stretch') { S.testDate = val; quick().booked = true; toast(`Test date moved to ${fmtLong(val)}. Book a real date close to it.`); }
+    else if (k === 'later') { S.startDate = val; toast(`You start on ${fmtLong(val)}.`); }
+    else if (k === 'hours') { const wp = weekPattern(S.hours.some(h => h > 0) ? S.hours : (tplById(S.template) || {}).hours || S.hours, +val); S.hours = wp.hours; quick().hpw = Math.round(sum(S.hours)); toast(`${sum(S.hours)} h a week, spread over your free time.`); }
+    else if (k === 'trim') { const F = fitInfo(); if (!F) return; const base = F.t.shape, n = Math.max(3, Math.min(base.flTotal, Math.round(base.flTotal * Math.max(0.5, F.ratio))));
+      S.shape = { ...shape(), flTotal: n, flWeekly: Math.min(base.flWeekly, n) }; S.trimmed = { from: base.flTotal, to: n }; toast(`Trimmed: ${n} full lengths instead of ${base.flTotal}.`); }
+    save(); renderHead(); keepY(); });
+  document.querySelectorAll('[data-spshift]').forEach(b => b.onclick = () => { suRead(); const sp = reanchorSpec(b.dataset.spshift); if (!sp) return;
+    if (S.template === sp.id) { S.testDate = sp.test; S.startDate = sp.start; } save(); renderHead(); keepY(); toast(`“${sp.name}” now starts ${fmtDay(sp.start)}; test day ${fmtLong(sp.test)}.`); });
   document.querySelectorAll('[data-tdel]').forEach(b => b.onclick = () => { S.myTemplates = (S.myTemplates || []).filter(t => t.id !== b.dataset.tdel); if (S.template === b.dataset.tdel) S.template = ''; save(); keepY(); });
   if ($('#tSave')) $('#tSave').onsubmit = e => { e.preventDefault(); suRead(); const n = $('#tName').value.trim(); if (!n) return toast('Name your setup first');
     const t = { id: 'my_' + Date.now().toString(36), name: n, desc: `${Math.round(shape().content * 100)}% content, ${Math.round(shape().practice * 100)}% questions, ${shape().flTotal} full lengths, ${sum(S.hours)} h a week.`, hours: S.hours.slice(), shape: { ...shape() } };
