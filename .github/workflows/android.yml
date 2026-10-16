@@ -1,0 +1,73 @@
+# Builds the Android app (APK) and attaches it to a new "Beta" release you can download on your phone.
+# When it runs:
+#   - every Sunday morning (Toronto time), only if the app changed since the last beta
+#   - when a commit message contains [apk] (for urgent fixes)
+#   - when you press "Run workflow" on the Actions tab
+# The website still updates on every change.
+name: Android APK
+on:
+  schedule:
+    - cron: '0 13 * * 0'
+  push:
+    branches: [main]
+    paths: ['src/**', 'public/**', 'config/**', 'scripts/**', 'android/**', 'package*.json', 'capacitor.config.json', '.github/workflows/android.yml']
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    outputs:
+      build: ${{ steps.c.outputs.build }}
+    steps:
+      - uses: actions/checkout@v5
+        with: { fetch-depth: 0 }
+      - id: c
+        env:
+          EVENT: ${{ github.event_name }}
+          MSG: ${{ github.event.head_commit.message }}
+        run: |
+          build=false
+          if [ "$EVENT" = "workflow_dispatch" ]; then build=true; fi
+          if [ "$EVENT" = "push" ] && printf '%s' "$MSG" | grep -qi '\[apk\]'; then build=true; fi
+          if [ "$EVENT" = "schedule" ]; then
+            last=$(git tag -l 'beta-*' --sort=-v:refname | head -1)
+            if [ -z "$last" ] || ! git diff --quiet "$last" HEAD -- src public config scripts android package.json package-lock.json capacitor.config.json; then build=true; fi
+          fi
+          echo "build=$build" >> "$GITHUB_OUTPUT"
+          echo "Build the APK: $build"
+  build:
+    needs: check
+    if: needs.check.outputs.build == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with: { node-version: 22, cache: npm }
+      - run: npm ci
+      - run: node scripts/build-web.mjs
+        env:
+          PLANNER_VERSION: 0.1.${{ github.run_number }}
+      - run: npx cap sync android
+      - uses: actions/setup-java@v5
+        with: { distribution: temurin, java-version: '21' }
+      - name: Build signed APK
+        working-directory: android
+        # GitHub's Ubuntu machines come with the Android SDK installed (ANDROID_HOME)
+        run: echo "sdk.dir=$ANDROID_HOME" > local.properties && chmod +x gradlew && ./gradlew assembleRelease --no-daemon
+      - run: cp android/app/build/outputs/apk/release/app-release.apk study-planner-0.1.${{ github.run_number }}.apk
+      - uses: actions/upload-artifact@v4
+        with:
+          name: study-planner-apk
+          path: study-planner-*.apk
+      - uses: softprops/action-gh-release@v2
+        with:
+          tag_name: beta-${{ github.run_number }}
+          name: Beta 0.1.${{ github.run_number }}
+          make_latest: true
+          files: study-planner-*.apk
+          body: |
+            Android beta build 0.1.${{ github.run_number }}.
+            On your phone: tap the .apk file below to download it, open it, and tap Install.
+            Installing a newer build over an older one keeps your data.
+            Step-by-step help: docs/SETUP.md
