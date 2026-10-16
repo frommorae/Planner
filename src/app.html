@@ -1023,7 +1023,7 @@ function supabaseBackend(client, userId){
     async list(after){
       const out = [];
       for (let from = 0; ; from += 1000) {
-        let q = client.from('planner_docs').select('id,body,device,updated_at').order('id').range(from, from + 999);
+        let q = client.from('planner_docs').select('id,body,device,updated_at').not('id', 'like', 'mcat_%').order('id').range(from, from + 999); // Morae MCAT rows live in the same table
         if (after) q = q.gt('updated_at', after);
         const { data, error } = await q; if (error) fail(error);
         data.forEach(r => { seen(r); out.push({ id: r.id, data: { ...(r.body || {}), device: r.device } }); });

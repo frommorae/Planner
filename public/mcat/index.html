@@ -1,3 +1,10 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<script src="../config.js"></script>
+<script src="../vendor/supabase.js"></script>
 <title>Morae MCAT</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -442,6 +449,7 @@ tr.upcoming td{color:var(--ink-3)}
 .own small.d{display:block}
 .srow{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid var(--rule)}
 .srow:last-of-type{border-bottom:0}
+.brand .tag.bad{background:var(--bad-soft);color:var(--bad)}
 
 [hidden]{display:none!important}
 /* blank page: plain sheet, no ruled lines */
@@ -683,13 +691,23 @@ button.g-ses{cursor:pointer;font:inherit;color:inherit;text-align:left}
 .tk-row label span{overflow-wrap:anywhere}.tk-row.done label span{text-decoration:line-through;color:var(--ink-3)}
 .tk-row .bad{color:var(--bad)}
 @media (max-width:640px){.tk-add{grid-template-columns:1fr 1fr}.tk-add input[type=text]{grid-column:1/-1}}
+/* website: signed-out welcome + read-only beta board */
+.gate #index{display:none}.gate .binder{grid-template-columns:minmax(0,1fr)}.gate .count{visibility:hidden}
+.welcome{display:flex;flex-direction:column;gap:16px;max-width:980px}
+.wl-hero h2{font-family:var(--f-display);font-size:clamp(28px,5vw,40px);letter-spacing:-.02em;margin:8px 0 6px}
+.wl-hero .lead{font-size:17px;color:var(--ink-2);max-width:36em;margin:0 0 16px}
+.wl-hero #wlForm .acct{margin-top:12px}
+.wl-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px}
+.wl-grid .card h3{margin-bottom:4px}.wl-grid .card p{margin:0;color:var(--ink-2)}
+.b-row.ro{grid-template-columns:6.5em 1fr auto}
+.welcome a{color:var(--accent)}.wl-hero .btns+p{margin-top:8px}
 </style>
 
 <div class="wrap">
   <header class="top">
     <div class="brand">
       <h1 class="brand-name">Morae <b>MCAT</b></h1>
-      <span class="tag" title="Free beta. Everything you enter stays in this browser; nothing is sent anywhere. Save a backup in Settings → App.">Free beta · saved in this browser</span>
+      <span class="tag" id="cloudTag" title="Without an account, everything stays in this browser. Sign in (Settings → App) to sync with your Morae account.">Free beta · this browser only</span>
     </div>
     <div class="count">
       <span class="big" id="dCount">D-—</span>
@@ -892,12 +910,23 @@ let RDB = null, rSynced = false, rMigrated = false;
 const flagsOpen = () => (D.flags || []).filter(f => !f.done && (f.kind || 'content') === 'content');
 const reportsOpen = () => (D.flags || []).filter(f => !f.done);
 const rBody = f => ({ kind: f.kind || 'content', where: f.where || '', text: f.text, at: f.at, done: !!f.done, imp: f.imp || 2 });
-async function rWrite(f, del){ if (!RDB) return; const r = RDB.collection('reports').doc(f.id);
+async function rWrite(f, del){
+  if (Cloud.on) { if (!isCreator()) return; const t = Cloud.client.from('beta_notes');
+    const { error } = del ? await t.delete().eq('id', f.id) : await t.upsert({ id: f.id, kind: f.kind || 'content', place: f.where || '', text: f.text, at: f.at || TODAY, done: !!f.done, imp: f.imp || 2 });
+    if (error) toast('Not saved to the beta board: ' + error.message); else f.synced = true; return; }
+  if (!RDB) return; const r = RDB.collection('reports').doc(f.id);
   for (let t = 0; t < 2; t++) { try { if (del) await r.delete(); else await r.set(rBody(f)); f.synced = true; save(); return; } catch (e) { if (e && e.code !== 'unavailable') return; await new Promise(z => setTimeout(z, 400 + Math.random() * 600)); } } }
 function flagBadge(){ const b = document.getElementById('cmFlags'); if (b) b.textContent = flagsOpen().length ? `Fix list · ${flagsOpen().length}` : 'Fix list'; if ($('#index')) renderIndex(); }
-function addFlag(where, text, kind, imp){ if (!text) return; const f = { id: 'fl_' + Date.now().toString(36), at: TODAY, where: where || '', text, done: false, kind: kind || 'content', imp: imp || 2 }; D.flags = [...(D.flags || []), f]; save(); flagBadge(); rWrite(f); return f; }
-function setFlag(id, patch){ const f = (D.flags || []).find(x => x.id === id); if (!f) return; Object.assign(f, patch); save(); flagBadge(); rWrite(f); }
-function delFlag(id){ const f = (D.flags || []).find(x => x.id === id); D.flags = (D.flags || []).filter(x => x.id !== id); save(); flagBadge(); if (f) rWrite(f, true); }
+function addFlag(where, text, kind, imp){ if (!text) return; if (Cloud.on && !isCreator()) return toast('Only Morae can add to the beta board'); const f = { id: 'fl_' + Date.now().toString(36), at: TODAY, where: where || '', text, done: false, kind: kind || 'content', imp: imp || 2 }; D.flags = [...(D.flags || []), f]; save(); flagBadge(); rWrite(f); return f; }
+function setFlag(id, patch){ if (Cloud.on && !isCreator()) return; const f = (D.flags || []).find(x => x.id === id); if (!f) return; Object.assign(f, patch); save(); flagBadge(); rWrite(f); }
+function delFlag(id){ if (Cloud.on && !isCreator()) return; const f = (D.flags || []).find(x => x.id === id); D.flags = (D.flags || []).filter(x => x.id !== id); save(); flagBadge(); if (f) rWrite(f, true); }
+async function sbReportsLoad(){
+  if (!Cloud.on) return;
+  const { data, error } = await Cloud.client.from('beta_notes').select('id,kind,place,text,at,done,imp').order('at', { ascending: false }).limit(1000);
+  if (error) return;
+  D.flags = data.map(r => ({ id: r.id, kind: r.kind, where: r.place || '', text: r.text, at: r.at, done: !!r.done, imp: r.imp || 2, synced: true }));
+  store.set(D); flagBadge(); if (D.view === 'beta' || gated()) render();
+}
 function reportsSync(){
   if (!(window.claude && window.claude.use)) return;
   window.claude.use('db').then(db => { if (!db) return; RDB = db;
@@ -914,6 +943,7 @@ function reportsSync(){
   }).catch(() => {});
 }
 function flagEditor(where, after){
+  if (Cloud.on && !isCreator()) return toast('Only Morae can edit the beta board');
   openModal(`<div class="modal-head"><h2>Flag something to fix</h2><button class="x" data-close aria-label="Close">×</button></div>
     <p class="lead">${esc(where)}. It goes on your fix list (Content map → Fix list${CREATOR ? ' and the Beta tab' : ''}), so you can deal with it later.</p>
     <label class="field"><span>What’s wrong or missing?</span><textarea id="flT" rows="3" placeholder="e.g. Lesson 3 belongs under 5E too · this KA link is dead · add the Kaplan Biochem ch. 2 page"></textarea></label>
@@ -1293,8 +1323,103 @@ function sample(){
 /* =========================================================
    State, theme
    ========================================================= */
+/* =========================================================
+   Account + sync (website only): same Morae account and table as Morae Planner.
+   Each top-level part of the data is one row "mcat_<part>" in planner_docs.
+   ========================================================= */
+const Cloud = { on: false, client: null, user: null, status: 'off', msg: '', sent: {}, timer: null, busy: false, again: false, at: 0 };
+const CFGW = () => window.PLANNER_CONFIG || {};
+const gated = () => Cloud.on && !Cloud.user && Cloud.status !== 'checking' && !(D.app && D.app.guest);
+const isCreator = () => CREATOR || !!(Cloud.user && Cloud.creator); // creators are listed in the database (public.creators), not in the code
+function cloudInit(){
+  const cfg = CFGW(); if (!(window.supabase && window.supabase.createClient && cfg.supabaseUrl && cfg.supabaseKey) || (window.claude && window.claude.use)) return;
+  Cloud.on = true; Cloud.status = 'checking';
+  setTimeout(() => { if (Cloud.status === 'checking') { Cloud.status = 'signedout'; paintCloud(); renderIndex(); render(); } }, 5000);
+  // storageKey matches Morae Planner, so signing in to one signs in to both
+  Cloud.client = window.supabase.createClient(cfg.supabaseUrl, cfg.supabaseKey, { auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: true, storageKey: 'morae-planner/v1/auth' } });
+  Cloud.client.auth.onAuthStateChange((ev, session) => {
+    const u = session ? session.user : null, first = Cloud.status === 'checking';
+    if (!first && (u && u.id) === (Cloud.user && Cloud.user.id)) return;
+    Cloud.user = u; Cloud.creator = false;
+    if (u) Cloud.client.rpc('is_creator').then(r => { Cloud.creator = !!(r && r.data); if (Cloud.creator) { renderIndex(); render(); sbReportsLoad(); } }, () => {});
+    if (u) { Cloud.status = 'loading'; setTimeout(() => cloudPull(true), 0); } else { Cloud.status = 'signedout'; Cloud.sent = {}; paintCloud(); renderIndex(); render(); }
+    setTimeout(sbReportsLoad, 0);
+  });
+  document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible' && Cloud.user && !Cloud.timer && !Cloud.busy) cloudPull(false); });
+  const tag = document.getElementById('cloudTag'); if (tag) { tag.style.cursor = 'pointer'; tag.onclick = () => { if (Cloud.status === 'error') { Cloud.sent = {}; return Cloud.user ? cloudPull(false) : null; } setTab = 'app'; go('settings'); }; }
+  paintCloud();
+}
+async function cloudPull(first){
+  if (!Cloud.user) return; Cloud.status = 'loading'; paintCloud();
+  const rows = [];
+  try {
+    for (let from = 0; ; from += 1000) {
+      const { data, error } = await Cloud.client.from('planner_docs').select('id,body,updated_at').like('id', 'mcat_%').range(from, from + 999);
+      if (error) throw error; rows.push(...data); if (data.length < 1000) break;
+    }
+  } catch (e) { Cloud.status = 'error'; Cloud.msg = (e && e.message) || 'Couldn’t reach your account'; paintCloud(); return; }
+  if (!rows.length) { Cloud.sent = {}; Cloud.status = 'synced'; if (first) { if (D.app && D.app.guest) { const fl = D.flags; D = freshData(); D.flags = fl; store.set(D); } cloudPush(); applyTheme(); renderHead(); renderIndex(); render(); } paintCloud(); return; } // new account: this browser's data goes up
+  const nd = {}, sent = {}; rows.forEach(r => { const k = r.id.slice(5); if (k === 'flags' || k === 'view') return; nd[k] = r.body ? r.body.v : null; sent[k] = JSON.stringify(nd[k]); });
+  if (nd.v !== 6 || !nd.set) { Cloud.status = 'error'; Cloud.msg = 'The saved data is from another version'; paintCloud(); return; }
+  const same = Object.keys(sent).every(k => JSON.stringify(D[k]) === sent[k]);
+  Cloud.sent = sent; Cloud.status = 'synced'; Cloud.at = Date.now();
+  if (!same) { const view = D.view, fl = D.flags; D = nd; D.flags = fl; D.view = view && view !== 'setup' ? view : (D.set.setupDone === false ? 'setup' : 'dash'); store.set(D); paintCloud(); if (typeof ensureSetup === 'function') { try { ensureSetup(); } catch (e) {} } if (first) toast('Your MCAT data is loaded from your account'); }
+  paintCloud(); if (!same || first) { applyTheme(); renderHead(); renderIndex(); render(); }
+}
+function cloudQueue(){ if (!Cloud.user || Cloud.status === 'loading') return; clearTimeout(Cloud.timer); Cloud.timer = setTimeout(cloudPush, 1500); }
+async function cloudPush(){
+  Cloud.timer = null; if (!Cloud.user) return; if (Cloud.busy) { Cloud.again = true; return; }
+  const rows = []; Object.keys(D).forEach(k => { if (k === 'view' || k === 'flags') return; const v = JSON.stringify(D[k]); if (v !== undefined && Cloud.sent[k] !== v) rows.push([k, v]); });
+  if (!rows.length) return;
+  Cloud.busy = true; Cloud.status = 'saving'; paintCloud();
+  try {
+    for (let i = 0; i < rows.length; i += 20) {
+      const part = rows.slice(i, i + 20);
+      const { error } = await Cloud.client.from('planner_docs').upsert(part.map(([k, v]) => ({ user_id: Cloud.user.id, id: 'mcat_' + k, body: { v: JSON.parse(v) }, device: 'mcat-web' })), { onConflict: 'user_id,id' });
+      if (error) throw error; part.forEach(([k, v]) => Cloud.sent[k] = v);
+    }
+    Cloud.status = 'synced'; Cloud.msg = ''; Cloud.at = Date.now();
+  } catch (e) { Cloud.status = 'error'; Cloud.msg = (e && e.message) || 'Not saved'; }
+  Cloud.busy = false; paintCloud(); if (Cloud.again) { Cloud.again = false; cloudQueue(); }
+}
+function cloudLabel(){
+  if (!Cloud.on) return '';
+  if (!Cloud.user && D.app && D.app.guest) return 'Guest mode · sample data';
+  return { checking: 'Free beta', signedout: 'Free beta · sign in or try guest mode', loading: 'Loading your account…', saving: 'Saving…', synced: 'Synced to your account', error: 'Not saved · ' + Cloud.msg }[Cloud.status] || '';
+}
+function paintCloud(){ const t = document.getElementById('cloudTag'); if (t && Cloud.on) { t.textContent = Cloud.status === 'error' ? 'Not saved · tap to retry' : cloudLabel(); t.classList.toggle('bad', Cloud.status === 'error'); }
+  const a = document.getElementById('acctStatus'); if (a) a.textContent = cloudLabel(); }
+function accountCard(){
+  if (!Cloud.on) return '';
+  const u = Cloud.user;
+  return `<section class="card s12 acct" id="acctCard">
+    <div class="card-head"><h3>Account</h3><span class="chip ${Cloud.status === 'synced' ? 'pill-ok' : Cloud.status === 'error' ? 'pill-bad' : ''}" id="acctStatus">${esc(cloudLabel())}</span></div>
+    ${u ? `<p>Signed in as <b>${esc(u.email || '')}</b>. Your plan, logs and settings sync to this account, the same one you use for <a href="../" target="_blank" rel="noopener">Morae Planner ↗</a>.</p>
+      <p class="muted small">Account ID: <span class="mono">${esc(u.id)}</span>${isCreator() ? ' · creator mode on' : ''}</p>
+      <div class="btns" style="justify-content:flex-start"><button class="btn" id="acSync">Sync now</button><button class="btn" id="acOut">Sign out</button></div>`
+    : `<p class="muted small">Sign in with your Morae Planner account to keep your plan and logs on every device. Without an account, everything stays in this browser.</p>
+      <form class="form" id="acForm"><label class="field f3"><span>Email</span><input type="email" id="acE" autocomplete="email" required></label>
+      <label class="field f3"><span>Password</span><input type="password" id="acP" autocomplete="current-password" minlength="6" required></label>
+      <div class="field f6 btns" style="justify-content:flex-start"><button class="btn btn-primary" type="submit">Sign in</button><button class="btn" type="button" id="acNew">Create account</button>${D.app && D.app.guest ? '<button class="btn" type="button" id="acLeave">Leave guest mode</button>' : ''}</div></form>`}
+  </section>`;
+}
+function bindAccount(){
+  if (!Cloud.on) return;
+  if ($('#acForm')) $('#acForm').onsubmit = async e => { e.preventDefault();
+    const { error } = await Cloud.client.auth.signInWithPassword({ email: $('#acE').value.trim(), password: $('#acP').value });
+    toast(error ? (/invalid/i.test(error.message) ? 'Wrong email or password' : error.message) : 'Signed in'); };
+  if ($('#acNew')) $('#acNew').onclick = async () => { const em = $('#acE').value.trim(), pw = $('#acP').value; if (!em || pw.length < 6) return toast('Type an email and a password of 6+ characters first');
+    const { data, error } = await Cloud.client.auth.signUp({ email: em, password: pw, options: { emailRedirectTo: location.href.split('#')[0] } });
+    toast(error ? (/not allowed|disabled/i.test(error.message) ? 'New accounts are closed during the beta' : error.message) : data.session ? 'Account created' : 'Check your email to confirm, then sign in'); };
+  if ($('#acLeave')) $('#acLeave').onclick = () => { const fl = D.flags; D = freshData(); D.flags = fl; store.set(D); renderHead(); renderIndex(); render(); };
+  if ($('#acSync')) $('#acSync').onclick = () => { Cloud.sent = {}; cloudPush(); };
+  if ($('#acOut')) $('#acOut').onclick = () => askConfirm('Sign out?', 'Your data stays in your account. This browser goes back to a blank start.', 'Sign out', async () => {
+    clearTimeout(Cloud.timer); await cloudPush(); await Cloud.client.auth.signOut(); Cloud.user = null; Cloud.status = 'signedout'; Cloud.sent = {};
+    const fl = D.flags; D = freshData(); D.flags = fl; store.set(D); applyTheme(); renderHead(); renderIndex(); render(); toast('Signed out'); });
+}
+
 let D = store.get(); const FRESH = !D || D.v !== 6; if (FRESH) { D = sample(); D.plan = null; }
-function save(){ store.set(D); }
+function save(){ store.set(D); if (Cloud.user) cloudQueue(); }
 function freshData(){
   const s = sample();
   Object.assign(s, { plan: null, days: {}, sess: {}, planned: {}, ankiStats: null, done: {}, passages: [], hours: {}, anki: {}, skip: {}, closed: {}, resAdj: {}, practice: [], errors: [], blank: [], fls: [], cm: {}, cmEdit: {}, cat: [], view: 'setup' });
@@ -1507,7 +1632,8 @@ const FLR2 = t => [t, 90, 'Full-length review · part 2', 'flrev', '', 'Finish e
 const FLR3 = t => [t, 90, 'Full-length review · part 3, only if needed', 'flrev', '', 'Skip it if parts 1–2 covered everything', { afterFl: 3 }];
 const SPECS = [];
 
-const activeSpec = () => SPECS.find(s => s.id === D.set.template) || null;
+const allSpecs = () => SPECS.concat((D.mySpecs || []).filter(s => s && !SPECS.some(x => x.id === s.id)));
+const activeSpec = () => allSpecs().find(s => s.id === D.set.template) || null;
 function buildFromSpec(sp){
   const S = D.set, start = TODAY, end = sp.test;
   const keep = {}; if (D.plan) Object.keys(D.plan.days).forEach(k => { if (k < start) keep[k] = D.plan.days[k]; });
@@ -1719,11 +1845,12 @@ const phaseNow = () => D.plan && D.plan.phases.find(p => p.from <= TODAY && TODA
 const VIEWS = [
   ['dash', 'Dashboard'], ['today', 'Today'], ['plan', 'Study plan'], ['practice', 'Practice log'], ['errors', 'Error log'],
   ['blank', 'Blank page'], ['fls', 'Full lengths'], ['content', 'Content map'], ['resources', 'Resources'], ['settings', 'Settings'],
-].concat(CREATOR ? [['beta', 'Beta']] : []);
+  ['beta', 'Beta'],
+];
 function daysLeft(){ return diff(TODAY, D.set.testDate); }
 function renderHead(){ const n = daysLeft(); $('#dCount').textContent = n > 0 ? `D-${n}` : n === 0 ? 'D-DAY' : `D+${-n}`; $('#dDate').textContent = fmtLong(D.set.testDate); }
 function renderIndex(){
-  $('#index').innerHTML = VIEWS.map(([id, label], i) => (id === 'settings' ? '<span class="sep" aria-hidden="true"></span>' : '') +
+  $('#index').innerHTML = VIEWS.filter(([id]) => id !== 'beta' || isCreator() || Cloud.on).map(([id, label], i) => (id === 'settings' ? '<span class="sep" aria-hidden="true"></span>' : '') +
     `<button role="tab" data-v="${id}" aria-selected="${D.view === id}"><span class="n">${id === 'settings' ? '⚙' : id === 'beta' ? 'β' : pad(i + 1)}</span>${label}${id === 'beta' && reportsOpen().length ? `<span class="cnt">${reportsOpen().length}</span>` : ''}${id === 'blank' && !blankDone(TODAY) && !D.skip[TODAY] ? '<span class="dot" title="Not done today"></span>' : ''}</button>`).join('');
 }
 $('#index').addEventListener('click', e => { const b = e.target.closest('button[data-v]'); if (b) go(b.dataset.v); });
@@ -3059,7 +3186,7 @@ V.settings = () => {
        ['Resources', `${RES().filter(r => owned(r.id)).length} resources · ${S.carsN} CARS a day · Anki ${S.ankiMin} min (${esc(S.deck)})`, 3],
        ['Plan', `${esc(tName)}${S.finalized ? ` · finalized ${fmtDay(S.finalized)}` : ''}`, 4]].map(([h, txt, i]) => `<section class="card s6 su-card"><div class="card-head"><h3>${h}</h3><button class="linkish small" data-su="${i}">Edit</button></div><p class="small">${txt}</p></section>`).join('')}
     <section class="card s6 su-card"><div class="card-head"><h3>Preview</h3><button class="linkish small" data-su="5">Open</button></div><p class="small">Hours per week, full lengths, and what each resource gets.</p></section>`;
-  const appTab = `
+  const appTab = `${accountCard()}
     <section class="card s6">
       <h3>Appearance</h3>
       <div class="srow"><span>Colours</span><div class="seg" id="aPal"><button data-v="sahara" aria-pressed="${a.palette === 'sahara'}">Sahara</button><button data-v="ink" aria-pressed="${a.palette === 'ink'}">Ink</button></div></div>
@@ -3073,11 +3200,11 @@ V.settings = () => {
       <p class="muted small">Passage laps turn red past the target.</p>
     </section>
     <section class="card s12 cta">
-      <div><b>Data</b><p class="muted small">This preview starts with your plan and example logs. Reset to get them back, or start fresh to try the setup the way a new user would.</p></div>
-      <span class="btns"><button class="btn" id="resetAll">Reset sample data</button><button class="btn" id="freshAll">Start fresh</button></span>
+      <div><b>Data</b><p class="muted small">${Cloud.user ? 'Start fresh clears your plan, logs and settings in this account too.' : 'Reset sample data loads example logs to look around; Start fresh clears everything and opens the plan setup.'}</p></div>
+      <span class="btns">${Cloud.user ? '' : '<button class="btn" id="resetAll">Reset sample data</button>'}<button class="btn" id="freshAll">Start fresh</button></span>
     </section>
     <section class="card s12 cta">
-      <div><b>Backup</b><p class="muted small">Your logs live in this browser only, so they don’t follow you to another device. Save a backup every week or two; restore it here or on another device.${D.app.lastBackup ? ` Last backup: ${fmtDay(D.app.lastBackup)}.` : ' No backup yet.'}</p></div>
+      <div><b>Backup</b><p class="muted small">${Cloud.user ? 'Your data syncs to your account. A backup file is an extra copy you keep yourself.' : 'Your logs live in this browser only, so they don’t follow you to another device. Save a backup every week or two, or sign in above to sync.'}${D.app.lastBackup ? ` Last backup: ${fmtDay(D.app.lastBackup)}.` : ' No backup yet.'}</p></div>
       <span class="btns"><button class="btn btn-primary" id="bkSave">Save backup</button><label class="btn" style="cursor:pointer">Restore<input type="file" id="bkLoad" accept=".json,application/json" hidden></label></span>
     </section>`;
   return `
@@ -3085,6 +3212,7 @@ V.settings = () => {
   <div class="grid">${setTab === 'plan' ? planTab : appTab}</div>`;
 };
 V.settings.bind = () => {
+  bindAccount();
   $('#setTab').onclick = e => { const b = e.target.closest('button'); if (b) { setTab = b.dataset.v; render(); } };
   const S = D.set, a = D.app;
   if (setTab === 'plan') {
@@ -3097,15 +3225,15 @@ V.settings.bind = () => {
     $('#aCars').onchange = e => { a.carsTarget = Math.min(15, Math.max(5, +e.target.value || 10)); save(); };
     $('#freshAll').onclick = () => askConfirm('Start fresh?', 'Your plan, logs and settings in this preview are cleared. “Reset sample data” brings them back.', 'Start fresh', () => { D = freshData(); save(); applyTheme(); renderHead(); SU.step = 0; renderIndex(); render(); window.scrollTo({ top: 0 }); toast('Fresh start. Set up your plan.'); }, true);
     $('#bkSave').onclick = async () => {
-      const name = `mcat-backup-${TODAY}.json`; D.app.lastBackup = TODAY; save(); const data = JSON.stringify(D);
+      const name = `mcat-backup-${TODAY}.json`; D.app.lastBackup = TODAY; save(); const data = JSON.stringify({ ...D, mySpecs: allSpecs().filter(x => x.mine) });
       const dl = window.claude && window.claude.use ? await window.claude.use('downloads').catch(() => null) : null;
       if (dl) { try { await dl.save({ filename: name, data }); toast('Backup saved'); render(); } catch (e) { if (!e || e.code !== 'declined') toast('Saving isn’t available here'); } return; }
       const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([data], { type: 'application/json' })); a.download = name; a.click(); setTimeout(() => URL.revokeObjectURL(a.href), 2000); render();
     };
     $('#bkLoad').onchange = async e => { const f = e.target.files[0]; if (!f) return; let j; try { j = JSON.parse(await f.text()); } catch (x) { return toast('That isn’t a backup file'); }
       if (!j || !j.set || !Array.isArray(j.errors)) return toast('That isn’t a backup file');
-      askConfirm('Restore this backup?', `Everything here is replaced by the backup from ${j.app && j.app.lastBackup ? fmtDay(j.app.lastBackup) : 'that file'}.`, 'Restore', () => { D = j; save(); applyTheme(); renderHead(); renderIndex(); render(); toast('Backup restored'); }, true); };
-    $('#resetAll').onclick = () => { D = sample(); D.plan = null; buildPlan(); D.view = 'settings'; save(); applyTheme(); renderHead(); renderIndex(); render(); toast('Sample data restored'); };
+      askConfirm('Restore this backup?', `Everything here is replaced by the backup from ${j.app && j.app.lastBackup ? fmtDay(j.app.lastBackup) : 'that file'}.`, 'Restore', () => { D = j; save(); if (Cloud.on) { if (isCreator() && Array.isArray(j.flags)) Promise.all(j.flags.map(f => rWrite(f))).then(sbReportsLoad); else sbReportsLoad(); } applyTheme(); renderHead(); renderIndex(); render(); toast('Backup restored'); }, true); };
+    if ($('#resetAll')) $('#resetAll').onclick = () => { D = sample(); D.plan = null; buildPlan(); D.view = 'settings'; save(); applyTheme(); renderHead(); renderIndex(); render(); toast('Sample data restored'); };
   }
 };
 
@@ -3237,8 +3365,8 @@ const suStyle = () => { const S = D.set, sh = shape(), w = shapeWeeks(sh), sp = 
   const tCard = (t, mine) => `<div class="tpl ${S.template === t.id ? 'on' : ''}"><div class="tpl-h"><b>${esc(t.name)}</b>${t.weeks ? `<span class="chip">${t.weeks} weeks</span>` : ''}${t.hours ? `<span class="chip">${sum(t.hours)} h/week</span>` : ''}${t.shared ? '<span class="chip pill-ok">Shared</span>' : ''}</div>
     ${t.author || t.result ? `<p class="small"><b>${esc(t.author || 'Someone')}</b>${t.result ? ` · ${esc(t.result)}` : ''}</p>` : ''}<p>${esc(t.desc || 'Your saved setup.')}</p>${t.src ? `<a class="small" href="${t.src.url}" target="_blank" rel="noopener">Based on: ${esc(t.src.label)}</a>` : t.from ? `<span class="small muted">${esc(t.from)}</span>` : ''}
     <div class="btns" style="justify-content:flex-start"><button class="btn btn-sm ${S.template === t.id ? '' : 'btn-primary'}" data-tpl="${t.id}">${S.template === t.id ? 'Chosen' : 'Choose'}</button>${mine ? `<button class="linkish small" data-tdel="${t.id}">Delete</button>` : ''}</div></div>`;
-  return `${SPECS.length ? `<section class="card s12 myplan ${sp ? 'on' : ''}"><div class="card-head"><h3>Your plans</h3>${sp ? '<span class="chip pill-ok">Chosen</span>' : ''}</div>
-      ${SPECS.map(x => `<div class="mp"><div><b class="mp-t">${esc(x.name)}</b><p>${esc(x.desc)}</p>${x.src ? `<a class="small" href="${x.src.url}" target="_blank" rel="noopener">From ${esc(x.src.label)}</a>` : ''}</div>${S.template === x.id ? '' : `<button class="btn btn-primary" data-tpl="${x.id}">Choose</button>`}</div>`).join('')}
+  return `${allSpecs().length ? `<section class="card s12 myplan ${sp ? 'on' : ''}"><div class="card-head"><h3>Your plans</h3>${sp ? '<span class="chip pill-ok">Chosen</span>' : ''}</div>
+      ${allSpecs().map(x => `<div class="mp"><div><b class="mp-t">${esc(x.name)}</b><p>${esc(x.desc)}</p>${x.src ? `<a class="small" href="${x.src.url}" target="_blank" rel="noopener">From ${esc(x.src.label)}</a>` : ''}</div>${S.template === x.id ? '' : `<button class="btn btn-primary" data-tpl="${x.id}">Choose</button>`}</div>`).join('')}
       <p class="muted small">A plan written for one person, with dated phases and full lengths. Your commitments, days off and resources still apply.</p></section>` : ''}
     <section class="card s12"><div class="card-head"><h3>Suggested setups</h3><span class="muted small">Your test is about ${weeksLeft} weeks away; a setup stretches or shrinks to fit.</span></div>
       <div class="tpls">${TEMPLATES.map(t => tCard(t)).join('')}</div></section>
@@ -3315,7 +3443,7 @@ V.setup.bind = () => {
   };
   if ($('#ankiUse')) $('#ankiUse').onclick = () => { S.ankiTotal = D.ankiStats.total - D.ankiStats.susp; S.ankiMature = D.ankiStats.mature; save(); keepY(); toast('Anki numbers filled in'); };
   document.querySelectorAll('[data-tpl]').forEach(b => b.onclick = () => {
-    suRead(); const spx = SPECS.find(x => x.id === b.dataset.tpl);
+    suRead(); const spx = allSpecs().find(x => x.id === b.dataset.tpl);
     if (spx) { S.template = spx.id; S.testDate = spx.test; S.startDate = spx.start; S.goal = spx.goal; S.floor = spx.floor; if (!commitList().length) S.commit = specCommits(spx); save(); renderHead(); keepY(); return toast(`“${spx.name}” chosen. Its dates are filled in.`); }
     const t = TEMPLATES.concat(S.myTemplates || []).find(x => x.id === b.dataset.tpl); if (!t) return;
     S.template = t.id; S.shape = { ...t.shape }; if (t.hours) S.hours = t.hours.slice(); S.carsN = t.shape.cars ?? S.carsN; save(); keepY(); toast(`“${t.name}” chosen. Its weekly hours are in Study time.`);
@@ -3343,11 +3471,14 @@ function reportEditor(id){
   });
 }
 V.beta = () => {
+  if (!isCreator()) { const open = (D.flags || []).filter(x => !x.done).sort((a, b) => ((b.imp || 2) - (a.imp || 2)) || String(b.at).localeCompare(String(a.at)));
+    return `<div class="page-head"><h2>Beta board</h2><p>What’s being fixed or built next. Only Morae edits this list; found a bug? Use Settings → App → Contact (coming soon) or the planner’s contact form.</p></div>
+    <section class="card"><div class="b-list">${open.map(x => `<div class="b-row ro"><span class="b-kind k-${esc(x.kind || 'content')}">${RKIND[x.kind || 'content'] || 'Note'}</span><div class="b-main"><b>${esc(x.text)}</b><span class="muted small">${x.where ? esc(x.where) + ' · ' : ''}${x.at ? fmtDay(x.at) : ''}</span></div><span class="chip b-imp i${x.imp || 2}">${RIMP[x.imp || 2]}</span></div>`).join('') || '<p class="muted">Nothing open right now.</p>'}</div></section>`; }
   const all = D.flags || [], f = UI.bF || 'open', kf = UI.bK || '';
   const list = all.filter(x => (f === 'all' || (f === 'open' ? !x.done : x.done)) && (!kf || (x.kind || 'content') === kf))
     .sort((a, b) => (a.done - b.done) || ((b.imp || 2) - (a.imp || 2)) || String(b.at).localeCompare(String(a.at)));
   const cnt = k => all.filter(x => !x.done && (x.kind || 'content') === k).length;
-  const sync = RDB ? (rSynced ? 'Synced · Claude can read this list' : 'Syncing…') : 'Saved in this browser only';
+  const sync = RDB ? (rSynced ? 'Synced · Claude can read this list' : 'Syncing…') : Cloud.on ? 'Public beta board · only you can edit' : 'Saved in this browser only';
   return `
   <div class="page-head"><h2>Beta</h2><p>Creator mode: everything you’ve flagged, plus bugs, ideas and to-dos for the app itself. This tab is only in your beta copy and gets switched off before the app is shared.</p><span class="btns"><span class="chip ${RDB && rSynced ? 'pill-ok' : ''}">${sync}</span><button class="btn btn-sm" id="bCopy">Copy open items</button></span></div>
   <div class="grid">
@@ -3374,6 +3505,7 @@ V.beta = () => {
   </div>`;
 };
 V.beta.bind = () => {
+  if (!isCreator()) return;
   $('#bKind').onclick = e => { const b = e.target.closest('button'); if (!b) return; UI.bNK = b.dataset.v; $('#bKind').querySelectorAll('button').forEach(x => x.setAttribute('aria-pressed', String(x === b))); };
   $('#bImp').onclick = e => { const b = e.target.closest('button'); if (!b) return; UI.bNI = +b.dataset.v; $('#bImp').querySelectorAll('button').forEach(x => x.setAttribute('aria-pressed', String(x === b))); };
   $('#bForm').onsubmit = e => { e.preventDefault(); const t = $('#bText').value.trim(); if (!t) return toast('Write a few words first');
@@ -3389,14 +3521,47 @@ V.beta.bind = () => {
     try { await navigator.clipboard.writeText(t); toast('Copied'); } catch (e) { toast('Copy isn’t allowed here. Claude can read the synced list instead.'); } };
 };
 
+/* ---------- welcome (website, signed out) ---------- */
+const WL_FEATURES = [
+  ['Plan builder', 'Your test date, weekly hours, commitments and the resources you own become a day-by-day plan around your schedule, with full lengths and review days.'],
+  ['Today', 'Plan vs actual on a time grid, a focus timer sized to each block, passage laps, and a “plan tomorrow” step.'],
+  ['Practice + error log', 'Log passages and question sets, reflect on every miss, blind-redo it later, and see your patterns by reason.'],
+  ['Full lengths', 'Section scores, review status, a raw-to-scaled converter and a go/no-go check before test day.'],
+  ['Content map', 'The AAMC content outline with your own Strong / Okay / Weak tags and what your error log says per category.'],
+  ['Free library', 'Free full lengths, review sheets, videos and Anki decks, each with a link.'],
+];
+V.welcome = () => {
+  const open = (D.flags || []).filter(x => !x.done).sort((a, b) => (b.imp || 2) - (a.imp || 2)).slice(0, 8);
+  return `<div class="welcome">
+    <section class="wl-hero">
+      <h2>A free MCAT study planner</h2>
+      <p class="lead">Tell it your test date, your hours and the resources you own. It builds a day-by-day plan with links, then keeps track of what you actually do.</p>
+      <div class="btns" style="justify-content:flex-start"><button class="btn btn-primary" id="wlSign">Sign in</button><button class="btn" id="wlGuest">Try guest mode</button></div>
+      <p class="muted small">In beta: accounts are by invitation for now. Guest mode opens example data in this browser only.</p>
+      <div id="wlForm"></div>
+    </section>
+    <div class="wl-grid">${WL_FEATURES.map(([t, d]) => `<section class="card"><h3>${t}</h3><p class="small">${d}</p></section>`).join('')}</div>
+    ${open.length ? `<section class="card"><h3>Being worked on</h3><div class="b-list">${open.map(x => `<div class="b-row ro"><span class="b-kind k-${esc(x.kind || 'content')}">${RKIND[x.kind || 'content'] || 'Note'}</span><div class="b-main"><b>${esc(x.text)}</b></div><span></span></div>`).join('')}</div></section>` : ''}
+    <p class="muted small">Made by <a href="https://www.youtube.com/@frommorae" target="_blank" rel="noopener">Morae</a> · <a href="../">Morae Planner</a> · <a href="../privacy.html">Privacy</a></p>
+  </div>`;
+};
+V.welcome.bind = () => {
+  $('#wlGuest').onclick = () => { const fl = D.flags; D = sample(); D.flags = fl; D.app.guest = true; D.view = 'dash'; store.set(D); applyTheme(); renderHead(); renderIndex(); render(); toast('Guest mode: example data, saved only in this browser'); };
+  $('#wlSign').onclick = () => { $('#wlForm').innerHTML = accountCard(); bindAccount(); const e = $('#acE'); if (e) e.focus(); };
+};
+
 /* ---------- render ---------- */
 function render(){
-  const v = V[D.view] && (D.view !== 'beta' || CREATOR) ? D.view : 'dash';
+  if (Cloud.on && Cloud.status === 'checking') { document.body.classList.add('gate'); $('#page').innerHTML = '<p class="muted" style="padding:48px 0">Loading…</p>'; return; }
+  document.body.classList.toggle('gate', gated());
+  if (gated()) { $('#page').innerHTML = V.welcome(); V.welcome.bind(); paintCloud(); return; }
+  const v = V[D.view] && (D.view !== 'beta' || isCreator() || Cloud.on) ? D.view : 'dash';
   $('#page').innerHTML = V[v]();
   $('#page').querySelectorAll('[data-go]').forEach(b => b.addEventListener('click', () => go(b.dataset.go)));
   if (V[v].bind) V[v].bind();
+  if (Cloud.on) paintCloud();
 }
-if (FRESH) { D = freshData(); save(); }
+cloudInit(); if (FRESH) { D = freshData(); save(); }
 applyTheme(); renderHead(); renderIndex(); render(); reportsSync();
 })();
 </script>
