@@ -548,6 +548,14 @@ tr.upcoming td{color:var(--ink-3)}
 .kit-c input{width:18px;height:18px;accent-color:var(--accent);margin:1px 0 0}
 .kit-c span{display:grid;gap:1px;font-size:13.5px}.kit-c small{font-size:11.5px}
 .kit-c:has(input:checked){border-color:var(--accent)}
+.help-q{display:inline-grid;place-items:center;width:22px;height:22px;margin-left:6px;border-radius:50%;border:1.5px solid var(--accent);background:none;color:var(--accent);font:700 12.5px var(--f-body, inherit);letter-spacing:0;text-transform:none;vertical-align:middle;cursor:pointer}
+.help-q:hover{background:var(--accent);color:var(--sheet)}
+.help-steps{margin:0;padding-left:20px;display:grid;gap:8px;font-size:14px;line-height:1.55;max-width:68ch}
+.help-steps .chip{vertical-align:baseline}
+.help-h{font-size:15px;margin-top:4px}
+.gloss{display:grid;grid-template-columns:max-content 1fr;gap:8px 16px;margin:0;font-size:14px;line-height:1.5}
+.gloss dt{font-weight:700}.gloss dd{margin:0;color:var(--ink-2);max-width:62ch}
+@media (max-width:560px){.gloss{grid-template-columns:1fr}.gloss dd{margin-bottom:6px}}
 .fitcheck{border-left:4px solid var(--ok)}
 .fitcheck.warn{border-left-color:var(--warn)}.fitcheck.soft{border-left-color:var(--rule-2)}
 .fitcheck p{max-width:72ch;color:var(--ink-2)}.fitcheck b{color:var(--ink)}
@@ -3548,9 +3556,37 @@ function reanchorSpec(id){
   const moved = { ...shiftDates(sp, n), id: sp.id, name: sp.name, desc: sp.desc, moved: (sp.moved || 0) + n };
   D.mySpecs[i] = moved; return moved;
 }
+/* ---------- help: how the Start page works and the words the plans use ---------- */
+const GLOSSARY = [
+  ['Content', 'Learning or relearning the science and psychology itself: reading a book chapter or watching videos, then making Anki cards. Plans put most of it early.'],
+  ['Questions', 'Practice from question banks and passages (UWorld, Kaplan, Jack Westin, Khan Academy passages and others): timed sets, then reviewing every miss and guess. This is where most of the score gain usually comes from.'],
+  ['AAMC', 'The official practice material from the people who write the MCAT: Practice Exams, Section Banks, Question Packs and the CARS Question Bank. It is the closest to the real test, so plans save most of it for the end.'],
+  ['Taper', 'The last few days before the test: no new material, light review of your notes and error log, sleep, and test-day logistics.'],
+  ['Full length (FL)', 'A complete practice MCAT under test conditions, about 7.5 hours with breaks. Its review the next day matters as much as the exam.'],
+  ['Diagnostic', 'A full length near the start, before much studying, to see where you stand.'],
+  ['Sequence bar', 'The coloured bar on each plan: how its time before the taper splits into content, questions and AAMC, in that order.'],
+  ['Total hours', 'About how many hours of study the plan adds up to. If you have fewer weeks, the same hours need more per week; with more weeks, fewer per week.'],
+  ['Room', 'On Study time: how much study really fits in a day between your day start, bedtime and commitments, leaving short breaks between blocks.'],
+  ['Catch-up day', 'One lighter day a week for anything that slipped, or rest if you are on track.'],
+  ['Trim', 'Keeping your test date when the plan doesn’t fit: fewer full lengths, and every phase gets proportionally fewer days.'],
+];
+function startHelp(){
+  openModal(`<div class="modal-head"><h2>How this page works</h2><button class="x" data-close aria-label="Close">×</button></div>
+    <ol class="help-steps">
+      <li><b>Answer the three questions.</b> Your start date and test date (or tick “No date yet”), the hours a week you can study, and what you have.</li>
+      <li><b>Read the labels.</b> Plans sort themselves, best fit first. <span class="chip pill-ok">Fits</span> means your weeks, hours and resources match. A yellow label says what’s short, like <span class="chip pill-warn">Needs 5 more h/week</span> or <span class="chip pill-warn">Built for 14+ weeks</span>. A red one means a resource the plan can’t do without, like <span class="chip pill-bad">Needs UWorld</span>. Grey lines under a plan are notes, not problems.</li>
+      <li><b>Open “Based on N real plans”</b> to see the real study plans and published schedules each one comes from, with links.</li>
+      <li><b>Press “Use this plan”.</b> It fills in your dates, weekly hours and resources. Next you add your commitments (classes, shifts), and Morae checks whether the plan still fits, with options: move the test date, study more hours a week, or trim the plan.</li>
+      <li><b>Change anything afterwards.</b> Every step stays editable, and a rebuild keeps your logs. Prefer to do it yourself? Use “Build from my resources”.</li>
+    </ol>
+    <h3 class="help-h">Words the plans use</h3>
+    <dl class="gloss">${GLOSSARY.map(([t, d]) => `<dt>${esc(t)}</dt><dd>${esc(d)}</dd>`).join('')}</dl>
+    <div class="btns"><button class="btn btn-primary" data-close>Got it</button></div>`, null, true);
+}
+const helpBtn = label => `<button class="help-q" data-help aria-label="${esc(label)}" title="${esc(label)}">?</button>`;
 const suStart = () => { const S = D.set, Q = quick(), w = Math.max(0, Math.round(diff(planStart(), S.testDate) / 7)), fw = freeWeek();
   const sp = activeSpec();
-  return `${sp ? `<section class="card s12 cta"><div><b>You’re using “${esc(sp.name)}”</b><p class="muted small">Your own plan stays chosen. Picking a shortcut below replaces it, and your plan stays under Plan → Your plans to switch back.</p></div><button class="btn" data-sustep="5">Go to my plan</button></section>` : ''}<section class="card s12"><h3>Three quick questions</h3>
+  return `${sp ? `<section class="card s12 cta"><div><b>You’re using “${esc(sp.name)}”</b><p class="muted small">Your own plan stays chosen. Picking a shortcut below replaces it, and your plan stays under Plan → Your plans to switch back.</p></div><button class="btn" data-sustep="5">Go to my plan</button></section>` : ''}<section class="card s12"><h3>Three quick questions ${helpBtn('How this page works')}</h3>
     <p class="lead">Answer these and the plans below sort themselves by how well they fit you. You can change everything afterwards.</p>
     <div class="form">
       <label class="field f2"><span>Start studying from</span><input type="date" id="qStart" value="${S.startDate}"></label>
@@ -3561,7 +3597,7 @@ const suStart = () => { const S = D.set, Q = quick(), w = Math.max(0, Math.round
     <p class="muted small">${Q.booked ? `<b>${w} weeks</b> from your start to test day.` : 'Each plan’s own length sets the test date. Book a real date close to it.'}${commitList().length ? ` Around your commitments there’s room for about ${Math.round(fw)} h of study a week.` : ''}</p>
     <div class="kit" role="group" aria-label="What you have">${KIT.map(([k, n, , d]) => `<label class="kit-c"><input type="checkbox" data-kit="${k}" ${kitOn(k) ? 'checked' : ''}><span><b>${esc(n)}</b>${d ? `<small class="muted">${esc(d)}</small>` : ''}</span></label>`).join('')}</div>
     <p class="muted small">Nothing ticked means free resources only. Fine-tune every resource later in Resources.</p></section>
-    <section class="card s12"><div class="card-head"><h3>Plans that fit you</h3><span class="muted small">built from real study plans · best fit first</span></div>
+    <section class="card s12"><div class="card-head"><h3>Plans that fit you ${helpBtn('How this page works and what the words mean')}</h3><span class="muted small">built from real study plans · best fit first</span></div>
       <div class="tpls">${rankTpls().map(([t, f]) => tplCard(t, false, f)).join('')}</div></section>
     <section class="card s12 cta"><div><b>Rather do it your way?</b><p class="muted small">Build from your own resources: Morae spreads what you ticked over your hours. Or use a plan file someone shared with you.</p></div>
       <span class="btns"><button class="btn" data-custom="go">Build from my resources</button><button class="btn" data-sustep="5">Plan files and more</button></span></section>`; };
@@ -3573,7 +3609,7 @@ const suStyle = () => { const S = D.set, sh = shape(), w = shapeWeeks(sh), sp = 
     ${allSpecs().length ? `<section class="card s12 myplan ${sp ? 'on' : ''}"><div class="card-head"><h3>Your plans</h3>${sp ? '<span class="chip pill-ok">Chosen</span>' : ''}</div>
       ${allSpecs().map(x => `<div class="mp"><div><b class="mp-t">${esc(x.name)}</b><p>${esc(x.desc)}</p>${x.src && /^https:/.test(x.src.url || '') ? `<a class="small" href="${esc(x.src.url)}" target="_blank" rel="noopener">From ${esc(x.src.label || 'source')}</a>` : ''}</div><span class="btns">${specShift(x) && (D.mySpecs || []).some(m => m.id === x.id) ? `<button class="btn" data-spshift="${x.id}" title="Moves every date by ${Math.abs(specShift(x) / 7)} week${Math.abs(specShift(x)) > 7 ? 's' : ''}; weekdays stay the same">Move it to start ${fmtDay(addDays(x.start, specShift(x)))}</button>` : ''}${S.template === x.id ? '' : `<button class="btn btn-primary" data-tpl="${x.id}">Choose</button>`}</span></div>`).join('')}
       <p class="muted small">A plan written for one person, with dated phases and full lengths. Your commitments, days off and resources still apply.</p></section>` : ''}
-    <section class="card s12"><div class="card-head"><h3>Shortcuts <small class="muted">built from real plans</small></h3><span class="muted small">Best fit first, from your answers on Start. Choosing one fills in your hours and Fine-tune; change anything after.</span></div>
+    <section class="card s12"><div class="card-head"><h3>Shortcuts <small class="muted">built from real plans</small> ${helpBtn('What the labels and words mean')}</h3><span class="muted small">Best fit first, from your answers on Start. Choosing one fills in your hours and Fine-tune; change anything after.</span></div>
       <div class="tpls">${rankTpls().map(([t, f]) => tplCard(t, false, f)).join('')}</div></section>
     <section class="card s12"><div class="card-head"><h3>Saved and shared setups</h3><span class="btns"><label class="btn btn-sm" style="cursor:pointer">Import a plan file<input type="file" id="tImp" accept=".json,application/json" hidden></label><button class="btn btn-sm" id="tExp">Share my setup</button></span></div>
       ${(S.myTemplates || []).length ? `<div class="tpls">${S.myTemplates.map(t => tCard(t, true)).join('')}</div>` : '<p class="muted small">None yet. Save your own below, or import a plan someone shared with you.</p>'}
@@ -3658,6 +3694,7 @@ V.setup.bind = () => {
     const msg = `“${t.name}” chosen.${wasBooked ? '' : ` Test date set to ${fmtLong(S.testDate)}; book a real date close to it.`}${wp && wp.short ? ` ${wp.short} h a week didn’t fit around your commitments.` : ''}`;
     if (SU.step === 0) { goStep(2); toast(`${msg} Next: your commitments, then we check it fits.`); } else { keepY(); toast(msg); }
   });
+  document.querySelectorAll('[data-help]').forEach(b => b.onclick = startHelp);
   document.querySelectorAll('[data-fit]').forEach(b => b.onclick = () => { suRead(); const k = b.dataset.fit, val = b.dataset.v;
     if (k === 'stretch') { S.testDate = val; quick().booked = true; toast(`Test date moved to ${fmtLong(val)}. Book a real date close to it.`); }
     else if (k === 'later') { S.startDate = val; toast(`You start on ${fmtLong(val)}.`); }
