@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <script src="../config.js"></script>
 <script src="../vendor/supabase.js"></script>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23355C8C'/%3E%3Crect x='11' y='13' width='42' height='38' rx='4' fill='%23F6F8FB'/%3E%3Crect x='16' y='18.5' width='25' height='5' rx='2.5' fill='%23F2C3BE'/%3E%3Crect x='16' y='26' width='32' height='5' rx='2.5' fill='%23C4E3C6'/%3E%3Crect x='16' y='33.5' width='19' height='5' rx='2.5' fill='%23BCD8F4'/%3E%3Crect x='16' y='41' width='28' height='5' rx='2.5' fill='%23DBCBEF'/%3E%3C/svg%3E">
 <title>Morae MCAT</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -1543,7 +1544,6 @@ const KA_LESSONS = [
   [128, 'Thermochemistry', 'chemical-processes#thermochemistry', '5E'],
 ];
 const CAT_SEC = c => (CATS.find(x => x.code === c) || {}).sec || '';
-const lessonItem = n => { const l = KA_LESSONS.find(x => x[0] === n); return { t: `Lesson ${l[0]} · ${l[1]}`, url: KA + l[2], cat: l[3], sec: CAT_SEC(l[3]), src: 'Khan Academy videos', lesson: l[0] }; };
 const lessonsFor = cat => KA_LESSONS.filter(l => l[3] === cat).map(l => ({ n: l[0], t: l[1], url: KA + l[2] }));
 // KA practice passages, in the IFD order
 const KA_P = {
@@ -1591,59 +1591,17 @@ const KAP_PS = kp('ps', 'P/S', [['patient-with-a-missing-cerebellum', 'Patient w
   ['applications-of-operant-conditioning-in-daily-life', 'Operant conditioning in daily life', '7C'], ['marijuana-usage-as-social-behavior', 'Marijuana use as social behavior', '7B'],
   ['is-obesity-contagious-', 'Is obesity contagious?', '8C'], ['romantic-and-sexual-networks-of-adolescents', 'Adolescent social networks', '8C'],
   ['do-beliefs-about-healthy-food-inform-consumer-choices--', 'Beliefs about healthy food', '7C'], ['race--socioeconomic-status--and-nutrition', 'Race, SES and nutrition', '10A']]);
-const KAP_CARS = kp('cars', 'CARS', [['living-in-a-rational-society', 'Living in a rational society'], ['the-happy-american', 'The happy American'], ['physical-education-in-the-uk', 'Physical education in the UK'],
-  ['the-honest-truth-about-dishonesty-', 'The honest truth about dishonesty'], ['the-ultimatum-game', 'The ultimatum game']]);
-const IFD_STRATEGY = [['Timing charts', 'https://www.youtube.com/watch?v=Xgj-Tyzc1RY'], ['The flowchart method', 'https://www.youtube.com/watch?v=-DqMlYom0JQ'],
-  ['Simplifying the question stem', 'https://www.youtube.com/watch?v=zzRvMX4hN7Q'], ['Condense to the main idea, part 1', 'https://www.youtube.com/watch?v=H6FYrCZpeKQ'],
-  ['Condense to the main idea, part 2', 'https://www.youtube.com/watch?v=d1XU6IEbVEQ'], ['How to review full-length exams', 'https://youtu.be/L40aCmPFmhw'],
-  ['Figure interpretation', 'https://youtu.be/yJyQNEPJKYw'], ['Foreshadowing', 'https://youtu.be/irngA9Q4Ie0'], ['Condense to the main idea, part 3', 'https://youtu.be/aCN3NzOWWFE'],
-  ['Research methods', 'https://youtu.be/vX96HG9QNGA'], ['Recognizing and avoiding traps', 'https://youtu.be/hKQXzStxNKs'], ['Math review', 'https://youtu.be/mplqkLjWypo']]
-  .map(([t, url]) => ({ t, url, src: 'IFD strategy videos' }));
-const IFD_AAMC_REVIEWS = 'https://www.youtube.com/playlist?list=PLaJGDCrlCozVaPCf7DyjK4--NLh4PGs3S';
 // AAMC sets for the main block, in order: unseen packs first, then the reset section banks
-function aamcSets(){
-  const out = [], add = (name, src, total, size, secs) => { const per = Math.ceil(total / size); for (let i = 0; i < per; i++) { const a = i * size + 1, z = Math.min(total, (i + 1) * size); out.push({ t: `${name} · Q${a}–${z}`, src, n: z - a + 1, unit: 'Q', sec: secs.length === 1 ? secs[0] : '' }); } };
-  add('Biology Question Pack vol. 1', 'Biology Question Packs vol. 1 & 2', 120, 20, ['B/B']);
-  add('Physics Question Pack', 'Physics Question Pack', 120, 20, ['C/P']);
-  add('Biology Question Pack vol. 2', 'Biology Question Packs vol. 1 & 2', 120, 20, ['B/B']);
-  add('Chemistry Question Pack', 'Chemistry Question Pack', 120, 20, ['C/P']);
-  add('Section Bank vol. 1', 'Section Bank vol. 1', 300, 25, ['B/B', 'C/P', 'P/S']);
-  add('Section Bank vol. 2', 'Section Bank vol. 2', 300, 25, ['B/B', 'C/P', 'P/S']);
-  return out;
-}
 // CARS Question Bank sets (AAMC, 2027): 1 = old Diagnostic Tool (169 Q, reset), 2 = old QPack 1 (120), 3 = old QPack 2 (120), 4 = new for 2027 (166, unseen)
-const cqSets = (set, qs, per) => Array.from({ length: Math.ceil(qs / per) }, (_, i) => ({ t: `set ${set} · passages ${i * 3 + 1}–${i * 3 + 3}`, src: 'CARS Question Bank', n: Math.min(per, qs - i * per), unit: 'Q', sec: 'CARS', cat: '' }));
 
 /* =========================================================
    Plan building blocks: the IFD 6-month plan + Savvy Pre-Med / Brem guidelines
    week slots: [start, minutes, title, kind, section, note, {from, to, afterFl, fallback}]  ·  weekday 0 = Mon
    {@pool} in a title takes the next item from that pool (a KA lesson, passage, AAMC set...) with its link and category.
    ========================================================= */
-const R2 = ' Solve, then review for twice as long.';
 const CARS30 = (t = '10:00') => [t, 30, 'CARS · 1 Jack Westin passage + review', 'cars', 'CARS', 'About 10 min timed, 20 min review. Main point + author’s attitude in one line before checking. End on a fully correct passage.'];
-const CARS60 = (t = '10:00') => [t, 60, 'CARS · 2 Jack Westin passages + review', 'cars', 'CARS', '20 min timed, 40 min review (2×). End on a fully correct passage.'];
 const ANKI_PHONE = ['20:00', 20, 'Anki · your deck', 'anki', '', 'Reviews first. If more are due than usual (about 1.5×), add no new cards today.'];
-const ANKI_REST = ['20:00', 15, 'Anki · reviews only', 'anki', '', 'Day off: reviews only, so they don’t pile up'];
-const REST = ['', 0, 'Day off · rest', 'rest', '', 'Want a different day off this week? Press “Make this my day off” on that day in Study plan.'];
-const LES = (t, pool, m = 60, o) => [t, m, 'KA {@' + pool + '}', 'content', '{@}', 'Watch at 1.5×, pause and recall every few minutes; then unsuspend or make the Anki cards for it.', o];
-const KAPS = (t, pool, o) => [t, 30, 'KA passage · {@' + pool + '}', 'pass', '{@}', 'About 9 min timed, 18 min review: why each choice is right or wrong.', o];
-const STRAT = t => [t, 20, 'Strategy video · {@strat}', 'review', '', 'IFD strategy series: try it on your next passage', { fallback: '' }];
-const BEMO = (t, o) => [t, 45, 'BeMo QBank · questions on this week’s lessons', 'qs', 'B/B', '15 min of questions, 30 min review.' + R2, o];
-const BOOT = (t, o) => [t, 75, 'MCAT Bootcamp · {sci} · science set', 'qs', '{sci}', '25 min, then 50 min review. Every miss into the error log.', { to: '2027-04-06', ...(o || {}) }];
-const JWQ = (t, m = 75, o) => [t, m, 'Jack Westin QBank · patch a gap from your error log', 'qs', '', 'Pick the weakest category on the content map; 20–25 questions, then review.' + R2, o];
-const AAMC_CARS = (t, o) => [t, 90, 'AAMC CARS · {@cq}', 'aamc', 'CARS', '3 passages timed (30 min), then 60 min review. Explain every choice; remembering the answer doesn’t count.', { fallback: 'AAMC CARS · redo your hardest earlier passages', ...(o || {}) }];
-const AAMC_CARS4 = (t, o) => [t, 90, 'AAMC CARS · {@cq4} (unseen)', 'aamc', 'CARS', 'Your honest CARS check for Jun 25: timed, no previewing.', o];
-const AAMCSET = (t, note, o) => [t, 105, '{@aamc}', 'aamc', '{@}', (note ? note + ' ' : '') + 'Timed (about 35 min), then 70 min review. Blind-review misses before the explanations.', { fallback: 'AAMC · redo your missed questions', ...(o || {}) }];
 // AAMC Sample Test as weekly passages with IFD's walkthrough videos (IFD weeks 1–11 order)
-const ST_ITEMS = [['C/P', 'C/P Q1–9'], ['CARS', 'CARS passage 1'], ['B/B', 'B/B Q1–10'], ['CARS', 'CARS passage 2'], ['P/S', 'P/S Q1–9'], ['CARS', 'CARS passage 3'], ['C/P', 'C/P Q10–21'], ['CARS', 'CARS passage 4'],
-  ['B/B', 'B/B Q11–22'], ['CARS', 'CARS passage 5'], ['P/S', 'P/S Q10–20'], ['CARS', 'CARS passage 6'], ['C/P', 'C/P Q22–33'], ['CARS', 'CARS passage 7'], ['B/B', 'B/B Q23–35'], ['CARS', 'CARS passage 8'],
-  ['P/S', 'P/S Q21–34'], ['CARS', 'CARS passage 9'], ['C/P', 'C/P Q34–46'], ['B/B', 'B/B Q36–47'], ['P/S', 'P/S Q35–47'], ['C/P', 'C/P Q47–59'], ['B/B', 'B/B Q48–59'], ['P/S', 'P/S Q48–59']]
-  .map(([sec, t]) => ({ t, sec, url: IFD_AAMC_REVIEWS, src: 'Unscored Sample Test' }));
-const STP = (t, o) => [t, 45, 'AAMC Sample Test · {@st}', 'aamc', '{@}', 'Timed, then IFD’s walkthrough video. Write why each choice is right or wrong before you watch.', { fallback: '', ...(o || {}) }];
-const WEEKLY = (t, m = 45) => [t, m, 'Weekly review · blank-page the week + redo due errors', 'review', '', 'Spaced review: what you learned this week, from memory, then the error-log redo queue'];
-const CHECKIN = ['19:30', 15, 'Weekly plan + check-in message', 'review', '', 'Send your check-in person: hours logged, top 3 errors, latest score'];
-const FLR2 = t => [t, 90, 'Full-length review · part 2', 'flrev', '', 'Finish every miss and guess; tag each with its content category', { afterFl: 2 }];
-const FLR3 = t => [t, 90, 'Full-length review · part 3, only if needed', 'flrev', '', 'Skip it if parts 1–2 covered everything', { afterFl: 3 }];
 const SPECS = [];
 
 const allSpecs = () => SPECS.concat((D.mySpecs || []).filter(s => s && !SPECS.some(x => x.id === s.id)));
@@ -2376,7 +2334,6 @@ V.today.bind = () => {
    Study plan
    ========================================================= */
 let weekOff = 0;
-const KIND_LABEL = { content: 'Content', pass: 'Passages', aamc: 'AAMC', cars: 'CARS', fl: 'Full length', flrev: 'FL review', errors: 'Error log', anki: 'Anki', blank: 'Blank page', review: 'Review', rest: 'Rest' };
 V.plan = () => {
   if (!D.plan || !D.plan.phases.length) return `<div class="page-head"><h2>Study plan</h2></div><section class="card"><p>${D.plan && D.plan.short ? 'Your test date is less than a week away, so there’s no plan to build. Focus on the taper: light review and sleep.' : 'No plan yet.'}</p><button class="btn btn-primary" data-go="setup">Set up my plan</button></section>`;
   const mon = addDays(TODAY, -wdOf(TODAY) + weekOff * 7), days = Array.from({ length: 7 }, (_, i) => addDays(mon, i));
@@ -3039,7 +2996,7 @@ V.content.bind = () => {
     const fc = e.target.closest('[data-fixcat]'); if (fc) return fixEditor(fc.dataset.fixcat, true);
     const s = e.target.closest('.sow button'); if (!s) return;
     const k = s.closest('.topic').dataset.k, cur = D.cm[k] || {}; cur.s = cur.s === s.dataset.v ? '' : s.dataset.v; D.cm[k] = cur;
-    save(); const det = s.closest('details'); const openCodes = [...document.querySelectorAll('.cmcat[open] .code')].map(x => x.textContent); render();
+    save(); const openCodes = [...document.querySelectorAll('.cmcat[open] .code')].map(x => x.textContent); render();
     document.querySelectorAll('.cmcat').forEach(d => { if (openCodes.includes(d.querySelector('.code').textContent)) d.open = true; });
   });
 };
@@ -3189,7 +3146,7 @@ function ankiReport(a){
 let setTab = 'plan';
 const shapeWeeks = sh => { const pre = Math.max(0, diff(TODAY > D.set.startDate ? TODAY : D.set.startDate, addDays(D.set.testDate, -5))); const c = Math.round(pre * sh.content), p = Math.round(pre * sh.practice); return { c: c / 7, p: p / 7, a: Math.max(0, pre - c - p) / 7 }; };
 V.settings = () => {
-  const S = D.set, a = D.app, sh = shape(), grps = [...new Set(RES().map(r => r.grp))], w = shapeWeeks(sh), weeksLeft = Math.round(daysLeft() / 7);
+  const S = D.set, a = D.app;
   const sp = activeSpec(), offN = (S.off || []).length;
   const tName = sp ? sp.name : ((TEMPLATES.concat(S.myTemplates || []).find(t => t.id === S.template) || {}).name || 'Custom setup');
   const planTab = `
@@ -3228,7 +3185,7 @@ V.settings = () => {
 V.settings.bind = () => {
   bindAccount();
   $('#setTab').onclick = e => { const b = e.target.closest('button'); if (b) { setTab = b.dataset.v; render(); } };
-  const S = D.set, a = D.app;
+  const a = D.app;
   if (setTab === 'plan') {
     document.querySelectorAll('[data-su]').forEach(b => b.onclick = () => openSetup(+b.dataset.su));
   } else {

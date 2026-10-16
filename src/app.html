@@ -2611,11 +2611,6 @@ $('#manualForm').addEventListener('submit', e => {
 /* --- history: week / month, heat map --- */
 function weekStart(k){ const d = parseKey(k); return addDays(k, -((d.getDay() + 6) % 7)); }
 UI.histMode = 'week'; UI.week = weekStart(todayKey()); UI.month = todayKey().slice(0, 7);
-function allDays(){
-  const set = new Set(Object.keys(S.days));
-  for (const arr of [S.plannedBlocks, S.tasks, S.sessions, S.reviews]) for (const x of arr) if (x.day) set.add(x.day);
-  return [...set].sort().reverse();
-}
 function monthDays(m){ const [y, mo] = m.split('-').map(Number), n = new Date(y, mo, 0).getDate(); return Array.from({ length: n }, (_, i) => `${m}-${pad(i + 1)}`); }
 function addMonths(m, n){ const [y, mo] = m.split('-').map(Number), d = new Date(y, mo - 1 + n, 1); return `${d.getFullYear()}-${pad(d.getMonth() + 1)}`; }
 function periodDays(){ return UI.histMode === 'week' ? Array.from({ length: 7 }, (_, i) => addDays(UI.week, i)) : monthDays(UI.month); }
