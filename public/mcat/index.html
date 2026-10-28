@@ -777,7 +777,7 @@ const secTag = s => s ? `<span class="sec" style="--c:var(${SECS[s] || '--ink-3'
 let tid = 0; const uid = () => 'x' + Date.now().toString(36) + (tid++);
 function toast(msg){ const t = $('#toast'); t.textContent = msg; t.hidden = false; clearTimeout(toast.t); toast.t = setTimeout(() => t.hidden = true, 2400); }
 const toMin = hm => { const [h, m] = hm.split(':').map(Number); return h * 60 + m; };
-const hm = m => `${Math.floor(m / 60)}:${pad(m % 60)}`;
+const hm = m => `${pad(Math.floor(m / 60))}:${pad(m % 60)}`;
 const nowMin = () => { const d = new Date(); return d.getHours() * 60 + d.getMinutes() + (keyOf(d) > TODAY ? 1440 : 0); };
 const acc = (ok, n) => n ? Math.round(ok / n * 100) : 0;
 const sum = (a, f) => a.reduce((s, x) => s + (f ? f(x) : x), 0);
@@ -1736,6 +1736,7 @@ function buildFromSpec(sp){
       });
     }
     sp.events.filter(ev => ev[0] === k).forEach(([, s, mins, t, sub]) => push(s, mins, t, 'review', '', sub));
+    if (ph && k >= sp.start && !B.some(b => b.kind !== 'fixed')) B.push({ id: '', s: '', e: '', t: 'Day off', mins: 0, kind: 'rest' }); // a day the plan leaves empty
     const study = B.filter(b => !['fixed', 'rest', 'anki', 'fl'].includes(b.kind)), first = study.sort((a, b) => toMin(a.s) - toMin(b.s))[0];
     if (first && sum(study, b => b.mins) >= 60 && !fl && !B.some(b => b.kind === 'rest')) {
       if (S.blankWhen !== 'end') { push(hm(Math.max(6 * 60, toMin(first.s) - 15)), 10, 'Blank page · yesterday', 'blank'); B[B.length - 1].when = 'start'; }
@@ -2213,6 +2214,7 @@ V.today = () => {
   const tBlocks = planDay(tom).filter(b => b.kind !== 'blank'), undone = blocks.filter(b => !isDone(k, b) && !['blank', 'rest', 'fl', 'fixed'].includes(b.kind) && b.s && toMin(b.e) <= nowMin());
   const upNext = blocks.filter(b => b.s && !isDone(k, b) && b.kind !== 'rest' && (!isT || toMin(b.e) > nowMin())).slice(0, 4);
   const dayLabel = k === TODAY ? 'Today' : k === tom ? 'Tomorrow' : k === addDays(TODAY, -1) ? 'Yesterday' : '';
+  const offDay = !work.length && blocks.find(b => b.kind === 'rest');
   return `
   <div class="page-head daynav-head">
     <div class="daynav"><button class="icon-btn" id="dPrev" aria-label="Previous day">‹</button>
@@ -2220,7 +2222,7 @@ V.today = () => {
       <button class="icon-btn" id="dNext" aria-label="Next day">›</button></div>
     <div class="seg"><button data-day="${TODAY}" aria-pressed="${isT}">Today</button><button data-day="${tom}" aria-pressed="${k === tom}">Tomorrow</button></div>
   </div>
-  ${isT ? `<div class="loop" id="loop">${steps.map((s, i) => `<button class="step ${s.done ? 'done' : ''} ${i === firstOpen ? 'next' : ''}" data-step="${s.go}"><span class="k">${s.k}</span><b>${s.t}</b><span>${esc(s.d)}</span></button>`).join('')}</div>` : k === tom ? `<div class="note-box">Planning tomorrow: move, resize or add blocks, then mark it ready. <button class="btn btn-sm btn-primary" id="tomReady">${D.planned[tom] ? 'Ready ✓' : 'Tomorrow looks good'}</button></div>` : ''}
+  ${offDay ? `<div class="note-box"><b>${esc(offDay.t)}</b> · nothing is planned${isT ? ' today' : ''}. Rest. If you study anyway, log it with + Actual.${isT ? ' Check tomorrow with the Tomorrow button.' : ''}</div>` : isT ? `<div class="loop" id="loop">${steps.map((s, i) => `<button class="step ${s.done ? 'done' : ''} ${i === firstOpen ? 'next' : ''}" data-step="${s.go}"><span class="k">${s.k}</span><b>${s.t}</b><span>${esc(s.d)}</span></button>`).join('')}</div>` : k === tom ? `<div class="note-box">Planning tomorrow: move, resize or add blocks, then mark it ready. <button class="btn btn-sm btn-primary" id="tomReady">${D.planned[tom] ? 'Ready ✓' : 'Tomorrow looks good'}</button></div>` : ''}
   <div class="grid">
     <section class="card s7">
       <div class="card-head"><h3>Plan <span class="muted">·</span> Actual</h3><span class="btns"><span class="chip">${plannedH(k).toFixed(1)} h planned${k <= TODAY ? ` · ${hoursOn(k)} h done${(m => m ? ` (${(m / 60).toFixed(1)} by hand)` : '')(sum((D.sess[k] || []).filter(x => x.manual), x => toMin(x.e) - toMin(x.s)))}` : ''}</span><button class="btn btn-sm" id="addBlk">+ Block</button>${k <= TODAY ? '<button class="btn btn-sm" id="addSes">+ Actual</button>' : ''}</span></div>
@@ -2891,7 +2893,7 @@ function bindChart(){
     c.addEventListener('mouseenter', show); c.addEventListener('click', show); c.addEventListener('mouseleave', () => tip.hidden = true);
   });
 }
-const flNames = () => { const n = []; if (owned('sample')) n.push('AAMC Unscored Sample Test'); if (owned('pe')) for (let i = 1; i <= 6; i++) n.push('AAMC Practice Exam ' + i); return [...n, ...thirdPartyFLs()]; };
+const flNames = () => { const n = []; if (owned('sample')) n.push('AAMC Unscored Sample Test'); if (owned('pe')) for (let i = 1; i <= 6; i++) n.push('AAMC Practice Exam ' + i); const sp = activeSpec(); const fromPlan = sp && Array.isArray(sp.fls) ? sp.fls.map(f => f && f[1]).filter(Boolean) : []; return [...new Set([...fromPlan, ...n, ...thirdPartyFLs()])]; };
 function flEditor(id, pre = {}){
   const old = id ? D.fls.find(f => f.id === id) : null;
   const f = old ? JSON.parse(JSON.stringify(old)) : { id: uid(), name: pre.name || '', date: pre.date || TODAY, aamc: /^AAMC/.test(pre.name || ''), cp: null, cars: null, bb: null, ps: null, raw: null, rev: { cp: 0, cars: 0, bb: 0, ps: 0 }, note: '' };
@@ -3305,7 +3307,14 @@ function exportSetup(){
 }
 function cleanSpec(sp){ // a plan file is someone else's data: keep links to https only
   const walk = v => { if (Array.isArray(v)) return v.map(walk); if (v && typeof v === 'object') { const o = {}; Object.entries(v).forEach(([k, x]) => { if (k === 'url' && !(typeof x === 'string' && /^https:\/\//i.test(x))) return; o[k] = walk(x); }); return o; } return v; };
-  const c = walk(sp); if (c.src && !c.src.url) delete c.src; return c;
+  const c = walk(sp); if (c.src && !c.src.url) delete c.src;
+  // fill in parts a hand-made file may leave out, so the plan pages never break
+  ['rules', 'fls', 'events', 'minimum', 'buffers', 'videos'].forEach(k => { if (!Array.isArray(c[k])) c[k] = []; });
+  ['fixed', 'pools'].forEach(k => { if (!c[k] || typeof c[k] !== 'object' || Array.isArray(c[k])) c[k] = {}; });
+  if (typeof c.fixedFrom !== 'string') c.fixedFrom = ''; if (typeof c.desc !== 'string') c.desc = ''; if (!c.name) c.name = 'My plan';
+  c.phases = c.phases.filter(ph => ph && ph.from && ph.to).map(ph => ({ ...ph, week: ph.week && typeof ph.week === 'object' ? ph.week : {} }));
+  if (!c.videos.length) c.videos = [['Strategy video', '']];
+  return c;
 }
 async function importSetup(file){
   let j; try { j = JSON.parse(await file.text()); } catch (e) { return toast('That file isn’t a Morae plan'); }
@@ -3607,7 +3616,7 @@ const suStyle = () => { const S = D.set, sh = shape(), w = shapeWeeks(sh), sp = 
   return `${fitCard()}<section class="card s12 myplan ${custom ? 'on' : ''}"><div class="card-head"><h3>Build from your own resources</h3>${custom ? '<span class="chip pill-ok">Chosen</span>' : ''}</div>
       <div class="mp"><div><p>Morae spreads the resources you ticked over the hours you set, around your commitments: content first, then question banks and passages, then AAMC material and full lengths. Adjust the mix under Fine-tune.</p></div>${custom ? '' : '<button class="btn btn-primary" data-custom="1">Use my resources</button>'}</div></section>
     ${allSpecs().length ? `<section class="card s12 myplan ${sp ? 'on' : ''}"><div class="card-head"><h3>Your plans</h3>${sp ? '<span class="chip pill-ok">Chosen</span>' : ''}</div>
-      ${allSpecs().map(x => `<div class="mp"><div><b class="mp-t">${esc(x.name)}</b><p>${esc(x.desc)}</p>${x.src && /^https:/.test(x.src.url || '') ? `<a class="small" href="${esc(x.src.url)}" target="_blank" rel="noopener">From ${esc(x.src.label || 'source')}</a>` : ''}</div><span class="btns">${specShift(x) && (D.mySpecs || []).some(m => m.id === x.id) ? `<button class="btn" data-spshift="${x.id}" title="Moves every date by ${Math.abs(specShift(x) / 7)} week${Math.abs(specShift(x)) > 7 ? 's' : ''}; weekdays stay the same">Move it to start ${fmtDay(addDays(x.start, specShift(x)))}</button>` : ''}${S.template === x.id ? '' : `<button class="btn btn-primary" data-tpl="${x.id}">Choose</button>`}</span></div>`).join('')}
+      ${allSpecs().map(x => `<div class="mp"><div><b class="mp-t">${esc(x.name)}</b><p>${esc(x.desc)}</p>${x.src && /^https:/.test(x.src.url || '') ? `<a class="small" href="${esc(x.src.url)}" target="_blank" rel="noopener">From ${esc(x.src.label || 'source')}</a>` : ''}</div><span class="btns">${S.template !== x.id && specShift(x) && (D.mySpecs || []).some(m => m.id === x.id) ? `<button class="btn" data-spshift="${x.id}" title="Moves every date by ${Math.abs(specShift(x) / 7)} week${Math.abs(specShift(x)) > 7 ? 's' : ''}; weekdays stay the same">Move it to start ${fmtDay(addDays(x.start, specShift(x)))}</button>` : ''}${S.template === x.id ? '<span class="muted small">In use</span>' : `${(D.mySpecs || []).some(m => m.id === x.id) ? `<button class="btn" data-spdel="${x.id}">Delete</button>` : ''}<button class="btn btn-primary" data-tpl="${x.id}">Choose</button>`}</span></div>`).join('')}
       <p class="muted small">A plan written for one person, with dated phases and full lengths. Your commitments, days off and resources still apply.</p></section>` : ''}
     <section class="card s12"><div class="card-head"><h3>Shortcuts <small class="muted">built from real plans</small> ${helpBtn('What the labels and words mean')}</h3><span class="muted small">Best fit first, from your answers on Start. Choosing one fills in your hours and Fine-tune; change anything after.</span></div>
       <div class="tpls">${rankTpls().map(([t, f]) => tplCard(t, false, f)).join('')}</div></section>
@@ -3704,6 +3713,8 @@ V.setup.bind = () => {
     save(); renderHead(); keepY(); });
   document.querySelectorAll('[data-spshift]').forEach(b => b.onclick = () => { suRead(); const sp = reanchorSpec(b.dataset.spshift); if (!sp) return;
     if (S.template === sp.id) { S.testDate = sp.test; S.startDate = sp.start; } save(); renderHead(); keepY(); toast(`“${sp.name}” now starts ${fmtDay(sp.start)}; test day ${fmtLong(sp.test)}.`); });
+  document.querySelectorAll('[data-spdel]').forEach(b => b.onclick = () => { suRead(); const sp = (D.mySpecs || []).find(x => x.id === b.dataset.spdel); if (!sp || S.template === sp.id) return;
+    askConfirm(`Delete “${sp.name}”?`, 'It is removed from Your plans in this account. Your logs, scores and the plan you’re using now stay. You can import the file again any time.', 'Delete', () => { D.mySpecs = D.mySpecs.filter(x => x.id !== sp.id); save(); keepY(); toast(`“${sp.name}” deleted`); }, true); });
   document.querySelectorAll('[data-tdel]').forEach(b => b.onclick = () => { S.myTemplates = (S.myTemplates || []).filter(t => t.id !== b.dataset.tdel); if (S.template === b.dataset.tdel) S.template = ''; save(); keepY(); });
   if ($('#tSave')) $('#tSave').onsubmit = e => { e.preventDefault(); suRead(); const n = $('#tName').value.trim(); if (!n) return toast('Name your setup first');
     const t = { id: 'my_' + Date.now().toString(36), name: n, desc: `${Math.round(shape().content * 100)}% content, ${Math.round(shape().practice * 100)}% questions, ${shape().flTotal} full lengths, ${sum(S.hours)} h a week.`, hours: S.hours.slice(), shape: { ...shape() } };
