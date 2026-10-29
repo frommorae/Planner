@@ -312,16 +312,55 @@ textarea.out{font:13px/1.5 var(--f-mono);min-height:180px}
 .tm-pet{display:grid;justify-items:center;gap:2px;border:0;background:none;padding:0;cursor:pointer;color:var(--ink-2);width:min(120px,30vw)}
 .tm-pet .pet-art{width:100%}
 .tm-full{margin-left:8px;vertical-align:middle;font-family:var(--f-body);letter-spacing:0;text-transform:none}
-.fs-back{position:fixed;inset:0;z-index:28;background:var(--paper);display:grid;place-items:center;overflow:auto;padding:calc(24px + env(safe-area-inset-top,0px)) max(16px, env(safe-area-inset-right,0px)) calc(24px + env(safe-area-inset-bottom,0px)) max(16px, env(safe-area-inset-left,0px))}
-.fs-in{display:grid;justify-items:center;gap:24px;text-align:center;width:100%;max-width:1200px}
-.fs-main{display:flex;align-items:center;justify-content:center;gap:4vw;flex-wrap:wrap;width:100%}
-.fs-ring{width:min(60vh,80vw)}
-.fs-main.with-pet .fs-ring{width:min(56vh,60vw)}
-.fs-ring .t{font-size:clamp(48px,11vh,120px)}
-.fs-ring .p{font-size:clamp(13px,2vh,18px)}
-.fs-pet{display:grid;justify-items:center;gap:8px;width:min(34vh,70vw);color:var(--ink-2);font-size:clamp(14px,2vh,18px)}
+.fs-back{position:fixed;inset:0;z-index:28;background:var(--bg);color:var(--ink);display:grid;grid-template-columns:minmax(0,1fr);grid-template-rows:auto 1fr auto;gap:10px;overflow:auto;padding:calc(14px + env(safe-area-inset-top,0px)) max(20px, env(safe-area-inset-right,0px)) calc(18px + env(safe-area-inset-bottom,0px)) max(20px, env(safe-area-inset-left,0px));font-family:var(--f-body);transition:background-color .8s ease}
+.fs-back.brk{background:color-mix(in oklab, var(--bg) 91%, var(--accent))}
+.fs-back>*{position:relative;z-index:1}
+.fs-back>.fs-menu{position:absolute;z-index:3}
+.fs-back>.fs-bgimg,.fs-back>.tide,.fs-back>.glow{position:fixed;z-index:0}
+.fs-bgimg{inset:0;background-position:center;background-size:cover;background-repeat:no-repeat;pointer-events:none}
+.fs-bgimg::after{content:"";position:absolute;inset:0;background:var(--bg);opacity:var(--veil, .35)}
+.fs-top{display:flex;align-items:center;gap:10px;flex-wrap:wrap;justify-content:space-between}
+.fs-chips{display:flex;gap:6px;flex-wrap:wrap}
+.fs-chips button,.fs-btn{border:1px solid color-mix(in oklab, var(--ink) 16%, transparent);background:color-mix(in oklab, var(--panel) 60%, transparent);color:var(--ink);border-radius:999px;padding:6px 14px;font:600 13px var(--f-body);cursor:pointer}
+.fs-chips button[aria-pressed="true"]{border-color:var(--ink);background:var(--panel)}
+.fs-right{display:flex;gap:8px;flex-wrap:wrap}
+.fs-menu{position:absolute;top:calc(58px + env(safe-area-inset-top,0px));right:max(20px, env(safe-area-inset-right,0px));z-index:3;width:min(520px,calc(100% - 40px));box-shadow:0 18px 40px color-mix(in oklab, #000 25%, transparent);background:var(--panel);color:var(--ink);border:1px solid color-mix(in oklab, var(--ink) 14%, transparent);border-radius:14px;padding:14px 16px;display:grid;gap:8px}
+.fs-menu h3{margin:0;font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+.fs-sw{display:flex;flex-wrap:wrap;gap:6px}
+.fs-sw button{display:inline-flex;align-items:center;gap:6px;border:1.5px solid transparent;background:color-mix(in oklab, var(--ink) 6%, transparent);color:var(--ink);border-radius:999px;padding:5px 10px 5px 6px;font:600 12.5px var(--f-body);cursor:pointer}
+.fs-sw button[aria-pressed="true"]{border-color:var(--ink)}
+.fs-sw span{width:14px;height:14px;border-radius:50%;border:1px solid color-mix(in oklab, var(--ink) 20%, transparent)}
+.fs-bgrow{display:flex;gap:6px;flex-wrap:wrap}
+.fs-bgrow input[type=url]{flex:1;min-width:0;font:14px var(--f-body);padding:6px 10px;border:1px solid color-mix(in oklab, var(--ink) 16%, transparent);border-radius:8px;background:var(--bg);color:var(--ink)}
+.fs-veil{display:flex;gap:10px;align-items:center;font-size:13px;color:var(--muted)}
+.fs-veil input{accent-color:var(--accent)}
+.fs-msg{margin:0;font-size:12.5px;color:var(--muted)}
+.fs-mid{display:flex;align-items:center;justify-content:center;gap:4vw;flex-wrap:wrap;min-height:0}
+.fs-stage{position:relative;display:grid;place-items:center;min-height:0}
+.fs-pet{display:grid;justify-items:center;gap:8px;width:min(32vh,70vw);border:0;background:none;color:var(--muted);font:500 clamp(14px,2vh,18px) var(--f-body);cursor:pointer}
 .fs-pet .pet-art{width:100%}
-.fs-what{font-family:var(--f-display);font-size:clamp(18px,3vh,28px);font-weight:600}
+.fs-bottom{display:grid;justify-items:center;gap:12px}
+.fs-what{font-family:var(--f-display);font-size:clamp(17px,2.6vh,26px);font-weight:600;text-align:center}
+.fs-go{border:0;background:var(--accent);color:var(--on-accent);font:700 17px var(--f-body);letter-spacing:.04em;padding:14px 46px;border-radius:999px;cursor:pointer;box-shadow:0 6px 0 color-mix(in oklab, var(--accent) 70%, #000)}
+.fs-back .btns{display:flex;gap:10px;justify-content:center;align-items:center}
+@media (max-width:760px){ .fs-mid{flex-direction:column;flex-wrap:nowrap;gap:8px} .fs-pet{width:min(44vw,22vh)} .fs-mid.with-pet .mts-ring{width:min(72vw,38vh)} .fs-mid.with-pet .vis canvas{width:min(52vw,26vh);height:min(66vw,33vh)} .fs-chips{flex-wrap:nowrap;overflow-x:auto;max-width:100%} .fs-chips button{flex:0 0 auto} .fs-top{gap:8px} }
+@media (max-height:520px) and (orientation:landscape){ .fs-back{gap:4px;padding-top:calc(8px + env(safe-area-inset-top,0px));padding-bottom:calc(8px + env(safe-area-inset-bottom,0px))} .fs-back .mts-ring{width:min(48vh,260px)} .fs-back .vis canvas{height:min(38vh,220px);width:min(30vh,180px)} .fs-pet{width:min(30vh,170px)} .fs-chips button,.fs-btn{padding:4px 10px;font-size:12px} .fs-go{padding:9px 30px;font-size:15px} }
+/* pet timer card: widget while ready, lock screen while running */
+.ptw{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:14px;align-items:center;width:100%;text-align:left;background:var(--paper);border-radius:14px;padding:12px}
+.ptw .pw-art{border:0;cursor:pointer;width:100%}
+.ptw-txt{display:grid;gap:5px;min-width:0}
+.ptw-big{font-family:var(--f-display);font-size:28px;line-height:1.1}
+.ptl{display:grid;justify-items:center;gap:8px;width:100%}
+.ptl-time{font-family:var(--f-display);font-weight:700;font-size:clamp(52px,9vw,72px);line-height:1;letter-spacing:-.01em;font-variant-numeric:tabular-nums}
+.ptl-sub{font-weight:600;color:var(--ink-2);font-size:14px}
+.ptl-row{display:grid;grid-template-columns:auto minmax(0,1fr);gap:14px;align-items:center;width:100%}
+.ptl-ring{position:relative;width:104px;aspect-ratio:1;border:0;background:none;padding:0;cursor:pointer}
+.ptl-ring>svg{width:100%;height:100%;transform:rotate(-90deg);display:block}
+.ptl-face{position:absolute;inset:16px;border-radius:50%;overflow:hidden;background:var(--paper)}
+.ptl-face svg{width:100%;height:100%;display:block}
+.ptl-card{background:var(--paper);border-radius:14px;padding:12px 14px;display:grid;gap:3px;text-align:left;min-width:0}
+.ptl-card b{font-family:var(--f-display);font-size:17px}
+.ptl-card span{font-size:13.5px;color:var(--ink-2)}
 .pet-room2{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.1fr);gap:20px;align-items:start}
 .pet-widget{background:var(--paper);border-radius:16px;padding:16px;display:grid;gap:12px}
 .pw-top{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1fr);gap:14px;align-items:center}
@@ -2135,8 +2174,9 @@ function tmTick(){
   }
   if (FS.open) fsTick();
   if (D.view !== 'today' || !$('#tmT')) return;
-  $('#tmT').textContent = tmText(); $('#tmRing').style.strokeDashoffset = CIRC * (1 - tmFrac());
-  if (TM.mode === 'laps' && TM.phase === 'run') $('#tmRing').style.stroke = Date.now() - TM.lapAt > lapTarget() ? 'var(--bad)' : 'var(--accent)';
+  $('#tmT').textContent = tmText(); const rg = $('#tmRing'); if (rg) rg.style.strokeDashoffset = CIRC * (1 - tmFrac());
+  if (rg && TM.mode === 'laps' && TM.phase === 'run') rg.style.stroke = Date.now() - TM.lapAt > lapTarget() ? 'var(--bad)' : 'var(--accent)';
+  const dr = $('#tmDay'); if (dr) dr.style.strokeDashoffset = CIRC * (1 - petDayFrac());
 }
 setInterval(tmTick, 250);
 setInterval(() => { if (D.view === 'today' && !$('#modalBack') && TM.phase === 'idle') { const n = $('#nowLine'); if (n) n.style.top = nowTop() + 'px'; } }, 60e3);
@@ -2313,8 +2353,8 @@ V.today = () => {
       <section class="card">
         <div class="card-head"><h3>Timer <button class="btn btn-sm tm-full" id="tmFull" type="button" title="Full screen">Full screen</button></h3>${!running ? `<div class="seg" id="tmMode"><button data-v="focus" aria-pressed="${TM.mode === 'focus'}">Focus</button><button data-v="laps" aria-pressed="${TM.mode === 'laps'}">Passage laps</button></div>` : ''}</div>
         <div class="timer">
-          <div class="tm-row"><div class="ring"><svg viewBox="0 0 120 120" aria-hidden="true"><circle cx="60" cy="60" r="54" fill="none" stroke="var(--rule)" stroke-width="4"/><circle id="tmRing" cx="60" cy="60" r="54" fill="none" stroke="${TM.phase === 'break' ? 'var(--ok)' : 'var(--accent)'}" stroke-width="4" stroke-linecap="round" stroke-dasharray="${CIRC}" stroke-dashoffset="${CIRC * (1 - tmFrac())}"/></svg>
-            <div class="in"><span class="p">${TM.mode === 'laps' ? (running ? `Passage ${TM.laps.length + 1}` : 'Passage laps') : TM.phase === 'break' ? 'Break' : TM.paused ? 'Paused' : running ? 'Focus' : 'Ready'}</span><span class="t" id="tmT" role="timer">${tmText()}</span><span class="p sm">${TM.mode === 'laps' ? `target ${lapTarget() / 60e3}:00 a passage` : TM.blockMin ? `${TM.blockMin} min block` : esc(PRESETS[TM.preset].label)}</span></div></div>${petBesideTimer()}</div>
+          ${petTimerMode() ? petTimerTop(running) : `<div class="tm-row"><div class="ring"><svg viewBox="0 0 120 120" aria-hidden="true"><circle cx="60" cy="60" r="54" fill="none" stroke="var(--rule)" stroke-width="4"/><circle id="tmRing" cx="60" cy="60" r="54" fill="none" stroke="${TM.phase === 'break' ? 'var(--ok)' : 'var(--accent)'}" stroke-width="4" stroke-linecap="round" stroke-dasharray="${CIRC}" stroke-dashoffset="${CIRC * (1 - tmFrac())}"/></svg>
+            <div class="in"><span class="p">${TM.mode === 'laps' ? (running ? `Passage ${TM.laps.length + 1}` : 'Passage laps') : TM.phase === 'break' ? 'Break' : TM.paused ? 'Paused' : running ? 'Focus' : 'Ready'}</span><span class="t" id="tmT" role="timer">${tmText()}</span><span class="p sm">${TM.mode === 'laps' ? `target ${lapTarget() / 60e3}:00 a passage` : TM.blockMin ? `${TM.blockMin} min block` : esc(PRESETS[TM.preset].label)}</span></div></div>${petBesideTimer()}</div>`}
           <div class="what">${cb ? `${secTag(cb.sec)} ${esc(cb.t)} ${openLink(blockLink(cb), 'linkish small')}` : '<span class="muted">Press ▶ on a block, or just start</span>'}</div>
           ${TM.mode === 'focus' ? `
             ${running || TM.blockMin ? '' : `<div class="seg" id="tmPreset">${Object.entries(PRESETS).map(([id, p]) => `<button data-v="${id}" aria-pressed="${TM.preset === id}">${p.label}</button>`).join('')}</div>`}
@@ -3895,36 +3935,97 @@ V.welcome.bind = () => {
 
 /* ---------- render ---------- */
 /* =========================================================
-   Full-screen focus: big timer (and the pet, if on) over the whole page. Buttons drive the Today timer's own buttons.
+   Full-screen focus: drawn by Morae Timers' own styles (timers/morae-timer-styles.js, shared with Morae Timers):
+   classic ring, flip clock, hourglass, candle, water, fill, apple tree; its colour sets and image backgrounds.
+   This app's timer still runs the session and logs it to the block. The pet sits beside it when pet mode is on.
    ========================================================= */
-const FS = { open: false };
-function fsOpen(){
+const FS = { open: false, menu: '' };
+const FS_BGKEY = 'morae-mcat/fs-bg';
+function fsLib(){
+  if (window.MoraeTimerStyles) return Promise.resolve(window.MoraeTimerStyles);
+  if (!fsLib.p) fsLib.p = new Promise((ok, no) => { const sc = document.createElement('script'); sc.src = '../../timers/morae-timer-styles.js'; sc.onload = () => window.MoraeTimerStyles ? ok(window.MoraeTimerStyles) : no(); sc.onerror = no; document.head.appendChild(sc); })
+    .catch(() => { fsLib.p = null; return null; });
+  return fsLib.p;
+}
+const fsSet = () => { const a = D.app; if (!a.fs || typeof a.fs !== 'object') a.fs = { theme: 'classic', pal: '', bg: null, imgPal: null }; return a.fs; };
+function fsPal(){
+  const M = window.MoraeTimerStyles, f = fsSet(), all = f.imgPal ? M.PALETTES.concat([f.imgPal.light, f.imgPal.dark]) : M.PALETTES;
+  const dark = document.documentElement.getAttribute('data-theme') === 'dark' || (!document.documentElement.getAttribute('data-theme') && matchMedia('(prefers-color-scheme: dark)').matches);
+  return all.find(p => p.id === f.pal) || (dark ? M.PALETTES[4] : M.PALETTES[0]);
+}
+function fsBgSrc(){ const f = fsSet(); if (!f.bg) return ''; if (f.bg.src === 'local') { try { return localStorage.getItem(FS_BGKEY) || ''; } catch (e) { return ''; } } return f.bg.src; }
+const fsLeft = () => TM.mode === 'laps' ? (TM.phase === 'run' ? Date.now() - TM.lapAt : 0) : TM.phase === 'idle' ? focusMin() * 60e3 : Math.max(0, TM.paused ? TM.rem : TM.endsAt - Date.now());
+async function fsOpen(){
+  const M = await fsLib(); if (!M) return toast('The timer styles couldn’t load. Check your connection and try again.');
   FS.open = true; let o = $('#fsBack');
   if (!o) { o = document.createElement('div'); o.id = 'fsBack'; o.className = 'fs-back'; o.setAttribute('role', 'dialog'); o.setAttribute('aria-label', 'Full-screen timer'); document.body.appendChild(o); }
   fsDraw(); document.body.style.overflow = 'hidden';
   try { const el = document.documentElement, r = el.requestFullscreen || el.webkitRequestFullscreen; if (r) { const pr = r.call(el); if (pr && pr.catch) pr.catch(() => {}); } } catch (e) { /* the window-sized view still works */ }
 }
 function fsClose(){
-  FS.open = false; const o = $('#fsBack'); if (o) o.remove(); document.body.style.overflow = '';
+  FS.open = false; FS.menu = ''; if (window.MoraeTimerStyles) window.MoraeTimerStyles.unmount();
+  const o = $('#fsBack'); if (o) o.remove(); document.body.style.overflow = '';
   try { if (document.fullscreenElement && document.exitFullscreen) document.exitFullscreen().catch(() => {}); } catch (e) { /* not in full screen */ }
   if (D.view === 'today') render();
 }
 function fsDraw(){
-  const o = $('#fsBack'); if (!o) return;
-  const running = TM.phase !== 'idle', cb = curBlock(), p = P(), withPet = p.on && p.active && !(p.hideFocus && petState() === 'focus');
-  const ph = TM.mode === 'laps' ? 'Passage laps' : TM.phase === 'break' ? 'Break' : TM.paused ? 'Paused' : running ? 'Focus' : 'Ready';
-  o.innerHTML = `<div class="fs-in">
-    <div class="fs-main ${withPet ? 'with-pet' : ''}">
-      <div class="ring fs-ring"><svg viewBox="0 0 120 120" aria-hidden="true"><circle cx="60" cy="60" r="54" fill="none" stroke="var(--rule)" stroke-width="3"/><circle id="fsRing" cx="60" cy="60" r="54" fill="none" stroke="${TM.phase === 'break' ? 'var(--ok)' : 'var(--accent)'}" stroke-width="3" stroke-linecap="round" stroke-dasharray="${CIRC}" stroke-dashoffset="${CIRC * (1 - tmFrac())}"/></svg>
-        <div class="in"><span class="p">${ph}</span><span class="t" id="fsT" role="timer">${tmText()}</span></div></div>
-      ${withPet ? `<div class="fs-pet"><div class="pet-art">${petSvg(p.active, { state: petState(), island: true })}</div><span>${esc(PET_TITLE[petState()](petInfo(p.active).name))}</span></div>` : ''}
+  const o = $('#fsBack'), M = window.MoraeTimerStyles; if (!o || !M) return;
+  const f = fsSet(), pl = fsPal(), running = TM.phase !== 'idle', cb = curBlock(), p = P(), st = petState();
+  const withPet = p.on && p.active && !(p.hideFocus && st === 'focus'), bg = fsBgSrc();
+  M.applyPalette(o, pl); o.classList.toggle('has-bg', !!bg); o.classList.toggle('brk', TM.phase === 'break');
+  const pals = f.imgPal ? M.PALETTES.concat([f.imgPal.light, f.imgPal.dark]) : M.PALETTES;
+  o.innerHTML = `<div class="fs-bgimg" ${bg ? `style="background-image:url(&quot;${esc(bg.replace(/["\\\n]/g, c => encodeURIComponent(c)))}&quot;);--veil:${f.bg.veil ?? .35}"` : 'hidden'}></div>
+    <div class="tide" id="tide" hidden aria-hidden="true"><canvas id="tideCv"></canvas></div><div class="glow" id="glow" aria-hidden="true"></div>
+    <div class="fs-top">
+      <div class="fs-chips" role="group" aria-label="Timer style">${M.THEMES.map(([v, n]) => `<button data-fst="${v}" aria-pressed="${f.theme === v}">${n}</button>`).join('')}</div>
+      <div class="fs-right"><button class="fs-btn" data-fsm="look" aria-expanded="${FS.menu === 'look'}">Colours and background</button><button class="fs-btn" data-fs="exit">Exit full screen</button></div>
     </div>
-    <div class="fs-what">${cb ? `${secTag(cb.sec)} ${esc(cb.t)}` : 'Focus'}</div>
-    <div class="btns">${TM.mode !== 'focus' ? '' : !running ? '<button class="btn btn-primary" data-fs="tmStart">Start focus</button>' : `<button class="btn btn-primary" data-fs="tmPause">${TM.paused ? 'Resume' : 'Pause'}</button><button class="btn" data-fs="tmStop">Stop</button>`}<button class="btn" data-fs="exit">Exit full screen</button></div>
-  </div>`;
-  o.onclick = e => { const b = e.target.closest('[data-fs]'); if (!b) return; if (b.dataset.fs === 'exit') return fsClose(); const t = $('#' + b.dataset.fs); if (t) t.click(); setTimeout(fsDraw, 60); };
+    ${FS.menu === 'look' ? `<div class="fs-menu">
+      <h3>Colours</h3><div class="fs-sw">${pals.map(x => `<button data-fsp="${esc(x.id)}" aria-pressed="${pl.id === x.id}"><span style="background:${x.bg}"></span><span style="background:${x.accent}"></span>${esc(x.name)}</button>`).join('')}</div>
+      <h3>Background image</h3><div class="fs-bgrow"><input type="url" id="fsBgUrl" placeholder="Paste an image link (https://…)" value="${f.bg && f.bg.src !== 'local' ? esc(f.bg.src) : ''}"><button class="fs-btn" data-fsb="link">Use link</button><label class="fs-btn">Choose a file<input type="file" id="fsBgFile" accept="image/*" hidden></label>${bg ? '<button class="fs-btn" data-fsb="off">Remove</button>' : ''}</div>
+      ${bg ? `<label class="fs-veil">Dim the picture <input type="range" id="fsVeil" min="0" max=".85" step=".05" value="${f.bg.veil ?? .35}"></label>` : ''}
+      <p class="fs-msg" id="fsMsg">Same styles, colours and pictures as Morae Timers.</p></div>` : ''}
+    <div class="fs-mid ${withPet ? 'with-pet' : ''}"><main class="fs-stage" id="stage"></main>
+      ${withPet ? `<button type="button" class="fs-pet" data-pet="room" aria-label="Open the pet room"><span class="pet-art">${petSvg(p.active, { state: st, island: true })}</span><span>${esc(PET_TITLE[st](petInfo(p.active).name))}</span></button>` : ''}</div>
+    <div class="fs-bottom">${cb ? `<div class="fs-what">${secTag(cb.sec)} ${esc(cb.t)}</div>` : ''}
+      <div class="btns">${TM.mode !== 'focus' ? '' : !running ? '<button class="fs-go" data-fs="tmStart">Start focus</button>' : `<button class="fs-go" data-fs="tmPause">${TM.paused ? 'Resume' : 'Pause'}</button><button class="fs-btn" data-fs="tmStop">Stop</button>`}</div></div>`;
+  M.mount({ root: o, stage: o.querySelector('#stage'), theme: () => fsSet().theme,
+    label: () => TM.mode === 'laps' ? 'Passage' : TM.phase === 'break' ? 'Break' : TM.paused ? 'Paused' : TM.phase === 'idle' ? 'Ready' : 'Focus',
+    round: () => { const n = (D.sess[TODAY] || []).length; return `${fmtHM(hoursOn(TODAY))} today · ${n} session${n === 1 ? '' : 's'}`; },
+    state: () => ({ mode: TM.phase === 'break' ? 'short' : 'focus', running: TM.phase !== 'idle' && !TM.paused, done: (D.sess[TODAY] || []).length, frac: tmFrac() }),
+    pal: fsPal, onPaint: fsTick });
+  o.onclick = e => {
+    const t = e.target.closest('[data-fst],[data-fsp],[data-fsm],[data-fsb],[data-fs]'); if (!t) return;
+    const ff = fsSet();
+    if (t.dataset.fst) { ff.theme = t.dataset.fst; save(); return fsDraw(); }
+    if (t.dataset.fsp) { ff.pal = t.dataset.fsp; save(); return fsDraw(); }
+    if (t.dataset.fsm) { FS.menu = FS.menu === t.dataset.fsm ? '' : t.dataset.fsm; return fsDraw(); }
+    if (t.dataset.fsb === 'link') { const u = ($('#fsBgUrl') || {}).value || ''; if (!/^https?:\/\/\S+$/i.test(u.trim())) return fsMsg('Paste a full link that starts with https://'); return fsUseBg(u.trim()); }
+    if (t.dataset.fsb === 'off') { ff.bg = null; ff.imgPal = null; if (/^img-/.test(ff.pal || '')) ff.pal = ''; try { localStorage.removeItem(FS_BGKEY); } catch (x) { /* fine */ } save(); return fsDraw(); }
+    const a = t.dataset.fs; if (!a) return; if (a === 'exit') return fsClose();
+    const b = $('#' + a); if (b) b.click(); setTimeout(fsDraw, 60);
+  };
+  const file = o.querySelector('#fsBgFile');
+  if (file) file.onchange = e => { const fl = e.target.files[0]; e.target.value = ''; if (!fl) return; const rd = new FileReader();
+    rd.onload = () => { const img = new Image(); img.onload = () => { const k = Math.min(1, 1920 / Math.max(img.naturalWidth, img.naturalHeight)), cv = document.createElement('canvas');
+      cv.width = Math.round(img.naturalWidth * k); cv.height = Math.round(img.naturalHeight * k); cv.getContext('2d').drawImage(img, 0, 0, cv.width, cv.height); fsUseBg(cv.toDataURL('image/jpeg', .85)); };
+      img.onerror = () => fsMsg('That file isn’t an image this browser can open.'); img.src = rd.result; }; rd.readAsDataURL(fl); };
+  const veil = o.querySelector('#fsVeil');
+  if (veil) { veil.oninput = () => { fsSet().bg.veil = +veil.value; const bi = o.querySelector('.fs-bgimg'); if (bi) bi.style.setProperty('--veil', veil.value); }; veil.onchange = () => save(); }
+  fsTick();
 }
-function fsTick(){ const t = $('#fsT'), r = $('#fsRing'); if (t) t.textContent = tmText(); if (r) r.style.strokeDashoffset = CIRC * (1 - tmFrac()); }
+const fsMsg = t => { const m = $('#fsMsg'); if (m) m.textContent = t; };
+async function fsUseBg(src){
+  const M = window.MoraeTimerStyles; fsMsg('Reading the picture…');
+  const r = await M.readPixels(src);
+  if (r.err === 'load') return fsMsg(window.claude && window.claude.use && !src.startsWith('data:') ? 'The Claude preview can’t load pictures from other sites. Choose the picture as a file instead.' : 'That picture didn’t load. Check the link, or choose the picture as a file.');
+  const f = fsSet(); let stored = src;
+  if (src.startsWith('data:')) { try { localStorage.setItem(FS_BGKEY, src); stored = 'local'; } catch (e) { return fsMsg('That picture is too large to keep in this browser. Try a smaller one.'); } } else { try { localStorage.removeItem(FS_BGKEY); } catch (e) { /* fine */ } }
+  f.bg = { src: stored, veil: f.bg && f.bg.veil != null ? f.bg.veil : .35 }; f.imgPal = r.px ? M.imagePalettes(r.px) : null;
+  if (f.imgPal) f.pal = fsPal().dark ? 'img-dark' : 'img-light'; else if (/^img-/.test(f.pal || '')) f.pal = '';
+  save(); fsDraw(); fsMsg(r.px ? 'Colours taken from the picture. Pick another colour set any time.' : 'The picture is on. This site doesn’t share its colours, so pick a colour set that suits it.');
+}
+function fsTick(){ const M = window.MoraeTimerStyles; if (FS.open && M && M.isMounted()) M.time(M.fmt(fsLeft())); }
 document.addEventListener('keydown', e => { if (FS.open && e.key === 'Escape' && !document.fullscreenElement) fsClose(); });
 
 /* =========================================================
@@ -3958,7 +4059,7 @@ function petWidget(id){
   const bl = planDay(TODAY).filter(b => b.kind !== 'rest' && b.kind !== 'fixed' && b.kind !== 'blank'), doneN = bl.filter(b => isDone(TODAY, b)).length;
   const pk = petPicks(), ph = plannedH(TODAY), hrs = hoursOn(TODAY);
   return `<div class="pet-widget">
-    <div class="pw-top"><div class="pw-art ${night ? 'night' : ''}">${petSvg(id, { state: s, island: true })}</div>
+    <div class="pw-top"><div class="pw-art ${night || info.island === 'cave' ? 'night' : ''}">${petSvg(id, { state: s, island: true })}</div>
       <div class="pw-txt"><b class="pw-title">${esc(PET_TITLE[s](info.name))}</b>
         <span class="small">Focus today · <b>${fmtHM(hrs)}</b></span>
         <span class="tbar"><span style="width:${ph ? Math.min(100, hrs / ph * 100) : 0}%"></span></span>
@@ -3980,7 +4081,7 @@ function P(){
   const p = D.pet;
   if (!Array.isArray(p.owned)) p.owned = [];
   if (!Array.isArray(p.log)) p.log = [];
-  ['items', 'colour', 'seen'].forEach(k => { if (!p[k] || typeof p[k] !== 'object') p[k] = {}; });
+  ['items', 'colour', 'seen', 'style'].forEach(k => { if (!p[k] || typeof p[k] !== 'object') p[k] = {}; });
   return p;
 }
 function petLib(){
@@ -3993,6 +4094,9 @@ const petInfo = id => (window.MoraePets && window.MoraePets.pets.find(x => x.id 
 function petStudyDays(){ const since = P().since || TODAY; return Object.keys(D.hours).filter(k => k >= since && k <= TODAY && hoursOn(k) > 0).sort(); }
 function petActiveOn(k){ let id = ''; for (const [d, x] of P().log) if (d <= k) id = x; return id; }
 function petDaysWith(id){ return petStudyDays().filter(k => petActiveOn(k) === id).length; }
+const PET_STYLES = [['geometric', 'Geometric'], ['pixel', 'Pixel'], ['isometric', 'Isometric']];
+const petStyleOf = id => { const st = P().style[id] || 'geometric'; return st === 'geometric' || PLUS_BETA ? st : 'geometric'; };
+const petSkyCls = id => petInfo(id).island === 'cave' || new Date().getHours() >= 19 || new Date().getHours() < 6 ? 'night' : '';
 const petStage = days => days >= PET_STAGE[2] ? 3 : days >= PET_STAGE[1] ? 2 : 1;
 const PET_STAGE_NAME = ['', 'First home', 'Young', 'Grown'];
 function petUnlocked(n){ return window.MoraePets ? window.MoraePets.pets.filter(x => !x.rare && x.unlockDays != null && x.unlockDays <= n) : []; }
@@ -4029,7 +4133,7 @@ function petSvg(id, opts){
   const MP = window.MoraePets; if (!MP) return '<div class="pet-wait" aria-hidden="true"></div>';
   const p = P(), info = petInfo(id), h = new Date().getHours();
   try {
-    return MP.svg({ pet: id, stage: opts.stage || petStage(petDaysWith(id)), state: opts.state || 'idle', colour: (opts.stage || petStage(petDaysWith(id))) >= 3 && p.colour[id] ? p.colour[id] : info.defaultColour,
+    return MP.svg({ pet: id, style: opts.style || petStyleOf(id), stage: opts.stage || petStage(petDaysWith(id)), state: opts.state || 'idle', colour: (opts.stage || petStage(petDaysWith(id))) >= 3 && p.colour[id] ? p.colour[id] : info.defaultColour,
       items: opts.noItems ? [] : (p.items[id] || []), island: opts.island ? info.island : null, weather: h >= 19 || h < 6 ? 'night' : 'clear', animate: opts.animate !== false, frame: opts.frame || 'full' });
   } catch (e) { return ''; }
 }
@@ -4062,6 +4166,34 @@ function petDash(){
       <div class="btns" style="justify-content:flex-start">${pk.can ? '<button class="btn btn-primary" data-pet="pick">Choose a new pet</button>' : ''}<button class="btn" data-pet="room">Pet room</button></div>
     </div>
   </section>`;
+}
+
+/* Timer card in pet mode (focus timer only): the home-screen widget while ready, the lock-screen view while running. */
+const petTimerMode = () => { const p = P(); return !!(p.on && p.active && TM.mode === 'focus'); };
+const petLiveMin = () => TM.phase === 'focus' && !TM.paused && TM.startedAt ? Math.max(0, (Date.now() - TM.startedAt) / 6e4) : 0;
+function petDayFrac(){ const goal = plannedH(TODAY) * 60; return goal ? Math.min(1, (hoursOn(TODAY) * 60 + petLiveMin()) / goal) : 0; }
+function petTimerTop(running){
+  const p = P(), id = p.active, info = petInfo(id), s = petState();
+  if (p.hideFocus && s === 'focus') return `<div class="ptl"><span class="ptl-time" id="tmT" role="timer">${tmText()}</span></div>`;
+  petNeedLib();
+  const hrs = hoursOn(TODAY), ph = plannedH(TODAY);
+  if (!running) {
+    const bl = planDay(TODAY).filter(b => b.kind !== 'rest' && b.kind !== 'fixed' && b.kind !== 'blank'), doneN = bl.filter(b => isDone(TODAY, b)).length;
+    return `<div class="ptw"><button type="button" class="pw-art ${petSkyCls(id)}" data-pet="room" title="Open the pet room" aria-label="Open the pet room">${petSvg(id, { state: s, island: true })}</button>
+      <div class="ptw-txt"><span class="small muted">Focus today</span><b class="ptw-big">${fmtHM(hrs)}</b>
+        <span class="tbar"><span style="width:${ph ? Math.min(100, hrs / ph * 100) : 0}%"></span></span>
+        <span class="small muted">${doneN} of ${bl.length} plan blocks</span>
+        <span class="small">${esc(PET_STATE_LINE[s](info.name))}</span>
+        <span class="small muted">${focusMin()} min ready · ${esc(petNextBlock())}</span></div></div>`;
+  }
+  const lab = TM.phase === 'break' ? 'Break' : TM.paused ? 'Paused' : 'Focus';
+  return `<div class="ptl">
+    <span class="ptl-time" id="tmT" role="timer">${tmText()}</span>
+    <span class="ptl-sub">${lab} · ${esc(info.name)} · ${fmtHM(hrs)} today</span>
+    <div class="ptl-row">
+      <button type="button" class="ptl-ring" data-pet="room" title="The ring fills toward today’s planned focus" aria-label="Today’s focus so far; open the pet room"><svg viewBox="0 0 120 120" aria-hidden="true"><circle cx="60" cy="60" r="54" fill="none" stroke="var(--rule)" stroke-width="7"/><circle id="tmDay" cx="60" cy="60" r="54" fill="none" stroke="${TM.phase === 'break' ? 'var(--ok)' : 'var(--accent)'}" stroke-width="7" stroke-linecap="round" stroke-dasharray="${CIRC}" stroke-dashoffset="${CIRC * (1 - petDayFrac())}"/></svg><span class="ptl-face">${petSvg(id, { state: s, frame: 'icon' })}</span></button>
+      <div class="ptl-card"><b>${esc(PET_TITLE[s](info.name))}</b><span>Focus ${fmtHM(hrs)}${ph ? ` of ${fmtHM(ph)}` : ''}</span><span>Next: ${esc(petNextBlock())}</span></div>
+    </div></div>`;
 }
 function petSettingsCard(){
   const p = P();
@@ -4108,10 +4240,11 @@ async function petRoom(){
         <div class="pr-meter"><div class="pr-row"><span>Growth</span><span class="tbar"><span style="width:${st >= 3 ? 100 : Math.round((days - from) / (next - from) * 100)}%"></span></span><span class="mono small">${st >= 3 ? 'grown' : `${days}/${next}`}</span></div>
           <p class="small muted">${PET_STAGE_NAME[st]}${st < 3 ? ` · ${next - days} more study day${next - days === 1 ? '' : 's'} together until ${PET_STAGE_NAME[st + 1].toLowerCase()}` : ` · ${days} study days together`}</p></div>
         <div class="msec"><h3>Your pets <small class="muted">${p.owned.length}${pk.can ? ' · a new one is ready' : ''}</small></h3><div class="pet-owned">${p.owned.map(x => `<button class="pet-opt sm" data-act="${esc(x)}" aria-pressed="${x === id}"><span class="pet-art icon">${petSvg(x, { frame: 'icon', animate: false })}</span><span class="small">${esc(petInfo(x).name)}</span></button>`).join('')}${pk.can ? '<button class="pet-opt sm add" data-pet="pick"><span class="pet-plus">+</span><span class="small">Choose</span></button>' : ''}</div></div>
+        <div class="msec"><h3>Style <small class="muted">Morae Plus · free during the beta</small></h3><div class="chips">${PET_STYLES.map(([v, n]) => `<button class="tog" data-style="${v}" aria-pressed="${petStyleOf(id) === v}">${n}</button>`).join('')}</div></div>
         <div class="msec"><h3>Wardrobe <small class="muted">one per spot</small></h3><div class="chips">${PET_EVERYDAY.map(x => `<button class="tog" data-item="${x}" aria-pressed="${worn.includes(x)}">${esc(itemById(x).name)}</button>`).join('')}</div></div>
         <div class="msec"><h3>Colour</h3>${st >= 3 ? `<div class="chips">${cols.map(c => `<button class="tog" data-col="${esc(c)}" aria-pressed="${(p.colour[id] || info.defaultColour) === c}">${esc(c[0].toUpperCase() + c.slice(1))}</button>`).join('')}</div>` : `<p class="small muted">Recolouring unlocks when ${esc(info.name)} is grown (${PET_STAGE[2] - days} more study days together).</p>`}</div>
         <div class="pr-plus"><span class="chip pill-ok">Free during the beta</span><h3>Morae Plus</h3><p class="small">More style and choice, never more luck.</p>
-          <ul class="small"><li class="on">One extra pet choice every month <b>· on now</b></li><li>Pixel and isometric styles for every pet you own <span class="muted">· coming with the next art batch</span></li><li>New pets and event outfits two weeks early <span class="muted">· coming</span></li><li>A thank-you mark on Mora’s hourglass <span class="muted">· coming</span></li></ul>
+          <ul class="small"><li class="on">One extra pet choice every month <b>· on now</b></li><li class="on">Pixel and isometric styles for every pet you own <b>· on now</b></li><li>New pets and event outfits two weeks early <span class="muted">· coming</span></li><li>A thank-you mark on Mora’s hourglass <span class="muted">· coming</span></li></ul>
           <p class="small muted">After the beta: 1 month $1.99 · 3 months $3.99 · 6 months $5.99 · lifetime $9.99. Passes never renew on their own. Every pet, item and island stays free in the geometric style.</p></div>
       </div>
     </div>
@@ -4127,6 +4260,7 @@ async function petRoom(){
         else { worn = worn.filter(x => itemAnchor(x) !== anchor); worn.push(it.dataset.item); }
         p.items[id] = worn; save(); m.innerHTML = draw(); return; }
       const c = e.target.closest('[data-col]'); if (c) { p.colour[id] = c.dataset.col; save(); m.innerHTML = draw(); return; }
+      const sy = e.target.closest('[data-style]'); if (sy) { p.style[id] = sy.dataset.style; save(); m.innerHTML = draw(); return; }
       if (e.target.closest('[data-close]')) { closeModal(); render(); }
     };
   };

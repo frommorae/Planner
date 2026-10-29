@@ -1,0 +1,193 @@
+[
+  {
+    "batch": 1,
+    "name": "First release",
+    "status": "live in Morae Timers",
+    "what": "Geometric pets for every student.",
+    "styles": [
+      "geometric"
+    ],
+    "pets": [
+      "mochi",
+      "bao",
+      "kite",
+      "sunny",
+      "pebble",
+      "dune",
+      "lotl",
+      "puddle",
+      "ember",
+      "sprout",
+      "sol",
+      "spike",
+      "mora"
+    ],
+    "states": [
+      "idle",
+      "focus",
+      "happy",
+      "rest",
+      "cold",
+      "celebrate"
+    ],
+    "islands": [
+      "meadow",
+      "dunes"
+    ],
+    "weather": [
+      "clear",
+      "night"
+    ],
+    "items": [
+      "beanie",
+      "sunhat",
+      "crown",
+      "flowers",
+      "headphones",
+      "glasses",
+      "sunglasses",
+      "starshades",
+      "scarf",
+      "collar",
+      "bowtie",
+      "cape",
+      "lights"
+    ],
+    "events": [],
+    "needs": "Nothing new. Already built."
+  },
+  {
+    "batch": 2,
+    "name": "Plus styles and more pets",
+    "status": "next",
+    "what": "Pixel and isometric styles (Morae Plus and earned styles), the 18 pets that unlock at 30, 60 and 100 study days, and the lake, cave and grove islands, so Lotl, Puddle and Ember get their own homes.",
+    "styles": [
+      "pixel",
+      "isometric"
+    ],
+    "pets": [
+      "pip",
+      "rook",
+      "pom",
+      "clover",
+      "nib",
+      "peep",
+      "zephyr",
+      "mesa",
+      "zig",
+      "dart",
+      "hop",
+      "kit",
+      "daisy",
+      "tuli",
+      "tomo",
+      "kabo",
+      "mac",
+      "bo"
+    ],
+    "states": [],
+    "islands": [
+      "lake",
+      "cave",
+      "grove"
+    ],
+    "weather": [],
+    "items": [],
+    "events": [],
+    "needs": "Stripe passes for Plus; glow and style tickets for earned styles; the weekly pick. The 30-day pets are needed before the first beta student reaches 30 study days."
+  },
+  {
+    "batch": 3,
+    "name": "Rare pets, care and rewards",
+    "status": "later",
+    "what": "The 6 rare pets and their eggs, the hungry state for care, study items (the graduation cap is the finish-line gift), and toys and treats.",
+    "styles": [],
+    "pets": [
+      "ripple",
+      "cinder",
+      "flare",
+      "cap",
+      "gust",
+      "moss"
+    ],
+    "states": [
+      "hungry"
+    ],
+    "islands": [],
+    "weather": [],
+    "items": [
+      "book",
+      "mug",
+      "lamp",
+      "visor",
+      "gradcap",
+      "ball",
+      "yarn",
+      "donut",
+      "meat",
+      "juice",
+      "cake"
+    ],
+    "events": [],
+    "needs": "Rare-egg odds shown on screen; care and feeding; marking a goal as done."
+  },
+  {
+    "batch": 4,
+    "name": "Seasons and live weather",
+    "status": "later",
+    "what": "The 15 event sets and their event items, and live weather beyond clear and night.",
+    "styles": [],
+    "pets": [],
+    "states": [],
+    "islands": [],
+    "weather": [
+      "cloudy",
+      "rain",
+      "snow"
+    ],
+    "items": [
+      "party",
+      "knot",
+      "heartband",
+      "shamrock",
+      "bunnyears",
+      "rainbow",
+      "maple",
+      "leafcrown",
+      "witch",
+      "santa"
+    ],
+    "events": [
+      "new-year",
+      "lunar-new-year",
+      "family-day",
+      "valentines-day",
+      "st-patricks-day",
+      "easter",
+      "earth-day",
+      "pride",
+      "canada-day",
+      "back-to-school",
+      "thanksgiving",
+      "halloween",
+      "christmas",
+      "exam-season",
+      "busy-season"
+    ],
+    "needs": "A calendar of event dates; a small server piece for weather (Environment Canada or MET Norway) and an optional city."
+  },
+  {
+    "batch": 5,
+    "name": "Not in this code yet",
+    "status": "future",
+    "what": "Home-screen widgets (need a phone app), animated idle quirks (written in pets.json), the four focus-journey special items and the starlit colour (not designed yet), and the ideas on the Future ideas board.",
+    "styles": [],
+    "pets": [],
+    "states": [],
+    "islands": [],
+    "weather": [],
+    "items": [],
+    "events": [],
+    "needs": "Design work first."
+  }
+]

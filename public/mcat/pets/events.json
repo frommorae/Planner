@@ -6,7 +6,8 @@
     "items": [
       "party",
       "bowtie"
-    ]
+    ],
+    "batch": 4
   },
   {
     "id": "lunar-new-year",
@@ -15,7 +16,8 @@
     "items": [
       "knot",
       "scarf"
-    ]
+    ],
+    "batch": 4
   },
   {
     "id": "family-day",
@@ -24,7 +26,8 @@
     "items": [
       "beanie",
       "scarf"
-    ]
+    ],
+    "batch": 4
   },
   {
     "id": "valentines-day",
@@ -32,7 +35,8 @@
     "when": "Feb 14",
     "items": [
       "heartband"
-    ]
+    ],
+    "batch": 4
   },
   {
     "id": "st-patricks-day",
@@ -41,7 +45,8 @@
     "items": [
       "shamrock",
       "bowtie"
-    ]
+    ],
+    "batch": 4
   },
   {
     "id": "easter",
@@ -50,7 +55,8 @@
     "items": [
       "bunnyears",
       "collar"
-    ]
+    ],
+    "batch": 4
   },
   {
     "id": "earth-day",
@@ -58,7 +64,8 @@
     "when": "Apr 22",
     "items": [
       "flowers"
-    ]
+    ],
+    "batch": 4
   },
   {
     "id": "pride",
@@ -67,7 +74,8 @@
     "items": [
       "rainbow",
       "bowtie"
-    ]
+    ],
+    "batch": 4
   },
   {
     "id": "canada-day",
@@ -76,7 +84,8 @@
     "items": [
       "maple",
       "bowtie"
-    ]
+    ],
+    "batch": 4
   },
   {
     "id": "back-to-school",
@@ -85,7 +94,8 @@
     "items": [
       "glasses",
       "book"
-    ]
+    ],
+    "batch": 4
   },
   {
     "id": "thanksgiving",
@@ -94,7 +104,8 @@
     "items": [
       "leafcrown",
       "scarf"
-    ]
+    ],
+    "batch": 4
   },
   {
     "id": "halloween",
@@ -103,7 +114,8 @@
     "items": [
       "witch",
       "cape"
-    ]
+    ],
+    "batch": 4
   },
   {
     "id": "christmas",
@@ -112,7 +124,8 @@
     "items": [
       "santa",
       "collar"
-    ]
+    ],
+    "batch": 4
   },
   {
     "id": "exam-season",
@@ -121,7 +134,8 @@
     "items": [
       "glasses",
       "mug"
-    ]
+    ],
+    "batch": 4
   },
   {
     "id": "busy-season",
@@ -130,6 +144,7 @@
     "items": [
       "headphones",
       "lamp"
-    ]
+    ],
+    "batch": 4
   }
 ]

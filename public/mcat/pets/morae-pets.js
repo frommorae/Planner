@@ -1,21 +1,24 @@
 /*!
- * morae-pets.js v1.0.0 · geometric style
+ * morae-pets.js v1.1.0 · geometric, pixel and isometric styles
  * Draws every Morae pet as an SVG string. No libraries, no network, no fonts, shapes only.
  * Original artwork made for Morae; rights belong to the Morae project owner.
  * Designed and coded with Claude (Anthropic).
  *
  * Usage:
- *   MoraePets.svg({ pet: 'mochi', stage: 2, state: 'idle' })            -> '<svg ...>'
- *   MoraePets.svg({ pet: 'bao', state: 'focus', items: ['glasses', 'mug'], island: 'meadow', weather: 'rain' })
- *   MoraePets.svg({ pet: 'mochi', animate: false, frame: 'icon' })       -> head shot for 24-48 px
- *   MoraePets.anchors({ pet: 'mochi', stage: 2 })                         -> { head, face, neck, back, hand }
+ *   MoraePets.svg({ pet: 'mochi', stage: 2, state: 'idle' })                  -> '<svg ...>' (geometric)
+ *   MoraePets.svg({ pet: 'mochi', style: 'pixel', state: 'happy' })           -> pixel style
+ *   MoraePets.svg({ pet: 'bao', style: 'isometric', items: ['glasses', 'mug'], island: 'meadow', weather: 'rain' })
+ *   MoraePets.svg({ pet: 'mochi', animate: false, frame: 'icon' })             -> head shot for 24-48 px
+ *   MoraePets.anchors({ pet: 'mochi', style: 'pixel', stage: 2 })              -> { head, face, neck, back, hand }
+ *   MoraePets.batches                                                          -> what belongs to each release batch
  *
- * Options: pet, style ('geometric'), stage (1 first home, 2 young, 3 grown), state (idle, focus, happy,
- * rest, cold, celebrate, hungry), colour (a colour id, see MoraePets.colours), items (item ids from
- * items.json; one head item at a time, one toy or treat at a time), island (null, meadow, dunes, lake,
- * cave, grove), weather (clear, cloudy, rain, snow, night), animate (true), frame ('full' or 'icon').
+ * Options: pet, style ('geometric', 'pixel' or 'isometric'), stage (1 first home, 2 young, 3 grown), state (idle,
+ * focus, happy, rest, cold, celebrate, hungry), colour (a colour id, see MoraePets.colours), items (item ids from
+ * items.json; one head item at a time, one toy or treat at a time), island (null, meadow, dunes, lake, cave, grove),
+ * weather (clear, cloudy, rain, snow, night), animate (true), frame ('full' or 'icon').
  */
 (function () {
+const MP_GEO = (function () {
 
 const COATS = {
   butter: { light: '#FBE7B4', base: '#F4DFA8', shade: '#E2C281', deep: '#CFA862', cream: '#FBF1D6', creamShade: '#EEDDB8' },
@@ -1411,18 +1414,4005 @@ const face = (f, mood) => {
 };
 const ITEM_ON = { ball: 1, yarn: 1, donut: 1, meat: 1, juice: 1, cake: 1 };
 
-const MP_PETS = [{"id": "mochi", "name": "Mochi", "species": "Cat", "design": "round", "group": "meadow", "island": "meadow", "words": ["unbothered", "cosy", "secretly clever"], "quirk": "Kneads its paws, then one slow blink at you.", "firstHome": "basket", "starter": true, "unlockDays": 0, "rare": false, "odds": null, "favouriteFood": "fish", "defaultColour": "butter"}, {"id": "pip", "name": "Pip", "species": "Cat", "design": "sharp", "group": "meadow", "island": "meadow", "words": ["dramatic", "fussy", "loyal"], "quirk": "Grooms one paw, then checks that you saw.", "firstHome": "basket", "starter": false, "unlockDays": 30, "rare": false, "odds": null, "favouriteFood": "fish", "defaultColour": "lavender"}, {"id": "bao", "name": "Bao", "species": "Dog", "design": "round", "group": "meadow", "island": "meadow", "words": ["stubborn", "snack-driven", "steady"], "quirk": "Sniffs the grass; its tail thumps once.", "firstHome": "basket", "starter": true, "unlockDays": 0, "rare": false, "odds": null, "favouriteFood": "bone", "defaultColour": "peach"}, {"id": "rook", "name": "Rook", "species": "Dog", "design": "sharp", "group": "meadow", "island": "meadow", "words": ["gentle", "shy", "watchful"], "quirk": "One ear lifts at every sound, then lowers.", "firstHome": "basket", "starter": false, "unlockDays": 60, "rare": false, "odds": null, "favouriteFood": "bone", "defaultColour": "charcoal"}, {"id": "pom", "name": "Pom", "species": "Bird", "design": "round", "group": "meadow", "island": "meadow", "words": ["bossy", "loud", "tidy"], "quirk": "Puffs up round, then preens one feather flat.", "firstHome": "egg", "starter": false, "unlockDays": 30, "rare": false, "odds": null, "favouriteFood": "berry", "defaultColour": "sky"}, {"id": "kite", "name": "Kite", "species": "Bird", "design": "sharp", "group": "meadow", "island": "meadow", "words": ["dreamy", "slow", "poetic"], "quirk": "Tilts its head and follows a passing cloud.", "firstHome": "egg", "starter": true, "unlockDays": 0, "rare": false, "odds": null, "favouriteFood": "berry", "defaultColour": "mint"}, {"id": "clover", "name": "Clover", "species": "Rabbit", "design": null, "group": "meadow", "island": "meadow", "words": ["brave", "nosy", "restless"], "quirk": "Nose wiggles; one ear flops and pops back.", "firstHome": "burrow", "starter": false, "unlockDays": 60, "rare": false, "odds": null, "favouriteFood": "carrot", "defaultColour": "cocoa"}, {"id": "nib", "name": "Nib", "species": "Hamster", "design": null, "group": "meadow", "island": "meadow", "words": ["organised", "thrifty", "cheerful"], "quirk": "Stuffs its cheeks, then pats them proudly.", "firstHome": "burrow", "starter": false, "unlockDays": 100, "rare": false, "odds": null, "favouriteFood": "seed", "defaultColour": "ginger"}, {"id": "peep", "name": "Peep", "species": "Chicken", "design": null, "group": "meadow", "island": "meadow", "words": ["punctual", "chatty", "nosy"], "quirk": "Pecks twice and bobs its head to a beat.", "firstHome": "egg", "starter": false, "unlockDays": 100, "rare": false, "odds": null, "favouriteFood": "seed", "defaultColour": "snow"}, {"id": "sunny", "name": "Sunny", "species": "Fennec", "design": "round", "group": "dunes", "island": "dunes", "words": ["mischievous", "funny", "warm"], "quirk": "Its big ears swivel one at a time.", "firstHome": "burrow", "starter": true, "unlockDays": 0, "rare": false, "odds": null, "favouriteFood": "berry", "defaultColour": "ginger"}, {"id": "zephyr", "name": "Zephyr", "species": "Fennec", "design": "sharp", "group": "dunes", "island": "dunes", "words": ["calm", "elegant", "night owl"], "quirk": "A slow tail sweep, eyes half closed.", "firstHome": "burrow", "starter": false, "unlockDays": 30, "rare": false, "odds": null, "favouriteFood": "berry", "defaultColour": "snow"}, {"id": "pebble", "name": "Pebble", "species": "Tortoise", "design": "round", "group": "dunes", "island": "dunes", "words": ["ambitious", "slow", "proud"], "quirk": "Stretches its neck out far, blinks, pulls back.", "firstHome": "egg", "starter": true, "unlockDays": 0, "rare": false, "odds": null, "favouriteFood": "leaf", "defaultColour": "olive"}, {"id": "mesa", "name": "Mesa", "species": "Tortoise", "design": "sharp", "group": "dunes", "island": "dunes", "words": ["wise", "grumpy", "soft inside"], "quirk": "Half-closed eyes and a tiny sigh.", "firstHome": "egg", "starter": false, "unlockDays": 60, "rare": false, "odds": null, "favouriteFood": "leaf", "defaultColour": "burgundy"}, {"id": "zig", "name": "Zig", "species": "Gecko", "design": "round", "group": "dunes", "island": "dunes", "words": ["curious", "giggly", "clingy"], "quirk": "Licks its own eyeball, like real geckos do.", "firstHome": "egg", "starter": false, "unlockDays": 30, "rare": false, "odds": null, "favouriteFood": "berry", "defaultColour": "teal"}, {"id": "dart", "name": "Dart", "species": "Gecko", "design": "sharp", "group": "dunes", "island": "dunes", "words": ["focused", "quiet", "precise"], "quirk": "Perfectly still, then one quick tail flick.", "firstHome": "egg", "starter": false, "unlockDays": 100, "rare": false, "odds": null, "favouriteFood": "berry", "defaultColour": "lavender"}, {"id": "dune", "name": "Dune", "species": "Camel", "design": null, "group": "dunes", "island": "dunes", "words": ["easygoing", "dramatic", "generous"], "quirk": "Chews slowly from side to side.", "firstHome": "blanket", "starter": true, "unlockDays": 0, "rare": false, "odds": null, "favouriteFood": "drop", "defaultColour": "caramel"}, {"id": "hop", "name": "Hop", "species": "Jerboa", "design": null, "group": "dunes", "island": "dunes", "words": ["bouncy", "scatterbrained", "night owl"], "quirk": "A tiny hop in place; the tail keeps balance.", "firstHome": "burrow", "starter": false, "unlockDays": 60, "rare": false, "odds": null, "favouriteFood": "seed", "defaultColour": "cocoa"}, {"id": "kit", "name": "Kit", "species": "Meerkat", "design": null, "group": "dunes", "island": "dunes", "words": ["watchful", "helpful", "team player"], "quirk": "Stands up tall to look around, then sits.", "firstHome": "burrow", "starter": false, "unlockDays": 100, "rare": false, "odds": null, "favouriteFood": "berry", "defaultColour": "charcoal"}, {"id": "lotl", "name": "Lotl", "species": "Axolotl", "design": null, "group": "special", "island": "lake", "words": ["unbothered", "smiley", "resilient"], "quirk": "Gills flutter while it floats up and down.", "firstHome": "egg", "starter": true, "unlockDays": 0, "rare": false, "odds": null, "favouriteFood": "fish", "defaultColour": "rose"}, {"id": "puddle", "name": "Puddle", "species": "Frog", "design": null, "group": "special", "island": "lake", "words": ["lazy", "philosophical", "rain-loving"], "quirk": "Throat pulses; a very slow blink.", "firstHome": "frogspawn", "starter": true, "unlockDays": 0, "rare": false, "odds": null, "favouriteFood": "berry", "defaultColour": "mint"}, {"id": "ripple", "name": "Ripple", "species": "Water spirit", "design": null, "group": "special", "island": "lake", "words": ["soothing", "shy", "adaptable"], "quirk": "Rings ripple outward from its base.", "firstHome": "orb", "starter": false, "unlockDays": null, "rare": true, "odds": 2, "favouriteFood": "drop", "defaultColour": "sky"}, {"id": "ember", "name": "Ember", "species": "Dragon", "design": null, "group": "special", "island": "cave", "words": ["tiny", "proud", "protective"], "quirk": "Puffs a smoke ring, then hiccups a spark.", "firstHome": "egg", "starter": true, "unlockDays": 0, "rare": false, "odds": null, "favouriteFood": "chili", "defaultColour": "teal"}, {"id": "cinder", "name": "Cinder", "species": "Phoenix", "design": null, "group": "special", "island": "cave", "words": ["theatrical", "hopeful", "comeback kid"], "quirk": "Its flame crest flickers and fluffs up.", "firstHome": "egg", "starter": false, "unlockDays": null, "rare": true, "odds": 1, "favouriteFood": "berry", "defaultColour": "butter"}, {"id": "flare", "name": "Flare", "species": "Fire spirit", "design": null, "group": "special", "island": "cave", "words": ["impatient", "excitable", "bright"], "quirk": "Crackles and sways like a candle in a draft.", "firstHome": "orb", "starter": false, "unlockDays": null, "rare": true, "odds": 2, "favouriteFood": "chili", "defaultColour": "ember"}, {"id": "cap", "name": "Cap", "species": "Mushroom", "design": null, "group": "special", "island": "grove", "words": ["shy", "mysterious", "patient"], "quirk": "Tilts its cap and lets out one spore puff.", "firstHome": "spore", "starter": false, "unlockDays": null, "rare": true, "odds": 1, "favouriteFood": "drop", "defaultColour": "burgundy"}, {"id": "gust", "name": "Gust", "species": "Wind spirit", "design": null, "group": "special", "island": "grove", "words": ["restless", "playful", "forgetful"], "quirk": "Drifts side to side; a leaf swirls past.", "firstHome": "orb", "starter": false, "unlockDays": null, "rare": true, "odds": 1, "favouriteFood": "berry", "defaultColour": "aqua"}, {"id": "moss", "name": "Moss", "species": "Earth spirit", "design": null, "group": "special", "island": "grove", "words": ["slow", "grounded", "nurturing"], "quirk": "The sprout on its head sways; eyes close.", "firstHome": "orb", "starter": false, "unlockDays": null, "rare": true, "odds": 1, "favouriteFood": "leaf", "defaultColour": "cocoa"}, {"id": "sprout", "name": "Gemma", "species": "Seedling", "design": null, "group": "garden", "island": "meadow", "words": ["eager", "tiny", "determined"], "quirk": "Both leaves stretch up, a little higher.", "firstHome": "seed", "starter": true, "unlockDays": 0, "rare": false, "odds": null, "favouriteFood": "drop", "defaultColour": "peach"}, {"id": "sol", "name": "Heli", "species": "Sunflower", "design": null, "group": "garden", "island": "meadow", "words": ["loyal", "sunny", "devoted"], "quirk": "Its face turns slowly toward the light.", "firstHome": "seed", "starter": true, "unlockDays": 0, "rare": false, "odds": null, "favouriteFood": "drop", "defaultColour": "lavender"}, {"id": "daisy", "name": "Beli", "species": "Daisy", "design": null, "group": "garden", "island": "meadow", "words": ["honest", "optimistic", "fresh"], "quirk": "Petals open and close a little.", "firstHome": "seed", "starter": false, "unlockDays": 30, "rare": false, "odds": null, "favouriteFood": "drop", "defaultColour": "rose"}, {"id": "tuli", "name": "Tuli", "species": "Tulip", "design": null, "group": "garden", "island": "meadow", "words": ["polite", "graceful", "romantic"], "quirk": "A small, gentle bow.", "firstHome": "seed", "starter": false, "unlockDays": 30, "rare": false, "odds": null, "favouriteFood": "drop", "defaultColour": "mint"}, {"id": "tomo", "name": "Sola", "species": "Tomato", "design": null, "group": "garden", "island": "meadow", "words": ["bubbly", "warm", "easily flustered"], "quirk": "Blushes a shade deeper and wobbles.", "firstHome": "seed", "starter": false, "unlockDays": 60, "rare": false, "odds": null, "favouriteFood": "drop", "defaultColour": "snow"}, {"id": "kabo", "name": "Pepo", "species": "Pumpkin", "design": null, "group": "garden", "island": "meadow", "words": ["hearty", "content", "homebody"], "quirk": "Rocks side to side; its vine curls.", "firstHome": "seed", "starter": false, "unlockDays": 100, "rare": false, "odds": null, "favouriteFood": "drop", "defaultColour": "ginger"}, {"id": "mac", "name": "Malu", "species": "Apple tree", "design": null, "group": "garden", "island": "meadow", "words": ["generous", "lucky", "sheltering"], "quirk": "One apple sways; the leaves rustle.", "firstHome": "seed", "starter": false, "unlockDays": 60, "rare": false, "odds": null, "favouriteFood": "drop", "defaultColour": "butter"}, {"id": "bo", "name": "Juni", "species": "Bonsai", "design": null, "group": "garden", "island": "meadow", "words": ["patient", "neat", "perfectionist"], "quirk": "One petal drifts down and it tidies up.", "firstHome": "seed", "starter": false, "unlockDays": 100, "rare": false, "odds": null, "favouriteFood": "drop", "defaultColour": "charcoal"}, {"id": "spike", "name": "Ceri", "species": "Cactus", "design": null, "group": "garden", "island": "dunes", "words": ["tough", "independent", "secretly soft"], "quirk": "A tiny flower blooms, then shyly closes.", "firstHome": "seed", "starter": true, "unlockDays": 0, "rare": false, "odds": null, "favouriteFood": "drop", "defaultColour": "sky"}, {"id": "mora", "name": "Mora", "species": "Time spirit", "design": null, "group": "mora", "island": "meadow", "words": ["timeless", "gentle", "encouraging"], "quirk": "Sand trickles down; the halo ticks once.", "firstHome": "orb", "starter": true, "unlockDays": 0, "rare": false, "odds": null, "favouriteFood": "drop", "defaultColour": "lavender"}];
-const MP_ITEMS = [{"id": "beanie", "name": "Beanie", "anchor": "head", "kind": "everyday", "event": null}, {"id": "sunhat", "name": "Sun hat", "anchor": "head", "kind": "everyday", "event": null}, {"id": "crown", "name": "Crown", "anchor": "head", "kind": "everyday", "event": null}, {"id": "flowers", "name": "Flower crown", "anchor": "head", "kind": "everyday", "event": null}, {"id": "headphones", "name": "Headphones", "anchor": "head", "kind": "everyday", "event": null}, {"id": "glasses", "name": "Study glasses", "anchor": "face", "kind": "everyday", "event": null}, {"id": "sunglasses", "name": "Shades, round", "anchor": "face", "kind": "everyday", "event": null}, {"id": "starshades", "name": "Star shades, sharp", "anchor": "face", "kind": "everyday", "event": null}, {"id": "scarf", "name": "Scarf", "anchor": "neck", "kind": "everyday", "event": null}, {"id": "collar", "name": "Collar and tag", "anchor": "neck", "kind": "everyday", "event": null}, {"id": "bowtie", "name": "Bow tie", "anchor": "neck", "kind": "everyday", "event": null}, {"id": "cape", "name": "Cape", "anchor": "back", "kind": "everyday", "event": null}, {"id": "lights", "name": "Fairy lights (plants)", "anchor": "neck", "kind": "everyday", "event": null}, {"id": "book", "name": "Book", "anchor": "hand", "kind": "study", "event": null}, {"id": "mug", "name": "Mug", "anchor": "hand", "kind": "study", "event": null}, {"id": "lamp", "name": "Desk lamp", "anchor": "hand", "kind": "study", "event": null}, {"id": "visor", "name": "Sun visor", "anchor": "head", "kind": "study", "event": null}, {"id": "gradcap", "name": "Graduation cap", "anchor": "head", "kind": "study", "event": null}, {"id": "party", "name": "Party hat", "anchor": "head", "kind": "event", "event": "new-year"}, {"id": "knot", "name": "Lucky knot", "anchor": "head", "kind": "event", "event": "lunar-new-year"}, {"id": "heartband", "name": "Heart band", "anchor": "head", "kind": "event", "event": "valentines-day"}, {"id": "shamrock", "name": "Shamrock band", "anchor": "head", "kind": "event", "event": "st-patricks-day"}, {"id": "bunnyears", "name": "Bunny ears", "anchor": "head", "kind": "event", "event": "easter"}, {"id": "rainbow", "name": "Rainbow band", "anchor": "head", "kind": "event", "event": "pride"}, {"id": "maple", "name": "Maple band", "anchor": "head", "kind": "event", "event": "canada-day"}, {"id": "leafcrown", "name": "Autumn leaves", "anchor": "head", "kind": "event", "event": "thanksgiving"}, {"id": "witch", "name": "Witch hat", "anchor": "head", "kind": "event", "event": "halloween"}, {"id": "santa", "name": "Santa hat", "anchor": "head", "kind": "event", "event": "christmas"}, {"id": "ball", "name": "Ball", "anchor": "hand", "kind": "toy", "event": null}, {"id": "yarn", "name": "Yarn", "anchor": "hand", "kind": "toy", "event": null}, {"id": "donut", "name": "Donut", "anchor": "hand", "kind": "treat", "event": null}, {"id": "meat", "name": "Meat", "anchor": "hand", "kind": "treat", "event": null}, {"id": "juice", "name": "Juice box", "anchor": "hand", "kind": "treat", "event": null}, {"id": "cake", "name": "Cake", "anchor": "hand", "kind": "treat", "event": null}];
+return { COATS, PETS, FORMS, formSpec, tintSpec, TINTS, accShapes, face, colr, NECK, LIGHTS, HEAD_ACC, E, xRange, XF };
+})();
+const MP_ISO = (function () {
+
+const COATS = {
+  butter: { light: '#FBE7B4', base: '#F4DFA8', shade: '#E2C281', deep: '#CFA862', cream: '#FBF1D6', creamShade: '#EEDDB8' },
+  lavender: { light: '#E2DCF2', base: '#CFC6E6', shade: '#A99DCC', deep: '#8C80B4', cream: '#F8F6FC', creamShade: '#E4DFF2' },
+  sky: { light: '#DDE7F3', base: '#C6D5E8', shade: '#9FB4D0', deep: '#8099BC', cream: '#F6F9FC', creamShade: '#DFE7F1' },
+  peach: { light: '#FDDCC8', base: '#F7C6A8', shade: '#E59F7D', deep: '#CC8262', cream: '#FFF4EC', creamShade: '#F6DCCB' },
+  mint: { light: '#D7F0E3', base: '#BCE3CF', shade: '#8FC8AC', deep: '#6FAE90', cream: '#F5FBF8', creamShade: '#DCEEE5' },
+  charcoal: { light: '#8D93A3', base: '#6E7486', shade: '#555A6A', deep: '#41464F', cream: '#F2F0EC', creamShade: '#D9D6D0' },
+  sand: { light: '#F6E3BD', base: '#E9CB97', shade: '#D2A96C', deep: '#B98A4E', cream: '#FBF3E3', creamShade: '#EFDFC2' },
+  rose: { light: '#FBE0E6', base: '#F4C3CF', shade: '#E39DAF', deep: '#C97C91', cream: '#FFF3F5', creamShade: '#F6DCE2' },
+  snow: { light: '#FFFFFF', base: '#FBF8F3', shade: '#E6DCCD', deep: '#C7B6A0', cream: '#FFFFFF', creamShade: '#EFE6D9' },
+  ginger: { light: '#F9C48E', base: '#F0A462', shade: '#D9813F', deep: '#B8652B', cream: '#FFF3E4', creamShade: '#F5DCC0' },
+  caramel: { light: '#E8B886', base: '#D49A64', shade: '#B87A46', deep: '#985E32', cream: '#FBF0E2', creamShade: '#EFD9BE' },
+  cocoa: { light: '#B8907A', base: '#9C735C', shade: '#7E5844', deep: '#634332', cream: '#F6EBDD', creamShade: '#E5D2BC' },
+  olive: { light: '#C8D69A', base: '#A8BC72', shade: '#869C52', deep: '#6A7E3E', cream: '#F6F3DC', creamShade: '#E6E0B8' },
+  teal: { light: '#9FDCD0', base: '#6FC2B4', shade: '#4FA396', deep: '#3A8579', cream: '#F0FAF6', creamShade: '#D2EEE6' },
+  aqua: { light: '#A8F0E4', base: '#62D9C8', shade: '#35BBAE', deep: '#1F9A92', cream: '#EFFFFB', creamShade: '#CDF3EC' },
+  burgundy: { light: '#D98A9A', base: '#B24A5E', shade: '#93394B', deep: '#74283A', cream: '#FBEFF1', creamShade: '#EFD3D9' },
+  ember: { light: '#FFB98A', base: '#FF8E5E', shade: '#E86A44', deep: '#C24E30', cream: '#FFF1C9', creamShade: '#FFD98A' }
+};
+const r1 = (v) => Math.round(v * 10) / 10;
+const pt = (x, y) => r1(x) + ' ' + r1(y);
+const E = (cx, cy, rx, ry) => 'M' + pt(cx - rx, cy) + 'a' + r1(rx) + ' ' + r1(ry) + ' 0 1 0 ' + r1(2 * rx) + ' 0a' + r1(rx) + ' ' + r1(ry) + ' 0 1 0 ' + r1(-2 * rx) + ' 0Z';
+const P = (pts) => 'M' + pts.map((p) => pt(p[0], p[1])).join('L') + 'Z';
+const drop = (x, y, s) => 'M' + pt(x, y - s * 1.6) + 'C' + pt(x + s * 0.6, y - s * 0.6) + ' ' + pt(x + s, y) + ' ' + pt(x + s, y + s * 0.3) + 'A' + r1(s) + ' ' + r1(s) + ' 0 0 1 ' + pt(x - s, y + s * 0.3) + 'C' + pt(x - s, y) + ' ' + pt(x - s * 0.6, y - s * 0.6) + ' ' + pt(x, y - s * 1.6) + 'Z';
+const fe = (cx, cy, rx, ry, n, t) => {
+  const out = [];
+  const outer = [];
+  const inner = [];
+  for (let i = 0; i < n; i++) {
+    const a = -Math.PI / 2 + (i * 2 * Math.PI) / n;
+    outer.push([cx + rx * Math.cos(a), cy + ry * Math.sin(a)]);
+    const b = a + Math.PI / n;
+    inner.push([cx + rx * 0.58 * Math.cos(b), cy + ry * 0.58 * Math.sin(b)]);
+  }
+  const tone = (x, y) => {
+    const nx = (x - cx) / rx;
+    const ny = (y - cy) / ry;
+    const l = Math.hypot(nx, ny) || 1;
+    const d = (-0.55 * nx - 0.83 * ny) / l;
+    return t[d > 0.5 ? 0 : d > -0.05 ? 1 : d > -0.6 ? 2 : 3];
+  };
+  for (let i = 0; i < n; i++) {
+    const p1 = outer[i];
+    const p2 = outer[(i + 1) % n];
+    const q = inner[i];
+    const q0 = inner[(i - 1 + n) % n];
+    out.push([P([p1, p2, q]), tone((p1[0] + p2[0]) / 2, (p1[1] + p2[1]) / 2)]);
+    out.push([P([p1, q, q0]), tone(p1[0] * 0.8 + cx * 0.2, p1[1] * 0.8 + cy * 0.2)]);
+  }
+  out.push([P(inner), t[1]]);
+  return out;
+};
+const T4 = ['light', 'base', 'shade', 'deep'];
+const CR = ['cream', 'cream', 'creamShade', 'creamShade'];
+const CR2 = ['creamShade', 'creamShade', 'creamShade', 'shade'];
+const DK = ['shade', 'shade', 'deep', 'deep'];
+const SOIL = ['#8A5631', '#7A4A2A', '#6A4024', '#5A361F'];
+const LEAF = ['#A5D874', '#8CCB5E', '#6FB04A', '#5A9A3C'];
+const arcPts = (cx, cy, rx, ry, a0, a1, n) => {
+  const out = [];
+  const step = (Math.PI * 2) / n;
+  for (let a = a0; a <= a1 + 1e-6; a += step) out.push([cx + rx * Math.cos(a), cy + ry * Math.sin(a)]);
+  return out;
+};
+const blob = (cx, cy, rx, ry, n, t) => {
+  const d = Math.PI / 180;
+  return [
+    [P(arcPts(cx, cy, rx, ry, 0, Math.PI * 2 - 0.001, n)), t[1]],
+    [P(arcPts(cx, cy, rx, ry, -70 * d, 110 * d, n)), t[2]],
+    [P(arcPts(cx, cy, rx, ry, 20 * d, 100 * d, n)), t[3]],
+    [P(arcPts(cx, cy, rx, ry, -165 * d, -60 * d, n)), t[0]]
+  ];
+};
+const isoPetals = (cx, cy, r0, r1, n, w) => {
+  let a1 = '';
+  let a2 = '';
+  for (let i = 0; i < n; i++) {
+    const a = (i / n) * Math.PI * 2;
+    const q = [[cx + r0 * Math.cos(a - w), cy + r0 * 0.95 * Math.sin(a - w)], [cx + r1 * Math.cos(a), cy + r1 * 0.95 * Math.sin(a)], [cx + r0 * Math.cos(a + w), cy + r0 * 0.95 * Math.sin(a + w)], [cx + r0 * 0.7 * Math.cos(a), cy + r0 * 0.7 * Math.sin(a)]];
+    if (i % 2) a2 += P(q); else a1 += P(q);
+  }
+  return [a1, a2];
+};
+const ISO_PETALS = isoPetals(280, 196, 28, 60, 16, 0.2);
+const FIX = { O: '#2E3B55', P: '#F2B8C0', P2: '#E39FAA', N: '#E08A97', beak: '#F2A65A', beakD: '#D98840', skin: '#C9C08A', skinD: '#A89F6B' };
+const colr = (k, pal) => (!k || k === 'none' ? 'none' : (k[0] === '#' ? k : (FIX[k] || pal[k] || k)));
+const STAR = (x, y, r) => 'M' + pt(x, y - r) + 'Q' + pt(x, y) + ' ' + pt(x + r, y) + 'Q' + pt(x, y) + ' ' + pt(x, y + r) + 'Q' + pt(x, y) + ' ' + pt(x - r, y) + 'Q' + pt(x, y) + ' ' + pt(x, y - r) + 'Z';
+const blobs = (arr, n, t) => {
+  const parts = arr.map(([cx, cy, rx, ry]) => blob(cx, cy, rx, ry, n, t));
+  return [0, 1, 2, 3].map((i) => [parts.map((q) => q[i][0]).join(''), parts[0][i][1]]);
+};
+const ISO_DAISY = isoPetals(280, 196, 28, 62, 16, 0.14);
+const TINTS = {
+  teal: { '#A5D874': '#A8E3D3', '#8CCB5E': '#7FCDB9', '#7DBB4C': '#5FB3A0', '#6FB04A': '#4FA08E', '#5A9A3C': '#3F8A7C', '#5E9A3C': '#3F8A7C', '#6AA63F': '#4F9A88' },
+  blossom: { '#A5D874': '#FFEFF4', '#8CCB5E': '#FFE1EA', '#7DBB4C': '#F7B3C8', '#6FB04A': '#F09AB5', '#5A9A3C': '#DE87A3' }
+};
+const tintList = (list, map) => list.map((sh) => (Array.isArray(sh[0]) ? tintList(sh, map) : sh.map((v, i) => (i > 0 && typeof v === 'string' && map[v] ? map[v] : v))));
+const tintSpec = (spec, map) => (map ? { ...spec, tail: tintList(spec.tail, map), body: tintList(spec.body, map) } : spec);
+const starP = (cx, cy, R, r, n) => {
+  let d = '';
+  for (let i = 0; i < n * 2; i++) {
+    const a = -Math.PI / 2 + (i * Math.PI) / n + 0.12;
+    const rr = i % 2 ? r : R;
+    d += (i ? 'L' : 'M') + pt(cx + rr * Math.cos(a), cy + rr * Math.sin(a));
+  }
+  return d + 'Z';
+};
+const PETS = {
+  mochi: {
+    name: 'Mochi', coat: 'butter', food: 'fish', pivot: [344, 332],
+    tail: [
+      [P([[340, 326], [366, 312], [374, 326], [348, 340]]), 'shade'],
+      [P([[366, 312], [380, 290], [390, 296], [374, 326]]), 'base'],
+      [P([[380, 290], [378, 276], [388, 272], [390, 296]]), 'light']
+    ],
+    body: [
+      [P([[214, 300], [222, 272], [246, 254], [272, 252], [290, 266], [300, 300], [296, 352], [250, 348], [240, 348], [218, 330]]), 'base'],
+      [P([[272, 252], [316, 254], [340, 272], [348, 300], [342, 330], [320, 348], [296, 352], [300, 300], [290, 266]]), 'shade'],
+      [P([[342, 330], [320, 348], [296, 352], [310, 330]]), 'deep'],
+      [P([[222, 272], [246, 254], [280, 248], [316, 254], [290, 266], [246, 270]]), 'light'],
+      [P([[250, 290], [272, 282], [294, 290], [298, 326], [284, 346], [262, 346], [248, 326]]), 'cream'],
+      [P([[272, 282], [294, 290], [298, 326], [284, 346], [276, 320]]), 'creamShade'],
+      [P([[238, 338], [260, 336], [264, 352], [240, 354]]), 'cream'],
+      [P([[282, 338], [302, 336], [306, 352], [284, 354]]), 'creamShade'],
+      ['M248 346L248 353M292 346L292 353', 'none', 'shade', 1.5],
+      [P([[222, 186], [220, 146], [232, 136], [246, 140], [262, 164]]), 'base'],
+      [P([[230, 176], [229, 152], [236, 146], [244, 150], [252, 166]]), 'P'],
+      [P([[300, 162], [320, 138], [334, 136], [342, 148], [340, 188]]), 'shade'],
+      [P([[308, 164], [322, 148], [330, 146], [334, 154], [332, 180]]), 'P2'],
+      [P([[210, 212], [214, 190], [228, 172], [252, 158], [280, 154], [276, 212], [280, 266], [260, 264], [234, 254], [216, 236]]), 'base'],
+      [P([[280, 154], [308, 158], [332, 172], [346, 190], [350, 212], [344, 236], [326, 254], [300, 264], [280, 266], [276, 212]]), 'shade'],
+      [P([[228, 172], [252, 158], [280, 154], [308, 158], [296, 174], [262, 176], [240, 184]]), 'light'],
+      [P([[214, 226], [198, 236], [212, 244], [206, 252], [228, 252]]), 'light'],
+      [P([[346, 226], [362, 236], [348, 244], [354, 252], [332, 252]]), 'deep'],
+      [P([[256, 226], [280, 220], [304, 226], [306, 244], [292, 256], [268, 256], [254, 244]]), 'cream'],
+      [P([[280, 220], [304, 226], [306, 244], [292, 256], [282, 240]]), 'creamShade'],
+      [P([[273, 228], [287, 228], [280, 236]]), 'N'],
+      ['M252 240L226 236M252 245L228 250M308 240L334 236M308 245L332 250', 'none', 'deep', 1.4]
+    ],
+    face: { eyes: [[256, 208], [304, 208]], er: 9, kind: 'oval', mouth: [280, 244], ma: 4, blush: [[236, 232], [324, 232]], br: 9 },
+    hat: [280, 160, 34], em: [350, 140]
+  },
+  pip: {
+    name: 'Pip', coat: 'lavender', food: 'fish', pivot: [326, 328],
+    tail: [
+      [P([[318, 318], [346, 300], [352, 312], [326, 328]]), 'deep'], [P([[346, 300], [360, 262], [370, 266], [352, 312]]), 'shade'],
+      [P([[360, 262], [358, 232], [368, 228], [370, 266]]), 'base'], [P([[358, 232], [362, 218], [372, 222], [368, 228]]), 'light']
+    ],
+    body: [
+      [P([[300, 236], [326, 262], [332, 300], [326, 328], [296, 334], [292, 258]]), 'shade'],
+      [P([[326, 328], [332, 300], [338, 322], [320, 336]]), 'deep'],
+      [P([[256, 244], [292, 258], [296, 334], [258, 336], [246, 296]]), 'base'],
+      [P([[256, 244], [300, 236], [292, 258]]), 'light'],
+      [P([[246, 296], [258, 336], [240, 334], [238, 312]]), 'light'],
+      [P([[262, 256], [290, 262], [288, 316], [270, 322], [258, 292]]), 'cream'],
+      [P([[290, 262], [292, 258], [296, 310], [288, 316]]), 'creamShade'],
+      [P([[256, 326], [276, 324], [280, 338], [258, 340]]), 'cream'],
+      [P([[282, 326], [298, 326], [302, 338], [284, 340]]), 'creamShade'],
+      ['M266 332L266 339M291 332L291 339', 'none', 'shade', 1.5],
+      [P([[238, 186], [236, 128], [270, 168]]), 'base'], [P([[244, 176], [242, 142], [262, 168]]), 'P'],
+      [P([[290, 166], [320, 128], [322, 184]]), 'shade'], [P([[296, 166], [316, 140], [316, 176]]), 'P2'],
+      [P([[232, 196], [278, 164], [280, 246], [240, 236]]), 'base'],
+      [P([[278, 164], [326, 186], [318, 232], [280, 246]]), 'shade'],
+      [P([[240, 182], [278, 160], [318, 180], [278, 170]]), 'light'],
+      [P([[232, 212], [218, 222], [236, 228]]), 'base'], [P([[234, 224], [222, 234], [240, 236]]), 'light'],
+      [P([[320, 212], [334, 220], [318, 226]]), 'shade'], [P([[318, 224], [330, 232], [314, 234]]), 'deep'],
+      [P([[258, 216], [280, 210], [300, 216], [294, 236], [280, 244], [264, 236]]), 'cream'],
+      [P([[280, 244], [294, 236], [300, 216], [302, 226], [292, 242]]), 'creamShade'],
+      [P([[276, 216], [284, 216], [280, 222]]), 'N'],
+      ['M250 226L222 221M250 230L224 234M310 226L338 221M310 230L336 234', 'none', 'deep', 1.4]
+    ],
+    face: { eyes: [[261, 199], [297, 199]], er: 7, kind: 'almond', mouth: [280, 229], ma: 3.5, blush: [[249, 221], [309, 221]], br: 7 },
+    hat: [279, 172, 26], em: [334, 124]
+  },
+  bao: {
+    name: 'Bao', coat: 'peach', food: 'bone', pivot: [338, 304],
+    tail: [fe(346, 290, 12, 18, 6, T4)],
+    body: [
+      fe(280, 308, 70, 48, 14, T4), fe(280, 326, 34, 24, 10, CR), fe(250, 352, 18, 8, 8, CR), fe(310, 352, 18, 8, 8, CR2),
+      fe(280, 212, 78, 64, 14, T4), fe(304, 204, 18, 15, 8, DK),
+      [P([[206, 186], [190, 212], [192, 250], [208, 262], [222, 238], [222, 196]]), 'shade'],
+      [P([[354, 186], [370, 212], [368, 250], [352, 262], [338, 238], [338, 196]]), 'deep'],
+      fe(280, 242, 30, 20, 10, CR),
+      [P([[270, 232], [290, 232], [280, 243]]), 'O']
+    ],
+    face: { eyes: [[256, 208], [304, 208]], er: 8, kind: 'oval', mouth: [280, 252], ma: 4.5, blush: [[234, 238], [326, 238]], br: 8 },
+    hat: [280, 158, 34], em: [358, 140]
+  },
+  rook: {
+    name: 'Rook', coat: 'charcoal', food: 'bone', pivot: [320, 320],
+    tail: [[P([[318, 316], [336, 296], [346, 250], [356, 254], [348, 302], [326, 326]]), 'shade'], [P([[346, 250], [352, 236], [356, 254]]), 'light']],
+    body: [
+      [P([[300, 236], [326, 262], [332, 300], [326, 328], [296, 334], [292, 258]]), 'shade'],
+      [P([[256, 244], [292, 258], [296, 334], [258, 336], [246, 296]]), 'base'],
+      [P([[256, 244], [300, 236], [292, 258]]), 'light'],
+      [P([[262, 256], [290, 262], [286, 316], [270, 322], [258, 292]]), 'cream'],
+      [P([[252, 298], [266, 298], [266, 342], [250, 342]]), 'cream'],
+      [P([[276, 300], [290, 300], [292, 342], [276, 342]]), 'creamShade'],
+      [P([[236, 184], [230, 104], [264, 164]]), 'base'], [P([[242, 172], [238, 124], [258, 164]]), 'P'],
+      [P([[296, 164], [328, 102], [322, 182]]), 'shade'], [P([[302, 164], [322, 120], [318, 176]]), 'P2'],
+      [P([[230, 190], [280, 158], [282, 230], [246, 226]]), 'base'],
+      [P([[280, 158], [328, 184], [318, 224], [282, 230]]), 'shade'],
+      [P([[240, 180], [280, 154], [318, 178], [280, 166]]), 'light'],
+      [P([[256, 212], [300, 212], [298, 244], [280, 258], [262, 244]]), 'cream'],
+      [P([[280, 258], [298, 244], [300, 212], [306, 224], [294, 250]]), 'creamShade'],
+      [P([[272, 224], [288, 224], [280, 234]]), 'O']
+    ],
+    face: { eyes: [[258, 194], [302, 194]], er: 7, kind: 'almond', mouth: [280, 247], ma: 3.5, blush: [[244, 218], [314, 218]], br: 7 },
+    hat: [280, 166, 26], em: [338, 108]
+  },
+  pom: {
+    name: 'Pom', coat: 'sky', food: 'berry', pivot: [336, 300],
+    tail: [[P([[332, 290], [374, 276], [370, 296], [384, 304], [340, 316]]), 'shade']],
+    body: [
+      [P([[264, 338], [274, 338], [272, 348], [260, 348]]), 'beak'], [P([[288, 338], [298, 338], [300, 348], [288, 348]]), 'beakD'],
+      [P([[268, 214], [262, 190], [278, 204], [288, 184], [292, 214]]), 'base'],
+      fe(280, 278, 72, 66, 16, T4), fe(276, 298, 40, 38, 10, CR),
+      fe(212, 288, 15, 28, 6, T4), fe(348, 288, 15, 28, 6, DK),
+      [P([[266, 262], [294, 262], [280, 280]]), 'beak'], [P([[280, 262], [294, 262], [280, 280]]), 'beakD']
+    ],
+    face: { eyes: [[256, 248], [304, 248]], er: 8, kind: 'oval', mouth: null, blush: [[236, 268], [324, 268]], br: 8 },
+    hat: [280, 220, 30], em: [356, 190]
+  },
+  kite: {
+    name: 'Kite', coat: 'mint', food: 'berry', pivot: [298, 322],
+    tail: [[P([[300, 316], [372, 350], [366, 360], [296, 332]]), 'deep'], [P([[300, 324], [364, 368], [356, 374], [294, 338]]), 'shade']],
+    body: [
+      [P([[268, 318], [273, 318], [271, 346], [266, 346]]), 'beak'], [P([[288, 318], [293, 318], [295, 346], [290, 346]]), 'beakD'],
+      [P([[256, 344], [276, 344], [274, 350], [258, 350]]), 'beak'], [P([[284, 344], [304, 344], [302, 350], [286, 350]]), 'beakD'],
+      [P([[268, 186], [256, 146], [276, 174], [286, 136], [292, 182]]), 'deep'],
+      [P([[280, 176], [232, 236], [240, 300], [280, 330]]), 'base'],
+      [P([[280, 176], [328, 236], [320, 300], [280, 330]]), 'shade'],
+      [P([[280, 176], [256, 206], [280, 214], [304, 206]]), 'light'],
+      [P([[280, 226], [254, 250], [260, 300], [280, 316]]), 'cream'],
+      [P([[280, 226], [306, 250], [300, 300], [280, 316]]), 'creamShade'],
+      [P([[254, 232], [224, 270], [234, 308], [256, 292]]), 'shade'],
+      [P([[306, 232], [342, 274], [330, 316], [304, 296]]), 'deep'],
+      [P([[270, 226], [290, 226], [280, 244]]), 'beak'], [P([[280, 226], [290, 226], [280, 244]]), 'beakD']
+    ],
+    face: { eyes: [[262, 208], [298, 208]], er: 7, kind: 'almond', mouth: null, blush: [[250, 226], [310, 226]], br: 6 },
+    hat: [280, 182, 24], em: [332, 150]
+  },
+  sprout: {
+    name: 'Gemma', coat: 'peach', food: 'drop', pivot: [280, 282],
+    tail: [
+      [P([[277, 282], [283, 282], [282, 230], [278, 230]]), '#5E9A3C'],
+      [P([[280, 238], [244, 214], [218, 222], [236, 242]]), '#8CCB5E'], [P([[280, 238], [236, 242], [252, 252]]), '#6FB04A'],
+      [P([[244, 214], [262, 216], [240, 226]]), '#A5D874'],
+      [P([[280, 230], [312, 198], [346, 202], [330, 226]]), '#7DBB4C'], [P([[280, 230], [330, 226], [318, 240]]), '#5A9A3C']
+    ],
+    body: [
+      [P([[226, 284], [280, 302], [276, 354], [244, 346]]), 'base'],
+      [P([[280, 302], [334, 284], [318, 346], [276, 354]]), 'shade'],
+      [P([[244, 346], [276, 354], [318, 346], [310, 356], [276, 362], [250, 354]]), 'deep'],
+      fe(280, 282, 54, 19, 14, T4), fe(280, 282, 44, 14, 12, SOIL)
+    ],
+    face: { eyes: [[262, 320], [300, 318]], er: 7, kind: 'oval', mouth: [281, 336], ma: 4, blush: [[250, 334], [312, 332]], br: 7 },
+    hat: [280, 232, 22], em: [352, 200]
+  },
+  spike: {
+    name: 'Ceri', coat: 'sky', food: 'drop', pivot: [280, 300],
+    tail: [],
+    body: [
+      [P([[244, 296], [280, 284], [316, 296], [280, 308]]), '#7A4A2A'],
+      [P([[256, 244], [230, 244], [230, 206], [242, 200], [244, 232], [256, 232]]), '#8CCB5E'],
+      [P([[306, 226], [328, 226], [328, 192], [318, 186], [316, 214], [306, 214]]), '#5A9A3C'],
+      [P([[256, 170], [280, 160], [282, 298], [256, 298]]), '#8CCB5E'],
+      [P([[280, 160], [304, 170], [306, 298], [282, 298]]), '#6FB04A'],
+      [P([[256, 170], [280, 160], [304, 170], [280, 180]]), '#A5D874'],
+      [P([[267, 184], [269, 184], [269, 292], [267, 292]]), '#6FB04A'],
+      [P([[293, 184], [295, 184], [295, 292], [293, 292]]), '#5A9A3C'],
+      [P([[270, 162], [280, 150], [290, 162], [280, 168]]), '#F2A0B4'],
+      [P([[246, 300], [280, 312], [278, 350], [254, 344]]), 'base'],
+      [P([[280, 312], [314, 300], [306, 344], [278, 350]]), 'shade'],
+      [P([[244, 294], [280, 306], [316, 294], [314, 302], [280, 314], [246, 302]]), 'light']
+    ],
+    face: { eyes: [[268, 226], [294, 224]], er: 6, kind: 'almond', mouth: [281, 246], ma: 3.5, blush: [[260, 240], [302, 238]], br: 6 },
+    hat: [280, 166, 22], em: [330, 140]
+  },
+  sunny: {
+    name: 'Sunny', coat: 'ginger', food: 'berry', pivot: [338, 330],
+    tail: [
+      [P([[336, 330], [372, 312], [392, 286], [386, 262], [374, 270], [372, 296], [346, 316]]), 'base'],
+      [P([[336, 330], [346, 316], [372, 296], [376, 318], [356, 338]]), 'shade'],
+      [P([[386, 262], [374, 270], [372, 284], [386, 280], [394, 270]]), 'deep']
+    ],
+    body: [
+      [P([[220, 302], [228, 276], [250, 260], [276, 258], [288, 270], [298, 302], [294, 350], [256, 346], [244, 346], [224, 330]]), 'base'],
+      [P([[276, 258], [312, 260], [334, 276], [340, 302], [334, 330], [314, 346], [294, 350], [298, 302], [288, 270]]), 'shade'],
+      [P([[228, 276], [250, 260], [280, 254], [312, 260], [290, 272], [250, 276]]), 'light'],
+      [P([[254, 292], [276, 284], [296, 292], [298, 326], [284, 344], [264, 344], [252, 326]]), 'cream'],
+      [P([[276, 284], [296, 292], [298, 326], [284, 344], [278, 320]]), 'creamShade'],
+      [P([[242, 336], [262, 334], [266, 350], [244, 352]]), 'cream'],
+      [P([[284, 336], [302, 334], [306, 350], [286, 352]]), 'creamShade'],
+      [P([[234, 200], [188, 92], [200, 88], [272, 184]]), 'base'],
+      [P([[240, 186], [200, 104], [262, 178]]), 'P'],
+      [P([[290, 184], [354, 86], [366, 92], [330, 200]]), 'shade'],
+      [P([[298, 178], [352, 102], [322, 188]]), 'P2'],
+      [P([[222, 214], [226, 194], [240, 178], [262, 168], [280, 166], [276, 214], [288, 262], [258, 258], [238, 248], [226, 234]]), 'base'],
+      [P([[280, 166], [298, 168], [320, 178], [334, 194], [338, 214], [334, 234], [322, 248], [302, 258], [288, 262], [276, 214]]), 'shade'],
+      [P([[240, 178], [262, 168], [280, 166], [298, 168], [290, 182], [262, 184]]), 'light'],
+      [P([[232, 226], [256, 232], [280, 244], [304, 232], [328, 226], [318, 248], [300, 262], [280, 266], [260, 262], [242, 248]]), 'cream'],
+      [P([[280, 244], [304, 232], [328, 226], [318, 248], [300, 262], [280, 266]]), 'creamShade'],
+      [P([[274, 240], [286, 240], [280, 247]]), 'O']
+    ],
+    face: { eyes: [[258, 214], [302, 214]], er: 8, kind: 'oval', mouth: [280, 254], ma: 3.5, blush: [[244, 236], [316, 236]], br: 7 },
+    hat: [280, 170, 28], em: [356, 120]
+  },
+  zephyr: {
+    name: 'Zephyr', coat: 'snow', food: 'berry', pivot: [326, 328],
+    tail: [
+      [P([[318, 330], [352, 320], [372, 296], [364, 284], [346, 304], [322, 314]]), 'base'],
+      [P([[372, 296], [382, 278], [370, 274], [364, 284]]), 'deep']
+    ],
+    body: [
+      [P([[300, 236], [326, 262], [332, 300], [326, 328], [296, 334], [292, 258]]), 'shade'],
+      [P([[326, 328], [332, 300], [338, 322], [320, 336]]), 'deep'],
+      [P([[256, 244], [292, 258], [296, 334], [258, 336], [246, 296]]), 'base'],
+      [P([[256, 244], [300, 236], [292, 258]]), 'light'],
+      [P([[262, 256], [290, 262], [288, 316], [270, 322], [258, 292]]), 'cream'],
+      [P([[290, 262], [292, 258], [296, 310], [288, 316]]), 'creamShade'],
+      [P([[256, 326], [276, 324], [280, 338], [258, 340]]), 'cream'],
+      [P([[282, 326], [298, 326], [302, 338], [284, 340]]), 'creamShade'],
+      [P([[240, 184], [216, 96], [266, 164]]), 'base'], [P([[244, 172], [222, 112], [258, 164]]), 'P'],
+      [P([[294, 164], [340, 94], [322, 184]]), 'shade'], [P([[300, 164], [334, 110], [318, 176]]), 'P2'],
+      [P([[232, 190], [280, 162], [282, 252], [244, 228]]), 'base'],
+      [P([[280, 162], [328, 186], [316, 228], [282, 252]]), 'shade'],
+      [P([[240, 182], [280, 158], [318, 180], [280, 170]]), 'light'],
+      [P([[248, 214], [280, 224], [312, 212], [282, 256]]), 'cream'],
+      [P([[280, 224], [312, 212], [282, 256]]), 'creamShade'],
+      [P([[274, 238], [286, 238], [280, 246]]), 'O']
+    ],
+    face: { eyes: [[260, 200], [300, 200]], er: 7, kind: 'almond', mouth: [280, 251], ma: 3, blush: [[248, 220], [312, 220]], br: 6 },
+    hat: [280, 168, 26], em: [338, 108]
+  },
+  pebble: {
+    capeShell: [P([[236, 300], [234, 266], [244, 254], [262, 240], [296, 234], [330, 240], [346, 256], [358, 282], [360, 300], [330, 306], [298, 300], [266, 306]]), P([[236, 300], [266, 306], [298, 300], [330, 306], [360, 300], [360, 292], [330, 298], [298, 292], [266, 298], [236, 292]]), P([[330, 240], [346, 256], [358, 282], [360, 300], [330, 306], [338, 268]]), E(240, 290, 5.5, 5.5)],
+    name: 'Pebble', coat: 'olive', food: 'leaf', pivot: [366, 320],
+    tail: [[P([[364, 316], [380, 320], [364, 326]]), 'skinD']],
+    body: [
+      [P([[318, 326], [334, 326], [336, 348], [316, 348]]), 'skinD'],
+      [P([[236, 312], [214, 296], [202, 302], [222, 326]]), 'skin'],
+      [P([[176, 284], [188, 270], [208, 266], [224, 276], [226, 296], [212, 310], [190, 312], [176, 300]]), 'skin'],
+      [P([[208, 266], [224, 276], [226, 296], [212, 310], [204, 290]]), 'skinD'],
+      [P([[244, 254], [262, 240], [296, 234], [330, 240], [346, 256], [312, 254], [276, 254]]), 'light', 'deep', 2.5],
+      [P([[276, 254], [312, 254], [326, 276], [312, 298], [276, 298], [262, 276]]), 'light', 'deep', 2.5],
+      [P([[244, 254], [276, 254], [262, 276], [230, 282], [234, 266]]), 'light', 'deep', 2.5],
+      [P([[312, 254], [346, 256], [358, 282], [326, 276]]), 'base', 'deep', 2.5],
+      [P([[230, 282], [262, 276], [276, 298], [262, 318], [234, 318], [226, 300]]), 'base', 'deep', 2.5],
+      [P([[276, 298], [312, 298], [326, 318], [262, 318]]), 'base', 'deep', 2.5],
+      [P([[326, 276], [358, 282], [362, 300], [354, 318], [326, 318], [312, 298]]), 'shade', 'deep', 2.5],
+      [P([[222, 318], [366, 318], [362, 330], [226, 330]]), 'deep'],
+      [P([[230, 326], [246, 326], [248, 348], [228, 348]]), 'skin']
+    ],
+    face: { eyes: [[192, 286], [212, 284]], er: 5, kind: 'oval', mouth: [200, 300], ma: 2.5, blush: [[184, 296], [220, 294]], br: 4 },
+    hat: [200, 270, 20], em: [252, 222]
+  },
+  mesa: {
+    capeShell: [P([[232, 298], [240, 262], [250, 244], [328, 244], [352, 268], [360, 298], [328, 304], [296, 298], [264, 304]]), P([[232, 298], [264, 304], [296, 298], [328, 304], [360, 298], [358, 290], [328, 296], [296, 290], [264, 296], [234, 290]]), P([[328, 244], [352, 268], [360, 298], [328, 304], [338, 268]]), E(238, 288, 5, 5)],
+    name: 'Mesa', coat: 'burgundy', food: 'leaf', pivot: [372, 318],
+    tail: [[P([[370, 314], [386, 318], [370, 324]]), 'skinD']],
+    body: [
+      [P([[330, 326], [346, 326], [350, 350], [328, 350]]), 'skinD'],
+      [P([[232, 306], [206, 290], [184, 292], [176, 304], [198, 314], [224, 322]]), 'skin'],
+      [P([[206, 290], [184, 292], [196, 284]]), 'skinD'],
+      [P([[248, 246], [262, 270], [226, 318], [222, 300], [234, 262]]), 'light'],
+      [P([[262, 270], [350, 270], [366, 318], [226, 318]]), 'base'],
+      [P([[328, 246], [350, 270], [366, 318], [372, 300], [352, 252]]), 'shade'],
+      [P([[248, 246], [328, 246], [350, 270], [262, 270]]), 'light'],
+      ['M290 270L282 318M322 270L330 318M248 246L262 270', 'none', 'deep', 2.5],
+      [P([[220, 318], [372, 318], [368, 330], [224, 330]]), 'deep'],
+      [P([[232, 326], [248, 326], [250, 350], [230, 350]]), 'skin']
+    ],
+    face: { eyes: [[190, 298], [206, 296]], er: 4.5, kind: 'almond', mouth: [184, 307], ma: 2.2, blush: [[196, 306], [212, 304]], br: 3.5 },
+    hat: [194, 288, 16], em: [250, 226]
+  },
+  clover: {
+    name: 'Clover', coat: 'cocoa', food: 'carrot', pivot: [338, 340],
+    tail: [blob(340, 334, 13, 12, 10, CR)],
+    body: [
+      blob(280, 312, 64, 44, 16, T4), blob(276, 322, 32, 26, 12, CR),
+      [P([[226, 350], [256, 348], [258, 358], [224, 360]]), 'base'], [P([[302, 348], [336, 350], [338, 360], [304, 358]]), 'shade'],
+      blob(262, 346, 10, 7, 8, CR), blob(298, 346, 10, 7, 8, CR2),
+      [P([[238, 186], [226, 120], [234, 96], [248, 92], [258, 112], [266, 180]]), 'base'],
+      [P([[242, 172], [234, 118], [240, 104], [248, 104], [252, 120], [256, 170]]), 'P'],
+      [P([[294, 180], [306, 110], [318, 92], [332, 98], [330, 124], [318, 188]]), 'shade'],
+      [P([[302, 172], [310, 118], [320, 104], [326, 108], [322, 128], [312, 176]]), 'P2'],
+      blob(280, 214, 62, 52, 16, T4),
+      blob(280, 238, 20, 13, 10, CR), [P([[275, 230], [285, 230], [280, 235]]), 'N']
+    ],
+    face: { eyes: [[258, 210], [302, 210]], er: 8, kind: 'oval', mouth: [280, 245], ma: 3.5, blush: [[244, 232], [316, 232]], br: 8 },
+    hat: [280, 168, 30], em: [350, 110]
+  },
+  nib: {
+    name: 'Nib', coat: 'ginger', food: 'seed', pivot: [280, 340],
+    tail: [],
+    body: [
+      blob(232, 232, 15, 14, 10, T4), blob(232, 234, 8, 8, 8, ['P', 'P', 'P2', 'P2']),
+      blob(328, 232, 15, 14, 10, DK), blob(328, 234, 8, 8, 8, ['P2', 'P2', 'P2', 'P2']),
+      blob(252, 350, 14, 6, 8, CR), blob(308, 350, 14, 6, 8, CR2),
+      blob(280, 290, 82, 62, 18, T4), blob(280, 314, 54, 34, 14, CR),
+      blob(230, 280, 22, 17, 10, CR), blob(330, 280, 22, 17, 10, CR2),
+      blob(280, 272, 15, 10, 8, CR), [P([[276, 266], [284, 266], [280, 271]]), 'N'],
+      blob(280, 314, 11, 15, 8, ['#F0D592', '#E8C77A', '#C9A55A', '#B98A4E']),
+      blob(266, 314, 8, 6, 6, CR), blob(294, 314, 8, 6, 6, CR2)
+    ],
+    face: { eyes: [[252, 254], [308, 254]], er: 8, kind: 'oval', mouth: [280, 280], ma: 3.5, blush: [[230, 280], [330, 280]], br: 9 },
+    hat: [280, 230, 36], em: [362, 200]
+  },
+  lotl: {
+    name: 'Lotl', coat: 'rose', food: 'fish', pivot: [334, 330],
+    tail: [[P([[330, 330], [366, 318], [392, 296], [382, 326], [346, 342]]), 'base'], [P([[366, 318], [392, 296], [396, 312], [382, 326]]), 'light']],
+    body: [
+      [P([[226, 200], [194, 172], [188, 178], [218, 210]]), 'deep'], [P([[220, 220], [180, 212], [178, 220], [216, 230]]), 'deep'], [P([[222, 240], [188, 254], [192, 262], [226, 250]]), 'deep'],
+      [P([[334, 200], [366, 172], [372, 178], [342, 210]]), 'deep'], [P([[340, 220], [380, 212], [382, 220], [344, 230]]), 'deep'], [P([[338, 240], [372, 254], [368, 262], [334, 250]]), 'deep'],
+      blob(232, 340, 12, 8, 8, T4), blob(328, 340, 12, 8, 8, DK),
+      blob(280, 304, 58, 44, 14, T4), blob(280, 318, 32, 24, 10, CR),
+      blob(280, 226, 62, 46, 16, T4)
+    ],
+    face: { eyes: [[248, 224], [312, 224]], er: 7, kind: 'oval', mouth: [280, 244], ma: 5, blush: [[238, 242], [322, 242]], br: 8 },
+    hat: [280, 186, 34], em: [350, 150]
+  },
+  ember: {
+    name: 'Ember', coat: 'teal', food: 'chili', pivot: [326, 336],
+    tail: [[P([[322, 340], [356, 336], [380, 316], [390, 296], [398, 304], [388, 326], [360, 350], [326, 352]]), 'base'], [P([[390, 296], [384, 282], [400, 276], [406, 292], [398, 304]]), 'deep']],
+    body: [
+      [P([[236, 282], [196, 250], [184, 226], [208, 236], [220, 248], [226, 240], [244, 262]]), 'deep'],
+      [P([[324, 282], [364, 250], [376, 226], [352, 236], [340, 248], [334, 240], [316, 262]]), 'deep'],
+      blob(254, 350, 14, 6, 8, T4), blob(306, 350, 14, 6, 8, DK),
+      blob(280, 300, 60, 50, 14, T4),
+      [P([[262, 274], [298, 274], [302, 330], [280, 346], [258, 330]]), 'cream'],
+      ['M264 290L296 290M262 306L298 306M264 322L296 322', 'none', 'creamShade', 1.5],
+      [P([[244, 180], [230, 140], [258, 172]]), 'light'], [P([[316, 180], [330, 140], [302, 172]]), 'light'],
+      blob(280, 212, 58, 46, 16, T4),
+      blob(280, 234, 24, 15, 10, CR), [E(273, 231, 2, 1.5) + E(287, 231, 2, 1.5), 'shade']
+    ],
+    face: { eyes: [[256, 206], [304, 206]], er: 8, kind: 'oval', mouth: [280, 243], ma: 4, blush: [[240, 228], [320, 228]], br: 8 },
+    hat: [280, 172, 30], em: [350, 140]
+  },
+  dune: {
+    name: 'Dune', coat: 'caramel', food: 'drop', pivot: [358, 300],
+    tail: [['M358 300 C366 312 366 326 362 336', 'none', 'deep', 4]],
+    body: [
+      [P([[318, 322], [330, 322], [330, 352], [318, 352]]), 'shade'], [P([[336, 320], [346, 320], [346, 350], [336, 350]]), 'shade'],
+      blob(274, 272, 26, 24, 12, T4), blob(318, 272, 24, 22, 12, T4),
+      blob(296, 304, 72, 30, 16, T4),
+      [P([[232, 322], [244, 322], [244, 354], [232, 354]]), 'base'], [P([[252, 324], [262, 324], [262, 354], [252, 354]]), 'base'],
+      ['M232 352h12M252 352h10M318 350h12M336 348h10', 'none', 'deep', 4],
+      [P([[236, 300], [214, 252], [206, 222], [226, 218], [236, 250], [256, 292]]), 'base'],
+      [P([[226, 218], [236, 250], [256, 292], [246, 296], [230, 250]]), 'shade'],
+      blob(206, 214, 26, 16, 12, T4), blob(188, 220, 12, 10, 8, CR),
+      [P([[214, 200], [218, 186], [224, 202]]), 'base'], [E(182, 216, 1.8, 1.4), 'O']
+    ],
+    face: { eyes: [[208, 210]], er: 5, kind: 'oval', mouth: [190, 228], ma: 2.2, blush: [[220, 220]], br: 5 },
+    hat: [210, 200, 18], em: [250, 170]
+  },
+  sol: {
+    name: 'Heli', coat: 'lavender', food: 'drop', pivot: [280, 300],
+    tail: [
+      [P([[277, 300], [283, 300], [283, 236], [277, 236]]), '#5E9A3C'],
+      [P([[280, 276], [248, 262], [236, 270], [256, 282]]), '#8CCB5E'], [P([[280, 266], [312, 250], [326, 258], [304, 272]]), '#5A9A3C']
+    ],
+    body: [
+      [P([[240, 300], [280, 312], [278, 350], [250, 344]]), 'base'], [P([[280, 312], [320, 300], [310, 344], [278, 350]]), 'shade'],
+      blob(280, 298, 42, 14, 14, T4), blob(280, 298, 34, 10, 12, SOIL),
+      [ISO_PETALS[0], '#FFD25E'], [ISO_PETALS[1], '#F2B33D'],
+      blob(280, 196, 34, 32, 14, ['#ECBE88', '#D9A066', '#C98A55', '#B87A48'])
+    ],
+    face: { eyes: [[264, 194], [296, 194]], er: 6.5, kind: 'oval', mouth: [280, 210], ma: 3.5, blush: [[256, 208], [304, 208]], br: 6 },
+    hat: [280, 162, 30], em: [346, 130]
+  },
+  rad: {
+    name: 'Rad', coat: 'rose', food: 'drop', pivot: [280, 220],
+    tail: [
+      [P([[280, 220], [256, 186], [252, 160], [268, 174]]), '#8CCB5E'], [P([[280, 220], [280, 176], [292, 152], [296, 182]]), '#7DBB4C'],
+      [P([[280, 220], [304, 194], [328, 182], [318, 204]]), '#5A9A3C'], [P([[280, 220], [252, 206], [230, 202], [246, 220]]), '#6FB04A']
+    ],
+    body: [
+      blob(280, 284, 54, 62, 18, T4),
+      ['M280 346 C282 354 288 358 296 356', 'none', 'deep', 3]
+    ],
+    face: { eyes: [[258, 284], [302, 284]], er: 7.5, kind: 'oval', mouth: [280, 304], ma: 4, blush: [[244, 300], [316, 300]], br: 8 },
+    hat: [280, 230, 32], em: [350, 190]
+  },
+  bo: {
+    name: 'Juni', coat: 'charcoal', food: 'drop', pivot: [280, 296],
+    tail: [
+      [P([[276, 300], [286, 300], [284, 262], [292, 236], [282, 232], [274, 258]]), '#8A5631'],
+      blob(244, 214, 36, 24, 12, LEAF), blob(318, 206, 40, 26, 12, LEAF), blob(282, 182, 32, 22, 12, LEAF)
+    ],
+    body: [
+      [P([[214, 300], [280, 322], [276, 352], [226, 334]]), 'base'], [P([[280, 322], [346, 300], [334, 334], [276, 352]]), 'shade'],
+      [P([[208, 296], [280, 272], [352, 296], [280, 320]]), 'light'], [P([[226, 296], [280, 278], [334, 296], [280, 314]]), '#7A4A2A']
+    ],
+    face: { eyes: [[250, 320], [310, 320]], er: 6.5, kind: 'oval', mouth: [280, 334], ma: 3.5, blush: [[238, 332], [322, 332]], br: 7 },
+    hat: [282, 164, 28], em: [356, 160]
+  },
+  peep: {
+    name: 'Peep', coat: 'snow', food: 'seed', pivot: [330.4, 291.2],
+    tail: [[P([[324.4, 292.4], [354.4, 255.2], [354.4, 216.8], [319.6, 255.2]]), 'shade'], [P([[330.4, 298.4], [380.8, 261.2], [380.8, 236.0], [334.0, 275.6]]), 'base']],
+    body: [
+      [P([[262.0, 323.6], [268.0, 323.6], [268.0, 348.8], [262.0, 348.8]]), 'beak'],
+      [P([[293.2, 323.6], [299.2, 323.6], [299.2, 348.8], [293.2, 348.8]]), 'beakD'],
+      [P([[253.6, 346.4], [275.2, 346.4], [275.2, 352.4], [253.6, 352.4]]), 'beak'],
+      [P([[286.0, 346.4], [307.6, 346.4], [307.6, 352.4], [286.0, 352.4]]), 'beakD'],
+      blob(280.0, 287.6, 70.8, 57.6, 16, T4),
+      blob(280.0, 305.6, 44.4, 33.6, 12, CR),
+      [P([[216.4, 272.0], [205.6, 303.2], [216.4, 323.6], [241.6, 329.6], [234.4, 303.2], [239.2, 272.0]]), 'shade'],
+      [P([[343.6, 272.0], [354.4, 303.2], [343.6, 323.6], [318.4, 329.6], [325.6, 303.2], [320.8, 272.0]]), 'deep'],
+      [P([[259.6, 191.6], [256.0, 162.8], [270.4, 158.0], [276.4, 170.0], [278.8, 152.0], [293.2, 150.8], [295.6, 170.0], [304.0, 156.8], [317.2, 164.0], [306.4, 194.0]]), '#E5484D'],
+      blob(280.0, 220.4, 51.6, 46.8, 16, T4),
+      [P([[268.0, 231.2], [292.0, 231.2], [280.0, 246.8]]), 'beak'],
+      [P([[280.0, 231.2], [292.0, 231.2], [280.0, 246.8]]), 'beakD'],
+      blob(280.0, 254.0, 5.4, 7.8, 8, ['#EC767A', '#E5484D', '#CA3F44', '#AE373B'])
+    ],
+    face: { eyes: [[257.2, 218.0], [302.8, 218.0]], er: 7.4, kind: 'oval', mouth: null, ma: 3.0, blush: [[242.8, 237.2], [317.2, 237.2]], br: 7.8 },
+    hat: [280.0, 177.2, 34], em: [349.6, 171.2]
+  },
+  hop: {
+    name: 'Hop', coat: 'cocoa', food: 'seed', pivot: [324.4, 327.2],
+    tail: [['M324.4 328.4L366.4 332.0L390.4 309.2L397.6 261.2L406.0 213.2', 'none', 'deep', 4], blob(408.4, 204.8, 9.6, 14.4, 8, CR)],
+    body: [
+      blob(244.0, 345.2, 28.8, 7.2, 10, CR),
+      blob(316.0, 345.2, 28.8, 7.2, 10, CR2),
+      blob(280.0, 303.2, 51.6, 44.4, 16, T4),
+      blob(280.0, 315.2, 31.2, 28.8, 12, CR),
+      [P([[246.4, 198.8], [216.4, 165.2], [210.4, 129.2], [217.6, 110.0], [236.8, 105.2], [253.6, 135.2], [269.2, 182.0]]), 'base'],
+      [P([[245.2, 186.8], [222.4, 153.2], [221.2, 129.2], [228.4, 120.8], [244.0, 138.8], [260.8, 177.2]]), 'P'],
+      [P([[313.6, 198.8], [343.6, 165.2], [349.6, 129.2], [342.4, 110.0], [323.2, 105.2], [306.4, 135.2], [290.8, 182.0]]), 'shade'],
+      [P([[314.8, 186.8], [337.6, 153.2], [338.8, 129.2], [331.6, 120.8], [316.0, 138.8], [299.2, 177.2]]), 'P2'],
+      blob(280.0, 225.2, 54.0, 46.8, 16, T4),
+      blob(280.0, 248.0, 19.2, 13.2, 10, CR),
+      [P([[275.2, 237.2], [284.8, 237.2], [280.0, 243.2]]), 'N']
+    ],
+    face: { eyes: [[256.0, 222.8], [304.0, 222.8]], er: 9.3, kind: 'oval', mouth: [280.0, 251.6], ma: 3.0, blush: [[236.8, 242.0], [323.2, 242.0]], br: 7.8 },
+    hat: [280.0, 180.8, 33], em: [361.6, 153.2]
+  },
+  zig: {
+    name: 'Zig', coat: 'teal', food: 'berry', pivot: [318.4, 327.2],
+    tail: [[P([[318.4, 332.0], [360.4, 338.0], [390.4, 326.0], [397.6, 303.2], [390.4, 285.2], [378.4, 291.2], [377.2, 309.2], [361.6, 318.8], [318.4, 321.2]]), 'shade'], blob(384.4, 304.4, 3.6, 3.0, 6, ['#F5BC83', '#F2A65A', '#D5924F', '#B87E44'])],
+    body: [
+      blob(232.0, 344.0, 24.0, 7.8, 10, T4),
+      blob(328.0, 344.0, 24.0, 7.8, 10, DK),
+      blobs([[210.4, 344.0, 6.0, 5.4], [224.8, 351.2, 6.0, 5.4], [241.6, 352.4, 6.0, 5.4]], 6, T4),
+      blobs([[349.6, 344.0, 6.0, 5.4], [335.2, 351.2, 6.0, 5.4], [318.4, 352.4, 6.0, 5.4]], 6, DK),
+      blob(280.0, 303.2, 55.2, 46.8, 16, T4),
+      blob(280.0, 315.2, 34.8, 31.2, 12, CR),
+      blobs([[250.0, 279.2, 6.6, 4.8], [308.8, 275.6, 7.8, 5.4], [322.0, 298.4, 4.8, 3.6]], 6, ['#F5BC83', '#F2A65A', '#D5924F', '#B87E44']),
+      blob(239.2, 174.8, 27.6, 26.4, 12, T4),
+      blob(320.8, 174.8, 27.6, 26.4, 12, DK),
+      blob(280.0, 222.8, 78.0, 51.6, 18, T4),
+      blob(280.0, 180.8, 5.4, 3.6, 6, ['#F5BC83', '#F2A65A', '#D5924F', '#B87E44'])
+    ],
+    face: { eyes: [[242.8, 192.8], [317.2, 192.8]], er: 11.8, kind: 'oval', mouth: [280.0, 243.2], ma: 5.4, blush: [[223.6, 225.2], [336.4, 225.2]], br: 9.6 },
+    hat: [280.0, 154.4, 38], em: [366.4, 141.2]
+  },
+  kit: {
+    name: 'Kit', coat: 'charcoal', food: 'berry', pivot: [312.4, 339.2],
+    tail: [['M312.4 342.8L348.4 345.2L366.4 327.2L368.8 297.2L368.8 261.2L364.0 244.4', 'none', 'shade', 6], ['M368.2 272.0L367.6 255.2L364.0 244.4', 'none', 'deep', 6]],
+    body: [
+      blob(259.6, 346.4, 18.0, 6.0, 8, T4),
+      blob(300.4, 346.4, 18.0, 6.0, 8, DK),
+      [P([[244.0, 350.0], [236.8, 309.2], [241.6, 261.2], [256.0, 234.8], [304.0, 234.8], [318.4, 261.2], [323.2, 309.2], [316.0, 350.0]]), 'base'],
+      [P([[304.0, 234.8], [318.4, 261.2], [323.2, 309.2], [316.0, 350.0], [301.6, 350.0], [306.4, 309.2], [305.2, 261.2]]), 'shade'],
+      [P([[280.0, 250.4], [266.8, 262.4], [262.0, 297.2], [263.2, 340.4], [296.8, 340.4], [298.0, 297.2], [293.2, 262.4]]), 'cream'],
+      [P([[248.8, 268.4], [259.6, 274.4], [270.4, 285.2], [268.0, 292.4], [254.8, 288.8], [246.4, 279.2]]), 'base'],
+      [P([[311.2, 268.4], [300.4, 274.4], [289.6, 285.2], [292.0, 292.4], [305.2, 288.8], [313.6, 279.2]]), 'shade'],
+      blob(232.0, 195.2, 10.2, 9.0, 8, DK),
+      blob(328.0, 195.2, 10.2, 9.0, 8, DK),
+      blob(280.0, 201.2, 50.4, 43.2, 16, T4),
+      blob(259.6, 198.8, 15.0, 12.6, 10, ['deep', 'deep', 'deep', 'deep']),
+      blob(300.4, 198.8, 15.0, 12.6, 10, ['deep', 'deep', 'deep', 'deep']),
+      blob(280.0, 226.4, 20.4, 14.4, 10, CR),
+      [P([[275.2, 216.8], [284.8, 216.8], [280.0, 222.8]]), 'O']
+    ],
+    face: { eyes: [[259.6, 198.8], [300.4, 198.8]], er: 6.8, kind: 'oval', mouth: [280.0, 232.4], ma: 3.0, blush: [[241.6, 221.6], [318.4, 221.6]], br: 6.6 },
+    hat: [280.0, 161.6, 32], em: [349.6, 141.2]
+  },
+  mora: {
+    name: 'Mora', coat: 'lavender', food: 'drop', pivot: [280.0, 261.2],
+    tail: [[E(280, 192.8, 79, 79), 'none', '#F2C14E', 4], ['M280 107.6L280 120.8M365 192.8L351.8 192.8M280 278L280 264.8M195 192.8L208.2 192.8', 'none', '#F2C14E', 5], [STAR(280, 107.6, 10) + STAR(205.6, 261.2, 7) + STAR(354.4, 261.2, 7), '#FFF1A8']],
+    body: [
+      [P([[224.8, 258.8], [232.0, 258.8], [232.0, 333.2], [224.8, 333.2]]), '#8A5631'],
+      [P([[328.0, 258.8], [335.2, 258.8], [335.2, 333.2], [328.0, 333.2]]), '#6E4426'],
+      [P([[244.0, 258.8], [316.0, 258.8], [316.0, 273.2], [283.6, 296.0], [316.0, 318.8], [316.0, 333.2], [244.0, 333.2], [244.0, 318.8], [276.4, 296.0], [244.0, 273.2]]), '#D8F2FF'],
+      [P([[280.0, 258.8], [316.0, 258.8], [316.0, 273.2], [283.6, 296.0], [316.0, 318.8], [316.0, 333.2], [280.0, 333.2]]), '#C2E8F7'],
+      [P([[250.0, 263.6], [310.0, 263.6], [280.0, 291.2]]), 'base'],
+      [P([[280.0, 263.6], [310.0, 263.6], [280.0, 291.2]]), 'shade'],
+      [P([[251.2, 330.8], [265.6, 317.6], [294.4, 317.6], [308.8, 330.8]]), 'base'],
+      ['M280.0 291.2L280.0 323.6', 'none', 'shade', 3],
+      [P([[216.4, 243.2], [343.6, 243.2], [343.6, 260.0], [216.4, 260.0]]), '#8A5631'],
+      [P([[216.4, 243.2], [343.6, 243.2], [343.6, 249.2], [216.4, 249.2]]), '#B07A45'],
+      [P([[216.4, 332.0], [343.6, 332.0], [343.6, 348.8], [216.4, 348.8]]), '#8A5631'],
+      [P([[216.4, 332.0], [343.6, 332.0], [343.6, 338.0], [216.4, 338.0]]), '#B07A45'],
+      [P([[280.0, 138.8], [332.8, 204.8], [331.5, 216.5], [327.6, 227.7], [321.3, 237.7], [312.9, 246.1], [302.9, 252.4], [291.7, 256.3], [280.0, 257.6], [268.3, 256.3], [257.1, 252.4], [247.1, 246.1], [238.7, 237.7], [232.4, 227.7], [228.5, 216.5], [227.2, 204.8]]), 'base'], [P([[280.0, 138.8], [227.2, 204.8], [251.0, 215.4], [280.0, 183.7]]), 'light'], [P([[280.0, 138.8], [332.8, 204.8], [332.8, 204.8], [331.5, 216.5], [327.6, 227.7], [321.3, 237.7], [312.9, 246.1], [302.9, 252.4], [291.7, 256.3], [280.0, 257.6], [280.0, 215.4]]), 'shade'], [P([[327.6, 227.7], [321.3, 237.7], [312.9, 246.1], [302.9, 252.4], [291.7, 256.3], [280.0, 257.6], [268.3, 256.3], [257.1, 252.4]]), 'deep']
+    ],
+    face: { eyes: [[260.8, 207.2], [299.2, 207.2]], er: 7.4, kind: 'oval', mouth: [280.0, 222.8], ma: 3.0, blush: [[245.2, 220.4], [314.8, 220.4]], br: 6.6 },
+    hat: [280.0, 154.4, 29], em: [342.4, 138.8]
+  },
+  flare: {
+    name: 'Flare', coat: 'ember', food: 'chili', pivot: [280.0, 327.2],
+    tail: [],
+    body: [
+      [P([[280.0, 138.8], [285.4, 147.7], [290.5, 154.6], [295.3, 159.5], [299.5, 162.1], [302.9, 162.3], [305.3, 160.2], [306.5, 155.6], [306.4, 148.4], [314.0, 159.5], [320.7, 171.4], [326.4, 184.0], [331.0, 197.3], [334.5, 211.4], [336.8, 226.4], [337.8, 242.1], [337.6, 258.8], [336.1, 273.8], [332.6, 287.2], [327.4, 298.9], [320.5, 308.8], [312.1, 316.6], [302.5, 322.4], [291.7, 326.0], [280.0, 327.2], [268.3, 326.0], [257.5, 322.4], [247.9, 316.6], [239.5, 308.8], [232.6, 298.9], [227.3, 287.2], [223.9, 273.8], [222.4, 258.8], [222.7, 246.2], [224.2, 234.4], [226.8, 223.4], [230.3, 213.1], [234.6, 203.3], [239.4, 194.2], [244.6, 185.5], [250.0, 177.2], [251.3, 184.4], [253.3, 189.8], [255.8, 193.3], [258.6, 195.1], [261.4, 194.9], [264.0, 192.9], [266.3, 189.0], [268.0, 183.2], [269.0, 177.8], [270.2, 172.6], [271.6, 167.3], [273.1, 161.9], [274.7, 156.4], [276.4, 150.8], [278.2, 144.9], [280.0, 138.8]]), 'base'],
+      [P([[306.4, 148.4], [314.0, 159.5], [320.7, 171.4], [326.4, 184.0], [331.0, 197.3], [334.5, 211.4], [336.8, 226.4], [337.8, 242.1], [337.6, 258.8], [336.1, 273.8], [332.6, 287.2], [327.4, 298.9], [320.5, 308.8], [312.1, 316.6], [302.5, 322.4], [291.7, 326.0], [280.0, 327.2], [289.2, 320.7], [297.1, 312.9], [303.6, 303.9], [308.6, 293.8], [312.3, 282.5], [314.6, 270.3], [315.4, 257.2], [314.8, 243.2], [313.7, 230.0], [312.3, 217.2], [310.8, 205.0], [309.2, 193.1], [307.9, 181.6], [306.9, 170.3], [306.3, 159.3], [306.4, 148.4]]), 'shade'],
+      blob(254.8, 243.2, 8.4, 15.6, 10, ['light', 'light', 'light', 'light']),
+      blob(280.0, 292.4, 31.2, 26.4, 10, ['cream', 'cream', 'cream', 'cream']),
+      blob(236.8, 165.2, 4.8, 4.8, 10, ['#FFD25E', '#FFD25E', '#FFD25E', '#FFD25E']),
+      blob(326.8, 138.8, 3.6, 3.6, 10, ['#FFD25E', '#FFD25E', '#FFD25E', '#FFD25E'])
+    ],
+    face: { eyes: [[259.6, 261.2], [300.4, 261.2]], er: 8.1, kind: 'oval', mouth: [280.0, 279.2], ma: 3.6, blush: [[244.0, 278.0], [316.0, 278.0]], br: 7.2 },
+    hat: [280.0, 171.2, 29], em: [348.4, 159.2]
+  },
+  ripple: {
+    name: 'Ripple', coat: 'sky', food: 'drop', pivot: [280.0, 327.2],
+    tail: [[E(280.0, 329.6, 79.2, 9.6), 'none', '#A6DAF2', 3.0], [E(280.0, 329.6, 55.2, 6.0), 'none', '#D8F2FF', 2.4]],
+    body: [
+      [P([[280.0, 153.2], [290.1, 164.5], [300.1, 176.1], [309.8, 188.0], [318.7, 200.3], [326.3, 213.2], [332.3, 226.8], [336.2, 241.1], [337.6, 256.4], [336.5, 271.5], [333.2, 285.2], [327.9, 297.3], [320.9, 307.6], [312.5, 315.9], [302.7, 322.0], [291.8, 325.9], [280.0, 327.2], [268.2, 325.9], [257.3, 322.0], [247.5, 315.9], [239.1, 307.6], [232.1, 297.3], [226.8, 285.2], [223.5, 271.5], [222.4, 256.4], [223.8, 241.1], [227.7, 226.8], [233.7, 213.2], [241.3, 200.3], [250.2, 188.0], [259.9, 176.1], [269.9, 164.5], [280.0, 153.2]]), 'base'],
+      [P([[280.0, 156.8], [289.6, 168.1], [299.1, 179.4], [308.2, 191.1], [316.4, 203.0], [323.6, 215.4], [329.1, 228.4], [332.7, 242.0], [334.0, 256.4], [333.0, 270.3], [329.9, 283.1], [325.1, 294.5], [318.7, 304.4], [310.8, 312.5], [301.6, 318.5], [291.3, 322.3], [280.0, 323.6], [289.2, 317.5], [296.9, 310.0], [303.1, 301.3], [307.9, 291.5], [311.2, 280.7], [313.1, 268.9], [313.5, 256.4], [312.4, 243.2], [310.7, 232.0], [308.2, 220.8], [305.0, 209.6], [301.1, 198.6], [296.7, 187.8], [291.6, 177.2], [286.1, 166.9], [280.0, 156.8]]), 'shade'],
+      blob(253.6, 231.2, 9.0, 16.8, 10, ['light', 'light', 'light', 'light']),
+      ['M246.4 292.4L250.8 290.9L255.0 290.7L259.1 291.3L263.2 292.4L267.3 293.5L271.4 294.1L275.6 293.9L280.0 292.4L284.4 290.9L288.6 290.7L292.7 291.3L296.8 292.4L300.9 293.5L305.0 294.1L309.2 293.9L313.6 292.4', 'none', 'light', 3.0]
+    ],
+    face: { eyes: [[259.6, 256.4], [300.4, 256.4]], er: 8.1, kind: 'oval', mouth: [280.0, 274.4], ma: 3.6, blush: [[244.0, 273.2], [316.0, 273.2]], br: 7.2 },
+    hat: [280.0, 171.2, 29], em: [346.0, 165.2]
+  },
+  gust: {
+    name: 'Gust', coat: 'aqua', food: 'berry', pivot: [280.0, 327.2],
+    tail: [['M336.4 261.2L347.6 260.4L356.8 257.4L364.0 252.7L369.1 246.9L372.1 240.5L372.9 234.0L371.4 227.9L367.6 222.8L363.9 220.4L360.1 219.4L356.4 219.6L353.2 220.9L350.7 222.9L349.0 225.7L348.6 228.9L349.6 232.4', 'none', 'light', 4], ['M188.8 249.2L216.4 249.2M181.6 274.4L210.4 274.4M192.4 298.4L214.0 298.4', 'none', 'light', 3.5]],
+    body: [
+      [P([[224.8, 270.8], [223.3, 256.4], [224.7, 243.3], [228.8, 231.5], [235.2, 221.4], [243.3, 213.4], [253.0, 207.5], [263.7, 204.2], [275.2, 203.6], [281.1, 197.1], [288.6, 192.8], [296.9, 190.8], [305.6, 191.0], [314.1, 193.5], [321.6, 198.2], [327.7, 205.2], [331.6, 214.4], [338.9, 217.5], [343.8, 222.9], [346.7, 229.7], [347.6, 237.4], [347.0, 245.0], [344.9, 252.0], [341.7, 257.7], [337.6, 261.2], [339.0, 276.1], [337.2, 289.4], [332.6, 300.9], [325.4, 310.6], [316.3, 318.2], [305.4, 323.8], [293.2, 327.2], [280.0, 328.4], [267.2, 327.3], [255.8, 324.1], [246.1, 319.0], [238.0, 312.2], [231.7, 303.8], [227.3, 294.0], [225.0, 282.9], [224.8, 270.8]]), 'base'],
+      [P([[331.6, 214.4], [338.9, 217.5], [343.8, 222.9], [346.7, 229.7], [347.6, 237.4], [347.0, 245.0], [344.9, 252.0], [341.7, 257.7], [337.6, 261.2], [339.0, 276.1], [337.2, 289.4], [332.6, 300.9], [325.4, 310.6], [316.3, 318.2], [305.4, 323.8], [293.2, 327.2], [280.0, 328.4], [290.5, 321.4], [299.5, 313.2], [306.8, 303.9], [312.4, 293.8], [316.2, 283.0], [318.1, 271.9], [318.1, 260.5], [316.0, 249.2], [319.1, 244.8], [322.1, 240.6], [324.9, 236.4], [327.4, 232.2], [329.4, 228.0], [330.9, 223.7], [331.6, 219.2], [331.6, 214.4]]), 'shade'],
+      blob(253.6, 238.4, 8.4, 13.2, 10, ['light', 'light', 'light', 'light']),
+      ['M244.0 304.4L251.0 301.2L258.5 300.3L266.3 300.7L274.3 301.9L282.4 302.9L290.6 303.2L298.6 302.0L306.4 298.4', 'none', 'light', 3.0]
+    ],
+    face: { eyes: [[259.6, 267.2], [300.4, 267.2]], er: 8.1, kind: 'oval', mouth: [280.0, 285.2], ma: 3.6, blush: [[244.0, 284.0], [316.0, 284.0]], br: 7.2 },
+    hat: [280.0, 201.2, 31], em: [349.6, 183.2]
+  },
+  moss: {
+    name: 'Moss', coat: 'cocoa', food: 'leaf', pivot: [280.0, 327.2],
+    tail: [],
+    body: [
+      [P([[215.2, 311.6], [214.2, 296.0], [216.4, 281.9], [221.5, 269.4], [229.2, 258.6], [239.1, 249.9], [251.1, 243.3], [264.9, 239.0], [280.0, 237.2], [295.9, 239.0], [310.0, 243.3], [322.2, 249.9], [332.2, 258.6], [339.7, 269.4], [344.5, 281.9], [346.2, 296.0], [344.8, 311.6], [342.6, 317.7], [338.7, 322.6], [333.2, 326.3], [325.9, 329.1], [317.0, 331.1], [306.3, 332.4], [294.0, 333.0], [280.0, 333.2], [266.0, 333.0], [253.7, 332.4], [243.0, 331.1], [234.1, 329.1], [226.8, 326.3], [221.3, 322.6], [217.4, 317.7], [215.2, 311.6]]), 'base'],
+      [P([[306.4, 240.8], [316.3, 244.7], [325.1, 250.0], [332.6, 256.8], [338.6, 264.9], [343.1, 274.5], [345.7, 285.5], [346.3, 297.9], [344.8, 311.6], [342.6, 317.7], [338.9, 322.6], [333.6, 326.3], [326.9, 329.1], [319.0, 331.1], [309.9, 332.4], [299.6, 333.0], [288.4, 333.2], [298.6, 326.7], [306.7, 318.1], [312.7, 307.8], [316.3, 296.0], [317.6, 283.1], [316.4, 269.4], [312.7, 255.2], [306.4, 240.8]]), 'shade'],
+      blob(244.0, 279.2, 9.6, 7.2, 10, ['light', 'light', 'light', 'light']),
+      [P([[227.2, 276.8], [230.3, 268.0], [234.8, 260.4], [240.5, 254.0], [247.3, 248.8], [254.9, 244.7], [263.0, 241.9], [271.4, 240.2], [280.0, 239.6], [289.0, 240.2], [297.7, 241.8], [306.1, 244.5], [313.8, 248.3], [320.6, 253.1], [326.4, 258.8], [330.9, 265.6], [334.0, 273.2], [328.6, 270.2], [323.3, 268.3], [318.1, 267.0], [313.0, 266.1], [308.2, 265.3], [303.6, 264.3], [299.4, 262.6], [295.6, 260.0], [291.3, 263.3], [286.8, 265.2], [282.0, 266.3], [277.1, 266.8], [272.4, 267.1], [267.8, 267.6], [263.5, 268.7], [259.6, 270.8], [255.6, 268.7], [251.5, 267.7], [247.4, 267.6], [243.4, 268.4], [239.3, 269.8], [235.3, 271.8], [231.2, 274.2], [227.2, 276.8]]), '#7DBB4C'],
+      ['M280.0 242.0L280.0 213.2', 'none', '#5E9A3C', 4.0],
+      [P([[280.0, 219.2], [274.4, 214.1], [268.6, 210.6], [262.8, 208.4], [257.2, 207.6], [252.1, 208.2], [247.6, 209.9], [244.0, 212.8], [241.6, 216.8], [246.6, 219.5], [251.8, 221.4], [257.0, 222.5], [262.1, 222.9], [267.1, 222.8], [271.8, 222.0], [276.1, 220.8], [280.0, 219.2]]), '#8CCB5E'],
+      [P([[280.0, 215.6], [284.9, 209.7], [290.4, 205.6], [296.2, 203.0], [301.9, 201.9], [307.3, 202.3], [312.1, 204.0], [315.9, 206.8], [318.4, 210.8], [313.3, 214.4], [308.0, 216.9], [302.7, 218.6], [297.4, 219.5], [292.4, 219.6], [287.7, 218.9], [283.5, 217.6], [280.0, 215.6]]), '#6FB04A'],
+      blob(251.2, 314.0, 5.4, 3.6, 10, ['deep', 'deep', 'deep', 'deep']),
+      blob(310.0, 318.8, 6.6, 4.2, 10, ['deep', 'deep', 'deep', 'deep']),
+      blob(324.4, 296.0, 4.2, 3.0, 10, ['deep', 'deep', 'deep', 'deep'])
+    ],
+    face: { eyes: [[259.6, 291.2], [300.4, 291.2]], er: 8.1, kind: 'oval', mouth: [280.0, 309.2], ma: 3.6, blush: [[244.0, 308.0], [316.0, 308.0]], br: 7.2 },
+    hat: [280.0, 222.8, 31], em: [349.6, 207.2]
+  },
+  fae: {
+    name: 'Fae', coat: 'rose', food: 'berry', pivot: [280.0, 273.2],
+    tail: [[P([[265.6, 261.2], [228.4, 216.8], [192.4, 214.4], [180.4, 243.2], [192.4, 273.2], [228.4, 282.8], [265.6, 274.4]]), '#D8F2FF'], [P([[294.4, 261.2], [331.6, 216.8], [367.6, 214.4], [379.6, 243.2], [367.6, 273.2], [331.6, 282.8], [294.4, 274.4]]), '#C4E8F8'], [P([[265.6, 280.4], [234.4, 287.6], [214.0, 309.2], [216.4, 327.2], [232.0, 333.2], [254.8, 316.4], [268.0, 292.4]]), '#A6DAF2'], [P([[294.4, 280.4], [325.6, 287.6], [346.0, 309.2], [343.6, 327.2], [328.0, 333.2], [305.2, 316.4], [292.0, 292.4]]), '#8FCBE8']],
+    body: [
+      ['M270.4 333.2L270.4 348.8', 'none', 'O', 4],
+      ['M289.6 333.2L289.6 348.8', 'none', 'O', 4],
+      ['M259.6 285.2L242.8 302.0', 'none', '#F2CDB6', 6],
+      ['M300.4 285.2L317.2 302.0', 'none', '#E5B89E', 6],
+      [P([[244.0, 339.2], [258.4, 279.2], [280.0, 258.8], [301.6, 279.2], [316.0, 339.2], [298.0, 344.0], [280.0, 347.6], [262.0, 344.0]]), 'base'],
+      [P([[280.0, 258.8], [301.6, 279.2], [316.0, 339.2], [298.0, 344.0], [280.0, 347.6]]), 'shade'],
+      blob(280.0, 209.6, 46.8, 43.2, 16, ['#FFF0E6', '#FCE3D2', '#F2CDB6', '#E5B89E']),
+      [P([[230.8, 210.8], [233.2, 177.2], [252.4, 156.8], [280.0, 152.0], [307.6, 156.8], [326.8, 177.2], [329.2, 210.8], [312.4, 192.8], [280.0, 189.2], [247.6, 192.8]]), 'base'],
+      [P([[280.0, 152.0], [307.6, 156.8], [326.8, 177.2], [329.2, 210.8], [312.4, 192.8], [280.0, 189.2]]), 'shade'],
+      [P([[280.0, 154.4], [276.4, 136.4], [290.8, 123.2], [289.6, 143.6]]), 'deep'],
+      ['M259.6 156.8L246.4 137.6L238.0 134.0', 'none', 'O', 3],
+      ['M300.4 156.8L313.6 137.6L322.0 134.0', 'none', 'O', 3],
+      blob(236.8, 132.8, 5.4, 5.4, 6, ['#FFF4BE', '#FFF1A8', '#E0D494', '#C2B780']),
+      blob(323.2, 132.8, 5.4, 5.4, 6, ['#FFF4BE', '#FFF1A8', '#E0D494', '#C2B780'])
+    ],
+    face: { eyes: [[262.0, 214.4], [298.0, 214.4]], er: 6.8, kind: 'oval', mouth: [280.0, 232.4], ma: 3.0, blush: [[248.8, 230.0], [311.2, 230.0]], br: 6.6 },
+    hat: [280.0, 156.8, 31], em: [349.6, 153.2]
+  },
+  cinder: {
+    name: 'Cinder', coat: 'butter', food: 'berry', pivot: [344.8, 309.2],
+    tail: [[P([[340.0, 303.2], [390.4, 237.2], [392.8, 285.2], [410.8, 270.8], [397.6, 321.2], [342.4, 328.4]]), '#F2C14E'], [P([[340.0, 303.2], [390.4, 237.2], [392.8, 285.2], [378.4, 300.8]]), '#FFD66B']],
+    body: [
+      [P([[253.6, 345.2], [270.4, 345.2], [270.4, 352.4], [253.6, 352.4]]), 'beak'],
+      [P([[289.6, 345.2], [306.4, 345.2], [306.4, 352.4], [289.6, 352.4]]), 'beakD'],
+      [P([[259.6, 209.6], [250.0, 165.2], [268.0, 123.2], [275.2, 159.2], [281.2, 171.2], [288.4, 141.2], [307.6, 118.4], [306.4, 165.2], [301.6, 209.6]]), '#E5484D'],
+      [P([[281.2, 171.2], [288.4, 141.2], [307.6, 118.4], [306.4, 165.2], [301.6, 209.6], [280.0, 209.6]]), '#C93A40'],
+      [P([[268.0, 204.8], [265.6, 165.2], [271.6, 148.4], [280.0, 177.2], [293.2, 150.8], [298.0, 171.2], [294.4, 204.8]]), '#FFD25E'],
+      blob(280.0, 273.2, 78.0, 74.4, 18, T4),
+      blob(280.0, 296.0, 48.0, 45.6, 14, CR),
+      [P([[230.8, 255.2], [204.4, 267.2], [193.6, 299.6], [209.2, 318.8], [228.4, 305.6], [234.4, 281.6]]), 'shade'],
+      [P([[329.2, 255.2], [355.6, 267.2], [366.4, 299.6], [350.8, 318.8], [331.6, 305.6], [325.6, 281.6]]), 'deep'],
+      [P([[268.0, 239.6], [292.0, 239.6], [280.0, 256.4]]), 'beak'],
+      [P([[280.0, 239.6], [292.0, 239.6], [280.0, 256.4]]), 'beakD']
+    ],
+    face: { eyes: [[251.2, 226.4], [308.8, 226.4]], er: 8.7, kind: 'oval', mouth: null, ma: 3.0, blush: [[234.4, 248.0], [325.6, 248.0]], br: 9.0 },
+    hat: [280.0, 200.0, 36], em: [359.2, 177.2]
+  },
+  mac: {
+    name: 'Malu', coat: 'butter', food: 'drop', pivot: [280.0, 273.2],
+    tail: [],
+    body: [
+      [P([[274.0, 279.2], [286.0, 279.2], [284.8, 222.8], [275.2, 222.8]]), '#8A5631'],
+      ['M280.0 244.4L254.8 222.8', 'none', '#8A5631', 10],
+      ['M280.0 236.0L305.2 214.4', 'none', '#6E4426', 10],
+      blob(280.0, 182.0, 75.6, 58.8, 18, ['#6FB04A', '#4F8A36', '#3F7A2C', '#356A25']),
+      blob(268.0, 170.0, 52.8, 37.2, 14, ['#8CCB5E', '#6FB04A', '#5A9A3C', '#4F8A36']),
+      blobs([[244.0, 194.0, 9.0, 9.0], [307.6, 165.2, 9.0, 9.0], [320.8, 209.6, 9.0, 9.0], [270.4, 216.8, 9.0, 9.0], [227.2, 156.8, 9.0, 9.0], [289.6, 137.6, 9.0, 9.0], [337.6, 182.0, 9.0, 9.0]], 8, ['#F26B6B', '#E5484D', '#C93A40', '#B03238']),
+      blobs([[241.6, 191.0, 2.4, 2.4], [305.2, 162.2, 2.4, 2.4], [318.4, 206.6, 2.4, 2.4], [268.0, 213.8, 2.4, 2.4], [224.8, 153.8, 2.4, 2.4], [287.2, 134.6, 2.4, 2.4], [335.2, 179.0, 2.4, 2.4]], 6, ['#FFFFFF', '#FFFFFF', '#E0E0E0', '#C2C2C2']),
+      [P([[214, 300], [280, 322], [276, 352], [226, 334]]), 'base'], [P([[280, 322], [346, 300], [334, 334], [276, 352]]), 'shade'], [P([[208, 296], [280, 272], [352, 296], [280, 320]]), 'light'], [P([[226, 296], [280, 278], [334, 296], [280, 314]]), '#7A4A2A']
+    ],
+    face: { eyes: [[250, 320], [310, 320]], er: 6.5, kind: 'oval', mouth: [280, 334], ma: 3.5, blush: [[238, 332], [322, 332]], br: 7 },
+    hat: [280, 120, 34], em: [366, 120]
+  },
+  daisy: {
+    name: 'Beli', coat: 'rose', food: 'drop', pivot: [280.0, 297.2],
+    tail: [[P([[277, 300], [283, 300], [283, 236], [277, 236]]), '#5E9A3C'], [P([[280, 276], [248, 262], [236, 270], [256, 282]]), '#8CCB5E'], [P([[280, 266], [312, 250], [326, 258], [304, 272]]), '#5A9A3C']],
+    body: [
+      [P([[240, 300], [280, 312], [278, 350], [250, 344]]), 'base'], [P([[280, 312], [320, 300], [310, 344], [278, 350]]), 'shade'], blob(280, 298, 42, 14, 14, T4), blob(280, 298, 34, 10, 12, SOIL), [ISO_DAISY[0], '#FFFFFF'], [ISO_DAISY[1], '#E3E8EF'], blob(280, 196, 32, 30, 14, ['#FFE08A', '#F2C14E', '#E0A93A', '#C9922E'])
+    ],
+    face: { eyes: [[266, 194], [294, 194]], er: 6.5, kind: 'oval', mouth: [280, 210], ma: 3.5, blush: [[258, 208], [302, 208]], br: 6 },
+    hat: [280, 150, 30], em: [346, 130]
+  },
+  dart: {
+    name: 'Dart', coat: 'lavender', food: 'berry', pivot: [318.4, 327.2],
+    tail: [[P([[318.4, 333.2], [378.4, 328.4], [397.6, 304.4], [388.0, 282.8], [374.8, 308.0], [318.4, 320.0]]), 'shade']],
+    body: [
+      [P([[216.4, 348.8], [232.0, 323.6], [254.8, 327.2], [244.0, 348.8]]), 'base'],
+      [P([[343.6, 348.8], [328.0, 323.6], [305.2, 327.2], [316.0, 348.8]]), 'shade'],
+      [P([[244.0, 348.8], [234.4, 285.2], [280.0, 258.8], [325.6, 285.2], [316.0, 348.8]]), 'base'],
+      [P([[280.0, 258.8], [325.6, 285.2], [316.0, 348.8], [280.0, 348.8]]), 'shade'],
+      [P([[262.0, 345.2], [260.8, 294.8], [280.0, 281.6], [299.2, 294.8], [298.0, 345.2]]), 'cream'],
+      [P([[280.0, 281.6], [299.2, 294.8], [298.0, 345.2], [280.0, 345.2]]), 'creamShade'],
+      [P([[246.4, 305.6], [251.2, 298.4], [256.0, 305.6], [251.2, 312.8]]), 'deep'],
+      [P([[306.4, 316.4], [311.2, 309.2], [316.0, 316.4], [311.2, 323.6]]), 'deep'],
+      [P([[244.0, 176.0], [254.8, 148.4], [265.6, 176.0]]), 'deep'],
+      [P([[269.2, 173.6], [280.0, 143.6], [290.8, 173.6]]), 'deep'],
+      [P([[294.4, 176.0], [305.2, 148.4], [316.0, 176.0]]), 'deep'],
+      [P([[210.4, 214.4], [238.0, 172.4], [322.0, 172.4], [349.6, 214.4], [322.0, 256.4], [238.0, 256.4]]), 'base'],
+      [P([[280.0, 172.4], [322.0, 172.4], [349.6, 214.4], [322.0, 256.4], [280.0, 256.4]]), 'shade']
+    ],
+    face: { eyes: [[248.8, 213.2], [311.2, 213.2]], er: 10.5, kind: 'almond', mouth: [280.0, 238.4], ma: 4.2, blush: [[232.0, 234.8], [328.0, 234.8]], br: 7.8 },
+    hat: [280.0, 171.2, 36], em: [356.8, 147.2]
+  },
+  puddle: {
+    name: 'Puddle', coat: 'mint', food: 'berry', pivot: [280.0, 321.2],
+    tail: [],
+    body: [
+      blob(216.4, 340.4, 33.6, 10.8, 12, T4),
+      blob(343.6, 340.4, 33.6, 10.8, 12, DK),
+      blob(280.0, 311.6, 70.8, 43.2, 16, T4),
+      blob(280.0, 323.6, 43.2, 27.6, 12, CR),
+      blob(280.0, 258.8, 88.8, 52.8, 18, T4),
+      blob(240.4, 220.4, 27.6, 25.2, 14, T4),
+      blob(319.6, 220.4, 27.6, 25.2, 14, DK),
+      blob(250.0, 348.8, 15.6, 6.0, 10, T4),
+      blob(310.0, 348.8, 15.6, 6.0, 10, DK)
+    ],
+    face: { eyes: [[240.4, 220.4], [319.6, 220.4]], er: 11.2, kind: 'oval', mouth: [280.0, 272.0], ma: 6.0, blush: [[226.0, 261.2], [334.0, 261.2]], br: 9.6 },
+    hat: [280.0, 208.4, 33], em: [368.8, 171.2]
+  },
+  cap: {
+    name: 'Cap', coat: 'burgundy', food: 'drop', pivot: [280.0, 333.2],
+    tail: [],
+    body: [
+      [P([[244.0, 348.8], [246.4, 249.2], [313.6, 249.2], [316.0, 348.8]]), 'cream'],
+      [P([[294.4, 249.2], [313.6, 249.2], [316.0, 348.8], [296.8, 348.8]]), 'creamShade'],
+      [P([[174.4, 238.4], [175.7, 224.3], [179.6, 210.6], [185.9, 197.5], [194.6, 185.5], [205.3, 174.8], [217.9, 165.6], [232.1, 158.2], [247.4, 152.8], [263.5, 149.5], [280.0, 148.4], [296.5, 149.5], [312.6, 152.8], [327.9, 158.2], [342.1, 165.6], [354.7, 174.8], [365.4, 185.5], [374.1, 197.5], [380.4, 210.6], [384.3, 224.3], [385.6, 238.4], [377.2, 249.2], [182.8, 249.2]]), 'base'],
+      [P([[306.4, 148.4], [312.6, 152.8], [327.9, 158.2], [342.1, 165.6], [354.7, 174.8], [365.4, 185.5], [374.1, 197.5], [380.4, 210.6], [384.3, 224.3], [385.6, 238.4], [377.2, 249.2], [324.4, 251.6]]), 'shade'],
+      [P([[184.0, 238.4], [376.0, 238.4], [366.4, 252.8], [193.6, 252.8]]), 'creamShade'],
+      blob(234.4, 201.2, 14.4, 10.8, 10, ['#FFFFFF', '#FFFFFF', '#E0E0E0', '#C2C2C2']),
+      blob(280.0, 165.2, 12.0, 8.4, 10, ['#FFFFFF', '#FFFFFF', '#E0E0E0', '#C2C2C2']),
+      blob(326.8, 195.2, 16.8, 12.0, 10, ['#FFFFFF', '#FFFFFF', '#E0E0E0', '#C2C2C2']),
+      blob(203.2, 227.6, 7.8, 5.4, 8, ['#FFFFFF', '#FFFFFF', '#E0E0E0', '#C2C2C2']),
+      blob(359.2, 226.4, 8.4, 6.0, 8, ['#FFFFFF', '#FFFFFF', '#E0E0E0', '#C2C2C2']),
+      blob(277.6, 209.6, 8.4, 6.0, 8, ['#FFFFFF', '#FFFFFF', '#E0E0E0', '#C2C2C2'])
+    ],
+    face: { eyes: [[262.0, 286.4], [298.0, 286.4]], er: 7.4, kind: 'oval', mouth: [280.0, 305.6], ma: 3.6, blush: [[251.2, 303.2], [308.8, 303.2]], br: 6.0 },
+    hat: [280.0, 152.0, 33], em: [368.8, 153.2]
+  },
+  tuli: {
+    name: 'Tuli', coat: 'mint', food: 'drop', pivot: [280.0, 297.2],
+    tail: [[P([[277, 300], [283, 300], [283, 236], [277, 236]]), '#5E9A3C'], [P([[280.0, 285.2], [232.0, 222.8], [238.0, 261.2], [270.4, 292.4]]), '#7DBB4C'], [P([[280.0, 279.2], [328.0, 218.0], [323.2, 258.8], [289.6, 290.0]]), '#5A9A3C']],
+    body: [
+      [P([[240, 300], [280, 312], [278, 350], [250, 344]]), 'base'], [P([[280, 312], [320, 300], [310, 344], [278, 350]]), 'shade'], blob(280, 298, 42, 14, 14, T4), blob(280, 298, 34, 10, 12, SOIL),
+      [P([[238.0, 153.2], [238.0, 201.2], [252.4, 231.2], [280.0, 238.4], [307.6, 231.2], [322.0, 201.2], [322.0, 153.2], [301.6, 174.8], [280.0, 143.6], [258.4, 174.8]]), '#F2A0B4'],
+      [P([[258.4, 174.8], [280.0, 143.6], [301.6, 174.8], [301.6, 222.8], [280.0, 234.8], [258.4, 222.8]]), '#F27A8E'],
+      [P([[301.6, 174.8], [322.0, 153.2], [322.0, 201.2], [307.6, 231.2], [301.6, 222.8]]), '#E8848F']
+    ],
+    face: { eyes: [[265.6, 198.8], [294.4, 198.8]], er: 6.2, kind: 'oval', mouth: [280.0, 214.4], ma: 3.0, blush: [[253.6, 213.2], [306.4, 213.2]], br: 5.4 },
+    hat: [280.0, 148.4, 28], em: [349.6, 135.2]
+  },
+  tomo: {
+    name: 'Sola', coat: 'snow', food: 'drop', pivot: [280.0, 279.2],
+    tail: [],
+    body: [
+      blob(280.0, 214.4, 67.2, 58.8, 18, ['#F26B6B', '#E5484D', '#C93A40', '#B03238']),
+      blob(250.0, 186.8, 10.8, 7.2, 8, ['#FFFFFF', '#FFFFFF', '#E0E0E0', '#C2C2C2']),
+      [P([[276.4, 155.6], [276.4, 135.2], [283.6, 135.2], [283.6, 155.6]]), '#5A9A3C'],
+      [P([[280.0, 152.0], [292.0, 162.8], [313.6, 155.6], [301.6, 170.0], [308.8, 183.2], [288.4, 174.8], [280.0, 185.6], [271.6, 174.8], [251.2, 183.2], [258.4, 170.0], [246.4, 155.6], [268.0, 162.8]]), '#6FB04A'],
+      [P([[240, 300], [280, 312], [278, 350], [250, 344]]), 'base'], [P([[280, 312], [320, 300], [310, 344], [278, 350]]), 'shade'], blob(280, 298, 42, 14, 14, T4), blob(280, 298, 34, 10, 12, SOIL)
+    ],
+    face: { eyes: [[256.0, 220.4], [304.0, 220.4]], er: 8.1, kind: 'oval', mouth: [280.0, 242.0], ma: 4.2, blush: [[240.4, 239.6], [319.6, 239.6]], br: 7.8 },
+    hat: [280.0, 159.2, 33], em: [361.6, 141.2]
+  },
+  kabo: {
+    name: 'Pepo', coat: 'ginger', food: 'drop', pivot: [280.0, 333.2],
+    tail: [[P([[272.8, 242.0], [270.4, 209.6], [283.6, 198.8], [290.8, 204.8], [281.2, 214.4], [284.8, 242.0]]), '#8A5631'], [P([[287.2, 220.4], [318.4, 195.2], [349.6, 204.8], [324.4, 226.4]]), '#6FB04A'], ['M265.6 231.2L246.4 216.8L248.8 201.2L262.0 198.8', 'none', '#5E9A3C', 2.7]],
+    body: [
+      blob(232.0, 299.6, 51.6, 49.2, 16, T4),
+      blob(328.0, 299.6, 51.6, 49.2, 16, DK),
+      blob(280.0, 297.2, 60.0, 55.2, 18, T4),
+      ['M256.0 250.4L248.8 279.2L248.8 321.2L256.0 347.6', 'none', 'deep', 2.7],
+      ['M304.0 250.4L311.2 279.2L311.2 321.2L304.0 347.6', 'none', 'deep', 2.7]
+    ],
+    face: { eyes: [[259.6, 291.2], [300.4, 291.2]], er: 8.1, kind: 'oval', mouth: [280.0, 315.2], ma: 4.2, blush: [[245.2, 312.8], [314.8, 312.8]], br: 7.2 },
+    hat: [280.0, 244.4, 35], em: [361.6, 219.2]
+  }
+};
+const NECK = { dart: [280, 258.8, 42], puddle: [280, 304.4, 66], cap: [280, 255.2, 36], tuli: [280, 304, 40], tomo: [280, 304, 40], kabo: [280, 261.2, 58], peep: [280, 261, 50], hop: [280, 268, 42], zig: [280, 272, 49], kit: [280, 242, 35], mora: [280, 235, 37], flare: [280, 292.4, 55], ripple: [280, 287.6, 53], gust: [280, 292.4, 55], moss: [280, 279.2, 62], fae: [280, 256, 20], cinder: [280, 261, 62], mac: [280, 304, 62], daisy: [280, 304, 40], clover: [280, 262, 36], nib: [280, 300, 60], lotl: [280, 268, 40], ember: [280, 256, 34], dune: [226, 252, 12], sol: [280, 304, 40], rad: [280, 232, 36], bo: [280, 304, 62], mochi: [280, 262, 42], pip: [280, 250, 26], bao: [280, 268, 42], rook: [280, 250, 26], pom: [280, 298, 46], kite: [280, 240, 26], sprout: [280, 306, 40], spike: [281, 282, 20], sunny: [280, 268, 36], zephyr: [280, 258, 24], pebble: [222, 312, 12], mesa: [218, 314, 10] };
+const LIGHTS = { cap: [280, 192, 92], tuli: [280, 250, 50], tomo: [280, 194, 60], kabo: [280, 272, 90], mac: [280, 166, 70], daisy: [280, 184, 52], sprout: [280, 216, 44], spike: [281, 204, 26], sol: [280, 184, 46], rad: [280, 206, 40], bo: [282, 184, 64] };
+const BIOME = { dart: 'desert', puddle: 'lake', cap: 'grove', hop: 'desert', zig: 'desert', kit: 'desert', flare: 'cave', cinder: 'cave', ripple: 'lake', gust: 'grove', moss: 'grove', fae: 'grove', lotl: 'lake', ember: 'cave', dune: 'desert', spike: 'desert', sunny: 'desert', zephyr: 'desert', pebble: 'desert', mesa: 'desert' };
+const HEAD_ACC = ['beanie', 'sunhat', 'crown', 'flowers', 'headphones', 'witch', 'santa', 'party', 'bunnyears', 'leafcrown', 'heartband', 'maple', 'knot', 'visor', 'gradcap', 'shamrock', 'rainbow'];
+const heartP = (cx, cy, s) => 'M' + pt(cx, cy + s * 0.9) + 'C' + pt(cx - s * 1.4, cy + s * 0.1) + ' ' + pt(cx - s * 0.9, cy - s * 0.9) + ' ' + pt(cx, cy - s * 0.3) + 'C' + pt(cx + s * 0.9, cy - s * 0.9) + ' ' + pt(cx + s * 1.4, cy + s * 0.1) + ' ' + pt(cx, cy + s * 0.9) + 'Z';
+const mapleP = (cx, cy, s) => {
+  const P = [[0, -1], [0.18, -0.62], [0.38, -0.72], [0.32, -0.3], [0.72, -0.5], [0.62, -0.22], [0.9, -0.12], [0.5, 0.18], [0.56, 0.36], [0.08, 0.28], [0.06, 0.66], [-0.06, 0.66], [-0.08, 0.28], [-0.56, 0.36], [-0.5, 0.18], [-0.9, -0.12], [-0.62, -0.22], [-0.72, -0.5], [-0.32, -0.3], [-0.38, -0.72], [-0.18, -0.62]];
+  return 'M' + P.map(([u, v]) => pt(cx + u * s, cy + v * s)).join('L') + 'Z';
+};
+const diamondP = (cx, cy, s) => 'M' + pt(cx, cy - s) + 'L' + pt(cx + s, cy) + 'L' + pt(cx, cy + s) + 'L' + pt(cx - s, cy) + 'Z';
+const leafP = (cx, cy, len, ang) => {
+  const dx = Math.cos(ang);
+  const dy = Math.sin(ang);
+  const tx = cx + dx * len;
+  const ty = cy + dy * len;
+  const px = -dy * len * 0.32;
+  const py = dx * len * 0.32;
+  return 'M' + pt(cx, cy) + 'Q' + pt((cx + tx) / 2 + px, (cy + ty) / 2 + py) + ' ' + pt(tx, ty) + 'Q' + pt((cx + tx) / 2 - px, (cy + ty) / 2 - py) + ' ' + pt(cx, cy) + 'Z';
+};
+const xRange = (list, yMin) => {
+  let lo = Infinity;
+  let hi = -Infinity;
+  const walk = (sh) => {
+    if (Array.isArray(sh[0])) { sh.forEach(walk); return; }
+    const d = sh[0];
+    if (typeof d !== 'string' || sh[1] === 'none') return;
+    const re = /([MLCQAaHhVvZz])([^MLCQAaHhVvZz]*)/g;
+    let m;
+    let cx = 0;
+    let cy = 0;
+    while ((m = re.exec(d))) {
+      const n = (m[2].match(/-?\d*\.?\d+/g) || []).map(Number);
+      const c = m[1];
+      const hit = (x, y) => { if (y >= yMin) { lo = Math.min(lo, x); hi = Math.max(hi, x); } };
+      if (c === 'M' || c === 'L' || c === 'C' || c === 'Q') { for (let i = 0; i + 1 < n.length; i += 2) { cx = n[i]; cy = n[i + 1]; hit(cx, cy); } }
+      else if (c === 'a') { for (let i = 0; i + 6 < n.length; i += 7) { cx += n[i + 5]; cy += n[i + 6]; hit(cx, cy); } }
+      else if (c === 'h') { n.forEach((v) => { cx += v; hit(cx, cy); }); }
+      else if (c === 'v') { n.forEach((v) => { cy += v; hit(cx, cy); }); }
+    }
+  };
+  list.forEach(walk);
+  return lo < hi ? [lo, hi] : null;
+};
+const HATCH = {};
+const STAGES = { 1: [1, 1, 1], 2: [1, 1, 1], 3: [1, 1, 1] };
+const eggShell = (spec, groundY, ol) => {
+  const h = groundY - spec.hat[1];
+  const box = xRange(spec.body, groundY - h * 0.35) || [spec.hat[0] - h * 0.4, spec.hat[0] + h * 0.4];
+  const cx = (box[0] + box[1]) / 2;
+  const hw = ((box[1] - box[0]) / 2) * 0.95 + h * 0.03;
+  const eh = Math.min(h * 0.32, hw * 0.8);
+  const ty = groundY - eh;
+  let d = 'M' + pt(cx - hw, ty + eh * 0.15);
+  for (let i = 1; i <= 6; i++) d += 'L' + pt(cx - hw + (2 * hw * (i - 0.5)) / 6, ty - eh * 0.18) + 'L' + pt(cx - hw + (2 * hw * i) / 6, ty + eh * 0.15);
+  d += 'C' + pt(cx + hw, groundY) + ' ' + pt(cx + hw * 0.6, groundY + eh * 0.12) + ' ' + pt(cx, groundY + eh * 0.12) + 'C' + pt(cx - hw * 0.6, groundY + eh * 0.12) + ' ' + pt(cx - hw, groundY) + ' ' + pt(cx - hw, ty + eh * 0.15) + 'Z';
+  const shade = 'M' + pt(cx + hw * 0.35, ty + eh * 0.3) + 'L' + pt(cx + hw, ty + eh * 0.15) + 'C' + pt(cx + hw, groundY) + ' ' + pt(cx + hw * 0.6, groundY + eh * 0.12) + ' ' + pt(cx + hw * 0.1, groundY + eh * 0.1) + 'C' + pt(cx + hw * 0.5, groundY - eh * 0.2) + ' ' + pt(cx + hw * 0.5, ty + eh * 0.5) + ' ' + pt(cx + hw * 0.35, ty + eh * 0.3) + 'Z';
+  const spots = E(cx - hw * 0.45, ty + eh * 0.55, hw * 0.08, eh * 0.1) + E(cx - hw * 0.1, ty + eh * 0.75, hw * 0.06, eh * 0.08);
+  return [ol ? [d, '#FBF6EA', 'O', ol] : [d, '#FBF6EA'], [shade, '#EADFC8'], [spots, '#E8C9A0']];
+};
+const NAMED = { red: '#E5484D', redD: '#C93A40', gold: '#F2C14E', yellow: '#FFD25E', leaf: '#7DBB4C', leafL: '#A5D874', leafD: '#5A9A3C', pink: '#F2A0B4', hot: '#F27A8E', blush: '#F2B8C0', brown: '#8A5631', brownD: '#6E4426', white: '#FFFFFF', water: '#BFE6F5', waterD: '#7FBCE0', glow: '#FFF1A8', soil: '#6A4024', tan: '#D9A066', ink: '#2E3B55' };
+const FORMS = {
+  mochi: [{ k: 'basket', ears: 'cat' }, { k: 'cub', ears: 'cat', tail: 'curl', belly: 1 }],
+  pip: [{ k: 'basket', ears: 'pointy' }, { k: 'cub', ears: 'pointy', tail: 'thin', belly: 1 }],
+  bao: [{ k: 'basket', ears: 'dog' }, { k: 'cub', ears: 'dog', tail: 'stub', belly: 1, muzzle: 1, spots: 1 }],
+  rook: [{ k: 'basket', ears: 'pointy' }, { k: 'cub', ears: 'pointy', tail: 'stub', belly: 1, muzzle: 1, mask: 1 }],
+  pom: [{ k: 'egg', pat: 'speckle', tuft: 1 }, { k: 'baby', beak: 1, wings: 1, tuft: 1, belly: 1, feetB: 1 }],
+  kite: [{ k: 'egg', pat: 'speckle', crest: 1 }, { k: 'baby', beak: 1, wings: 1, crest: 1, belly: 1, feetB: 1 }],
+  peep: [{ k: 'egg', pat: 'speckle' }, { k: 'baby', beak: 1, wings: 1, comb: 1, belly: 1, feetB: 1 }],
+  clover: [{ k: 'burrow', ears: 'lop', ground: 'brown' }, { k: 'cub', ears: 'lop', tail: 'puff', belly: 1 }],
+  nib: [{ k: 'burrow', ears: 'round', ground: 'brown' }, { k: 'cub', ears: 'round', cheeks: 1, belly: 1 }],
+  sunny: [{ k: 'burrow', ears: 'fennec', ground: 'tan' }, { k: 'cub', ears: 'fennec', tail: 'fluffy', belly: 1, muzzle: 1 }],
+  zephyr: [{ k: 'burrow', ears: 'fennec', ground: 'tan' }, { k: 'cub', ears: 'fennec', tail: 'fluffy', belly: 1, muzzle: 1, mask: 1 }],
+  pebble: [{ k: 'egg', pat: 'scales' }, { k: 'turtle', shell: 'round' }],
+  mesa: [{ k: 'egg', pat: 'scales' }, { k: 'turtle', shell: 'angular' }],
+  zig: [{ k: 'egg', pat: 'spots' }, { k: 'baby', tail: 'lizard', spots: 1, belly: 1, feet: 1 }],
+  dart: [{ k: 'egg', pat: 'zigzag', crest: 1 }, { k: 'baby', tail: 'lizard', spikes: 1, belly: 1, feet: 1 }],
+  dune: [{ k: 'blanket' }, { k: 'cub', ears: 'camel', hump: 1, belly: 1, tail: 'stub', muzzle: 1, longLegs: 1 }],
+  hop: [{ k: 'burrow', ears: 'jerboa', ground: 'tan' }, { k: 'cub', ears: 'jerboa', tail: 'thin', belly: 1 }],
+  kit: [{ k: 'burrow', ears: 'round', ground: 'tan' }, { k: 'cub', ears: 'round', mask: 1, belly: 1, tail: 'thin' }],
+  lotl: [{ k: 'egg', pat: 'spawn' }, { k: 'baby', gills: 1, tail: 'fin', belly: 1, feet: 1 }],
+  puddle: [{ k: 'egg', pat: 'spawn' }, { k: 'tadpole' }],
+  ember: [{ k: 'egg', pat: 'scales', horns: 1 }, { k: 'baby', horns: 1, dwings: 1, tail: 'lizard', belly: 1, feet: 1 }],
+  cinder: [{ k: 'egg', pat: 'flame' }, { k: 'baby', beak: 1, wings: 1, flame: 1, belly: 1, feetB: 1 }],
+  flare: [{ k: 'orb' }, { k: 'sprite', tip: 'flame' }],
+  ripple: [{ k: 'orb' }, { k: 'sprite', tip: 'drop' }],
+  gust: [{ k: 'orb' }, { k: 'sprite', tip: 'swirl' }],
+  moss: [{ k: 'orb' }, { k: 'sprite', tip: 'leaf' }],
+  mora: [{ k: 'orb', star: 1 }, { k: 'sprite', tip: 'halo' }],
+  sprout: [{ k: 'seed' }, { k: 'young', top: 'seedling' }],
+  sol: [{ k: 'seed' }, { k: 'young', top: 'sunbud' }],
+  daisy: [{ k: 'seed' }, { k: 'young', top: 'daisybud' }],
+  tuli: [{ k: 'seed' }, { k: 'young', top: 'tulipbud' }],
+  tomo: [{ k: 'seed' }, { k: 'young', top: 'tomato' }],
+  mac: [{ k: 'seed' }, { k: 'young', top: 'sapling' }],
+  bo: [{ k: 'seed', pot: 'bonsai' }, { k: 'young', top: 'bonsai', pot: 'bonsai' }],
+  spike: [{ k: 'seed' }, { k: 'young', top: 'cactusball' }],
+  kabo: [{ k: 'seedBig' }, { k: 'vine' }],
+  cap: [{ k: 'spore' }, { k: 'button' }]
+};
+// primitives: { e: [cx, cy, rx, ry], c, o } | { p: [[x, y]...], c, o } | { l: [[x, y]...], c, w } | { ring: [cx, cy, r], c, w }
+const fE = (cx, cy, rx, ry, c, o = 1) => ({ e: [cx, cy, rx, ry], c, o });
+const fP = (p, c, o = 1) => ({ p, c, o });
+const fL = (l, c, w) => ({ l, c, w });
+const eggHW = (cy, rx, ry, y) => { const s = Math.max(-1, Math.min(1, (y - cy) / ry)); return rx * Math.sqrt(Math.max(0, 1 - s * s)) * (s < 0 ? 1 - 0.2 * -s : 1); };
+const eggPts = (cx, cy, rx, ry) => { const o = []; for (let i = 0; i < 32; i++) { const t = (i / 32) * Math.PI * 2; const s = Math.sin(t); o.push([cx + rx * Math.cos(t) * (s < 0 ? 1 - 0.2 * -s : 1), cy + ry * s]); } return o; };
+const eggBand = (cx, cy, rx, ry, y0, y1, zig) => {
+  const top = [];
+  const bot = [];
+  const n = 8;
+  for (let i = 0; i <= n; i++) {
+    const f = i / n;
+    const yt = y0 + (zig && i % 2 ? -zig : 0);
+    const yb = y1 + (zig && i % 2 ? -zig : 0);
+    const ht = eggHW(cy, rx, ry, yt) * 0.97;
+    const hb = eggHW(cy, rx, ry, yb) * 0.97;
+    top.push([cx - ht + 2 * ht * f, yt]);
+    bot.unshift([cx - hb + 2 * hb * f, yb]);
+  }
+  return top.concat(bot);
+};
+const mirror = (pts, cx) => pts.map(([x, y]) => [2 * cx - x, y]);
+const earShapes = (type, cx, top, w, s = 1) => {
+  // w = half width of head/body, top = top y of body
+  const out = [];
+  const tri = (pts, inner) => { out.push(fP(pts, 'base')); out.push(fP(mirror(pts, cx), 'base')); if (inner) { out.push(fP(inner, 'blush', 0)); out.push(fP(mirror(inner, cx), 'blush', 0)); } };
+  if (type === 'cat') tri([[cx - w * 0.78, top + 40 * s], [cx - w * 0.66, top - 40 * s], [cx - w * 0.18, top + 10 * s]], [[cx - w * 0.64, top + 24 * s], [cx - w * 0.6, top - 16 * s], [cx - w * 0.34, top + 12 * s]]);
+  if (type === 'pointy') tri([[cx - w * 0.72, top + 40 * s], [cx - w * 0.62, top - 64 * s], [cx - w * 0.2, top + 12 * s]], [[cx - w * 0.6, top + 22 * s], [cx - w * 0.57, top - 36 * s], [cx - w * 0.36, top + 12 * s]]);
+  if (type === 'fennec') tri([[cx - w * 0.6, top + 44 * s], [cx - w * 0.98, top - 86 * s], [cx - w * 0.08, top + 16 * s]], [[cx - w * 0.52, top + 28 * s], [cx - w * 0.82, top - 54 * s], [cx - w * 0.26, top + 14 * s]]);
+  if (type === 'dog') { out.push(fE(cx - w * 0.92, top + 64 * s, w * 0.26, 54 * s, 'deep')); out.push(fE(cx + w * 0.92, top + 64 * s, w * 0.26, 54 * s, 'deep')); }
+  if (type === 'lop') { out.push(fE(cx - w * 0.9, top + 80 * s, w * 0.24, 76 * s, 'base')); out.push(fE(cx + w * 0.9, top + 80 * s, w * 0.24, 76 * s, 'base')); out.push(fE(cx - w * 0.9, top + 86 * s, w * 0.12, 56 * s, 'blush', 0)); out.push(fE(cx + w * 0.9, top + 86 * s, w * 0.12, 56 * s, 'blush', 0)); }
+  if (type === 'round') { [-1, 1].forEach((d) => { out.push(fE(cx + d * w * 0.62, top + 4 * s, w * 0.22, w * 0.22, 'base')); out.push(fE(cx + d * w * 0.62, top + 6 * s, w * 0.11, w * 0.11, 'blush', 0)); }); }
+  if (type === 'jerboa') { [-1, 1].forEach((d) => { out.push(fE(cx + d * w * 0.58, top - 26 * s, w * 0.34, 50 * s, 'base')); out.push(fE(cx + d * w * 0.58, top - 22 * s, w * 0.18, 32 * s, 'blush', 0)); }); }
+  if (type === 'camel') { [-1, 1].forEach((d) => out.push(fE(cx + d * w * 0.8, top + 26 * s, w * 0.16, 12 * s, 'base'))); }
+  return out;
+};
+const formPrims = (id, stage) => {
+  const f = (FORMS[id] || [])[stage - 1];
+  if (!f) return null;
+  const G = 444;
+  const cx = 256;
+  const R = { tail: [], body: [], face: null, hat: null, neck: null, deco: null, em: null, pivot: [cx, G] };
+  const B = R.body;
+  const T = R.tail;
+  if (f.k === 'egg') {
+    const rx = 94; const ry = 116; const cy = G - ry;
+    const top = cy - ry;
+    if (f.ears) earShapes(f.ears, cx, top + 4, rx * 0.95, 0.8).forEach((s) => B.push(s));
+    if (f.horns) [-1, 1].forEach((d) => B.push(fP([[cx + d * 30, top + 26], [cx + d * 44, top - 18], [cx + d * 56, top + 34]], 'light')));
+    if (f.crest) B.push(fP([[cx - 26, top + 20], [cx - 14, top - 26], [cx, top + 8], [cx + 14, top - 30], [cx + 28, top + 20]], 'deep'));
+    if (f.tuft) B.push(fP([[cx - 12, top + 16], [cx + 4, top - 30], [cx + 18, top + 14]], 'base'));
+    const spawn = f.pat === 'spawn';
+    B.push(fP(eggPts(cx, cy, rx, ry), spawn ? 'water' : 'light'));
+    if (spawn) { B.push(fE(cx, cy + 20, 62, 66, 'base')); B.push(fE(cx - 40, cy - 60, 16, 22, 'white', 0)); }
+    if (f.pat === 'band') B.push(fP(eggBand(cx, cy, rx, ry, cy - 6, cy + 30), 'base', 0));
+    if (f.pat === 'stripes') { B.push(fP(eggBand(cx, cy, rx, ry, cy - 46, cy - 26), 'shade', 0)); B.push(fP(eggBand(cx, cy, rx, ry, cy + 4, cy + 24), 'shade', 0)); B.push(fP(eggBand(cx, cy, rx, ry, cy + 54, cy + 72), 'shade', 0)); }
+    if (f.pat === 'zigzag') B.push(fP(eggBand(cx, cy, rx, ry, cy - 10, cy + 22, 18), 'deep', 0));
+    if (f.pat === 'spots') [[-44, -50, 18], [36, -70, 13], [52, 10, 20], [-56, 40, 15], [6, 70, 17]].forEach(([dx, dy, r]) => B.push(fE(cx + dx, cy + dy, r, r * 0.85, 'base', 0)));
+    if (f.pat === 'speckle') [[-40, -60], [20, -82], [50, -30], [-60, 0], [40, 26], [-22, 56], [30, 80], [-50, 70], [64, 60], [0, -30]].forEach(([dx, dy]) => B.push(fE(cx + dx, cy + dy, 6, 5, 'deep', 0)));
+    if (f.pat === 'scales') [[-30, -50], [26, -50], [-58, 4], [0, 0], [58, 4], [-30, 56], [26, 56]].forEach(([dx, dy]) => { B.push(fE(cx + dx, cy + dy, 20, 16, 'base', 0)); B.push(fE(cx + dx, cy + dy - 4, 12, 8, 'shade', 0)); });
+    if (f.pat === 'flame') { B.push(fP([[cx - 84, cy + 40], [cx - 60, cy - 10], [cx - 40, cy + 26], [cx - 10, cy - 40], [cx + 18, cy + 20], [cx + 46, cy - 20], [cx + 62, cy + 30], [cx + 86, cy + 20], [cx + 70, cy + 100], [cx - 70, cy + 100]], 'red', 0)); B.push(fP([[cx - 56, cy + 70], [cx - 36, cy + 34], [cx - 14, cy + 60], [cx + 12, cy + 24], [cx + 34, cy + 62], [cx + 58, cy + 50], [cx + 50, cy + 100], [cx - 50, cy + 100]], 'gold', 0)); }
+    B.push(fE(cx - 44, cy - 50, 14, 22, 'white', 0));
+    const ey = spawn ? cy + 10 : cy + 12;
+    R.face = { eyes: [[cx - 32, ey], [cx + 32, ey]], er: 13, kind: 'oval', mouth: [cx, ey + 30], ma: 6, blush: [[cx - 58, ey + 24], [cx + 58, ey + 24]], br: 11 };
+    R.hat = [cx, top + 18, 50]; R.neck = [cx, G - 46, 76]; R.em = [cx + 100, top - 6];
+  } else if (f.k === 'baby') {
+    const rx = 112; const ry = 100; const cy = G - ry - 4;
+    const top = cy - ry;
+    if (f.tail === 'curl') { T.push(fE(cx + rx * 0.98, cy + 52, 38, 20, 'base')); T.push(fE(cx + rx * 1.24, cy + 30, 18, 16, 'base')); }
+    if (f.tail === 'thin') T.push(fP([[cx + rx * 0.8, cy + 70], [cx + rx * 1.3, cy + 20], [cx + rx * 1.4, cy - 40], [cx + rx * 1.5, cy - 36], [cx + rx * 1.42, cy + 30], [cx + rx * 0.86, cy + 86]], 'base'));
+    if (f.tail === 'stub') T.push(fE(cx + rx * 0.96, cy + 40, 24, 18, 'base'));
+    if (f.tail === 'puff') T.push(fE(cx + rx * 0.98, cy + 56, 26, 24, 'cream'));
+    if (f.tail === 'fluffy') { T.push(fE(cx + rx * 1.08, cy + 26, 46, 34, 'base')); T.push(fE(cx + rx * 1.32, cy + 10, 20, 16, 'cream')); }
+    if (f.tail === 'lizard') T.push(fP([[cx + rx * 0.7, cy + 50], [cx + rx * 1.6, cy + 80], [cx + rx * 1.9, cy + 60], [cx + rx * 1.62, cy + 96], [cx + rx * 0.72, cy + 92]], 'base'));
+    if (f.tail === 'fin') T.push(fP([[cx + rx * 0.7, cy + 40], [cx + rx * 1.5, cy + 20], [cx + rx * 1.7, cy + 50], [cx + rx * 1.5, cy + 86], [cx + rx * 0.7, cy + 88]], 'light'));
+    R.pivot = [cx + rx * 0.8, cy + 60];
+    if (f.hump) B.push(fE(cx + 10, top + 16, 56, 40, 'base'));
+    if (f.ears) earShapes(f.ears, cx, top + 26, rx, 1).forEach((s) => B.push(s));
+    if (f.dwings) [-1, 1].forEach((d) => B.push(fP([[cx + d * rx * 0.6, cy - 30], [cx + d * rx * 1.45, cy - 80], [cx + d * rx * 1.3, cy - 30], [cx + d * rx * 1.5, cy], [cx + d * rx * 0.7, cy + 20]], 'deep')));
+    if (f.gills) [-1, 1].forEach((d) => [-40, -6, 28].forEach((dy, i) => B.push(fP([[cx + d * rx * 0.78, cy + dy - 6], [cx + d * (rx * 1.28 + (i === 1 ? 10 : 0)), cy + dy - 18 + i * 8], [cx + d * rx * 0.82, cy + dy + 10]], 'deep'))));
+    if (f.horns) [-1, 1].forEach((d) => B.push(fP([[cx + d * 40, top + 24], [cx + d * 58, top - 30], [cx + d * 72, top + 34]], 'light')));
+    if (f.spikes) B.push(fP([[cx - 70, top + 30], [cx - 54, top - 18], [cx - 30, top + 12], [cx - 10, top - 26], [cx + 12, top + 10], [cx + 34, top - 22], [cx + 52, top + 14], [cx + 72, top - 6], [cx + 80, top + 40]], 'deep'));
+    if (f.crest) B.push(fP([[cx - 30, top + 22], [cx - 18, top - 34], [cx, top + 4], [cx + 16, top - 40], [cx + 32, top + 22]], 'deep'));
+    if (f.comb) [[-24, 0, 16], [0, -12, 20], [24, 0, 16]].forEach(([dx, dy, r]) => B.push(fE(cx + dx, top + dy + 8, r, r, 'red')));
+    if (f.tuft) B.push(fP([[cx - 14, top + 16], [cx + 6, top - 40], [cx + 22, top + 14]], 'base'));
+    if (f.flame) { B.push(fP([[cx - 40, top + 26], [cx - 34, top - 30], [cx - 10, top - 6], [cx + 4, top - 56], [cx + 22, top - 8], [cx + 44, top - 34], [cx + 44, top + 26]], 'red')); B.push(fP([[cx - 22, top + 24], [cx - 14, top - 6], [cx + 4, top - 26], [cx + 22, top - 2], [cx + 26, top + 24]], 'gold', 0)); }
+    if (f.feet) { B.push(fE(cx - 50, G - 6, 34, 14, 'base')); B.push(fE(cx + 50, G - 6, 34, 14, 'base')); }
+    if (f.feetB) { B.push(fE(cx - 34, G - 6, 22, 10, 'beak')); B.push(fE(cx + 34, G - 6, 22, 10, 'beak')); }
+    B.push(fE(cx, cy, rx, ry, 'base'));
+    if (f.belly) B.push(fE(cx, cy + 44, rx * 0.56, ry * 0.46, 'cream', 0));
+    if (f.cheeks) { B.push(fE(cx - 66, cy + 18, 36, 28, 'cream', 0)); B.push(fE(cx + 66, cy + 18, 36, 28, 'cream', 0)); }
+    if (f.spots) [[-60, -30, 14], [56, -46, 11], [70, 20, 13]].forEach(([dx, dy, r]) => B.push(fE(cx + dx, cy + dy, r, r * 0.8, 'deep', 0)));
+    if (f.mask) { B.push(fE(cx - 42, cy - 12, 28, 24, 'deep', 0)); B.push(fE(cx + 42, cy - 12, 28, 24, 'deep', 0)); }
+    if (f.wings) [-1, 1].forEach((d) => B.push(fE(cx + d * rx * 0.94, cy + 20, 26, 42, 'shade')));
+    B.push(fE(cx - 54, cy - 54, 16, 22, 'light', 0));
+    const ey = cy - 12;
+    const bird = !!f.beak;
+    if (bird) B.push(fP([[cx - 18, ey + 18], [cx + 18, ey + 18], [cx, ey + 40]], 'beak'));
+    R.face = { eyes: [[cx - 42, ey], [cx + 42, ey]], er: 16, kind: 'oval', mouth: bird ? null : [cx, ey + 36], ma: 7, blush: [[cx - 72, ey + 30], [cx + 72, ey + 30]], br: 14 };
+    R.hat = [cx, top + 14, 58]; R.neck = [cx, G - 40, 96]; R.em = [cx + 118, top - 10];
+  } else if (f.k === 'basket' || f.k === 'burrow') {
+    const basket = f.k === 'basket';
+    const ground = f.ground || 'brown';
+    const hy = basket ? G - 128 : G - 104;
+    const hr = basket ? 72 : 64;
+    if (basket) {
+      B.push(fE(cx, G - 92, 128, 22, 'brown'));
+      B.push(fE(cx, G - 96, 112, 16, 'cream', 0));
+    } else {
+      B.push(fE(cx, G - 30, 156, 52, ground));
+      B.push(fE(cx, G - 58, 84, 22, 'brownD', 0));
+    }
+    earShapes(f.ears, cx, hy - hr + 18, hr, 0.85).forEach((s) => B.push(s));
+    B.push(fE(cx, hy, hr, hr * 0.84, 'base'));
+    B.push(fE(cx - hr * 0.5, hy - hr * 0.45, 12, 16, 'light', 0));
+    if (basket) {
+      B.push(fE(cx - 40, G - 92, 20, 13, 'base')); B.push(fE(cx + 40, G - 92, 20, 13, 'base'));
+      B.push(fP([[cx - 124, G - 92], [cx + 124, G - 92], [cx + 102, G], [cx - 102, G]], 'tan'));
+      [G - 66, G - 40, G - 16].forEach((y) => B.push(fL([[cx - 112 + (G - y) * -0.2, y], [cx + 112 - (G - y) * -0.2, y]], 'brown', 4)));
+      B.push(fP([[cx - 130, G - 100], [cx + 130, G - 100], [cx + 126, G - 84], [cx - 126, G - 84]], 'brown'));
+    } else {
+      B.push(fE(cx - 34, G - 64, 18, 12, 'base')); B.push(fE(cx + 34, G - 64, 18, 12, 'base'));
+      B.push(fP([[cx - 96, G - 62], [cx - 60, G - 54], [cx, G - 50], [cx + 60, G - 54], [cx + 96, G - 62], [cx + 120, G - 30], [cx - 120, G - 30]], ground, 0));
+      if (ground === 'brown') [[-120, -60], [110, -64], [60, -22]].forEach(([dx, dy]) => B.push(fP([[cx + dx - 12, G + dy + 14], [cx + dx - 4, G + dy - 14], [cx + dx + 2, G + dy + 6], [cx + dx + 10, G + dy - 18], [cx + dx + 14, G + dy + 14]], 'leaf', 0)));
+      else [[-110, -40], [96, -30]].forEach(([dx, dy]) => B.push(fE(cx + dx, G + dy, 14, 6, 'brownD', 0)));
+    }
+    const ey = hy - 4;
+    R.face = { eyes: [[cx - 26, ey], [cx + 26, ey]], er: 12, kind: 'oval', mouth: [cx, ey + 26], ma: 5, blush: [[cx - 46, ey + 20], [cx + 46, ey + 20]], br: 10 };
+    R.hat = [cx, hy - hr + 12, 46]; R.neck = [cx, hy + hr * 0.7, 56]; R.em = [cx + 110, hy - 110];
+  } else if (f.k === 'blanket') {
+    B.push(fE(cx, G - 16, 156, 28, 'red'));
+    B.push(fL([[cx - 140, G - 22], [cx + 140, G - 22]], 'gold', 6)); B.push(fL([[cx - 130, G - 8], [cx + 130, G - 8]], 'gold', 4));
+    B.push(fE(cx + 50, G - 108, 40, 26, 'base'));
+    B.push(fE(cx + 30, G - 62, 104, 46, 'base'));
+    B.push(fE(cx + 60, G - 30, 26, 10, 'shade')); B.push(fE(cx - 10, G - 30, 26, 10, 'shade'));
+    B.push(fP([[cx - 70, G - 72], [cx - 108, G - 128], [cx - 80, G - 140], [cx - 44, G - 88]], 'base'));
+    B.push(fE(cx - 98, G - 146, 46, 36, 'base'));
+    B.push(fE(cx - 126, G - 138, 20, 16, 'cream', 0));
+    B.push(fE(cx - 104, G - 186, 10, 7, 'base')); B.push(fE(cx - 70, G - 180, 10, 7, 'base'));
+    R.face = { eyes: [[cx - 112, G - 152], [cx - 80, G - 152]], er: 10, kind: 'oval', mouth: [cx - 100, G - 128], ma: 4, blush: [[cx - 132, G - 136], [cx - 64, G - 136]], br: 8 };
+    R.hat = [cx - 98, G - 182, 38]; R.neck = [cx - 92, G - 112, 34]; R.em = [cx + 40, G - 220];
+  } else if (f.k === 'cub') {
+    const bcy = G - 64; const brx = 74; const bry = 56;
+    const hcy = f.longLegs ? G - 196 : G - 162; const hr = 90;
+    const top = hcy - hr * 0.84;
+    if (f.tail === 'curl') { T.push(fE(cx + brx * 1.05, bcy + 10, 34, 16, 'base')); T.push(fE(cx + brx * 1.36, bcy - 12, 16, 16, 'base')); }
+    if (f.tail === 'thin') T.push(fP([[cx + brx * 0.8, bcy + 20], [cx + brx * 1.4, bcy - 30], [cx + brx * 1.5, bcy - 100], [cx + brx * 1.62, bcy - 96], [cx + brx * 1.54, bcy - 24], [cx + brx * 0.86, bcy + 36]], 'base'));
+    if (f.tail === 'stub') T.push(fE(cx + brx * 1.0, bcy - 10, 22, 16, 'base'));
+    if (f.tail === 'puff') T.push(fE(cx + brx * 1.0, bcy + 10, 24, 22, 'cream'));
+    if (f.tail === 'fluffy') { T.push(fE(cx + brx * 1.25, bcy - 16, 46, 32, 'base')); T.push(fE(cx + brx * 1.6, bcy - 30, 18, 15, 'cream')); }
+    R.pivot = [cx + brx * 0.8, bcy];
+    const legY = f.longLegs ? G - 34 : G - 10;
+    const legH = f.longLegs ? 40 : 14;
+    [[-56, 'shade'], [56, 'shade'], [-26, 'base'], [26, 'base']].forEach(([dx, c]) => B.push(f.longLegs ? fP([[cx + dx - 12, G - 90], [cx + dx + 12, G - 90], [cx + dx + 10, G], [cx + dx - 10, G]], c) : fE(cx + dx, legY, 18, legH, c)));
+    if (f.hump) B.push(fE(cx + 10, bcy - (f.longLegs ? 90 : 50), 44, 30, 'base'));
+    B.push(fE(cx, f.longLegs ? bcy - 50 : bcy, brx, bry, 'base'));
+    if (f.belly) B.push(fE(cx, (f.longLegs ? bcy - 50 : bcy) + 16, brx * 0.5, bry * 0.5, 'cream', 0));
+    earShapes(f.ears, cx, top + 18, hr, 0.95).forEach((s) => B.push(s));
+    B.push(fE(cx, hcy, hr, hr * 0.84, 'base'));
+    if (f.muzzle) B.push(fE(cx, hcy + 30, 42, 28, 'cream', 0));
+    if (f.cheeks) { B.push(fE(cx - 56, hcy + 20, 30, 24, 'cream', 0)); B.push(fE(cx + 56, hcy + 20, 30, 24, 'cream', 0)); }
+    if (f.mask) { B.push(fE(cx - 34, hcy - 8, 24, 21, 'deep', 0)); B.push(fE(cx + 34, hcy - 8, 24, 21, 'deep', 0)); }
+    if (f.spots) { B.push(fE(cx + 44, hcy - 44, 18, 14, 'deep', 0)); B.push(fE(cx - 40, bcy - 6, 14, 11, 'deep', 0)); }
+    B.push(fE(cx - 44, hcy - 40, 14, 18, 'light', 0));
+    const ey = hcy - 8;
+    R.face = { eyes: [[cx - 34, ey], [cx + 34, ey]], er: 15, kind: 'oval', mouth: [cx, ey + 34], ma: 6, blush: [[cx - 60, ey + 26], [cx + 60, ey + 26]], br: 12 };
+    R.hat = [cx, top + 12, 56]; R.neck = [cx, hcy + hr * 0.78, 58]; R.em = [cx + 116, top - 10];
+  } else if (f.k === 'turtle') {
+    const cy = G - 70;
+    B.push(fE(cx - 70, G - 8, 30, 14, 'skinD')); B.push(fE(cx + 70, G - 8, 30, 14, 'skinD'));
+    if (f.shell === 'angular') B.push(fP([[cx - 132, cy + 24], [cx - 100, cy - 70], [cx - 40, cy - 106], [cx + 40, cy - 106], [cx + 100, cy - 70], [cx + 132, cy + 24]], 'base'));
+    else { const pts = []; for (let i = 0; i <= 20; i++) { const t = Math.PI + (Math.PI * i) / 20; pts.push([cx + 132 * Math.cos(t), cy + 24 + 128 * Math.sin(t)]); } B.push(fP(pts, 'base')); }
+    [[-58, -40], [0, -70], [58, -40]].forEach(([dx, dy]) => B.push(fE(cx + dx, cy + dy, 24, 18, 'light', 0)));
+    B.push(fP([[cx - 136, cy + 10], [cx + 136, cy + 10], [cx + 130, cy + 30], [cx - 130, cy + 30]], 'deep'));
+    B.push(fE(cx, cy + 36, 58, 50, 'skin'));
+    R.face = { eyes: [[cx - 22, cy + 30], [cx + 22, cy + 30]], er: 11, kind: 'oval', mouth: [cx, cy + 54], ma: 5, blush: [[cx - 42, cy + 50], [cx + 42, cy + 50]], br: 9 };
+    R.hat = [cx, cy - 98, 54]; R.neck = [cx, cy + 74, 52]; R.em = [cx + 130, cy - 120];
+  } else if (f.k === 'tadpole') {
+    const hcx = cx - 30; const cy = G - 84;
+    T.push(fP([[hcx + 60, cy - 30], [hcx + 150, cy - 50], [hcx + 210, cy - 10], [hcx + 240, cy + 40], [hcx + 180, cy + 30], [hcx + 130, cy + 50], [hcx + 60, cy + 40]], 'light'));
+    R.pivot = [hcx + 70, cy];
+    B.push(fE(hcx, cy, 100, 84, 'base'));
+    B.push(fE(hcx, cy + 36, 60, 36, 'cream', 0));
+    B.push(fE(hcx - 40, cy - 40, 14, 18, 'light', 0));
+    R.face = { eyes: [[hcx - 38, cy - 14], [hcx + 34, cy - 14]], er: 15, kind: 'oval', mouth: [hcx, cy + 18], ma: 7, blush: [[hcx - 64, cy + 14], [hcx + 62, cy + 14]], br: 12 };
+    R.hat = [hcx, cy - 78, 56]; R.neck = [hcx, cy + 50, 80]; R.em = [hcx + 110, cy - 100];
+  } else if (f.k === 'orb') {
+    const cy = G - 96;
+    B.push(fE(cx, cy, 108, 108, 'light', 0));
+    B.push(fE(cx, cy, 82, 82, 'base'));
+    B.push(fE(cx - 30, cy - 34, 18, 14, 'white', 0));
+    if (f.star) B.push(fP([[cx, cy - 150], [cx + 10, cy - 128], [cx + 32, cy - 124], [cx + 14, cy - 110], [cx + 20, cy - 88], [cx, cy - 100], [cx - 20, cy - 88], [cx - 14, cy - 110], [cx - 32, cy - 124], [cx - 10, cy - 128]], 'gold'));
+    R.face = { eyes: [[cx - 28, cy + 2], [cx + 28, cy + 2]], er: 12, kind: 'oval', mouth: [cx, cy + 28], ma: 5, blush: [[cx - 50, cy + 22], [cx + 50, cy + 22]], br: 10 };
+    R.hat = [cx, cy - 72, 50]; R.neck = [cx, cy + 66, 64]; R.em = [cx + 100, cy - 110];
+  } else if (f.k === 'sprite') {
+    const cy = G - 92; const rx = 100; const ry = 90;
+    if (f.tip === 'flame') B.push(fP([[cx - 70, cy - 40], [cx - 54, cy - 120], [cx - 20, cy - 80], [cx, cy - 170], [cx + 24, cy - 84], [cx + 58, cy - 130], [cx + 72, cy - 40]], 'base'));
+    if (f.tip === 'drop') B.push(fP([[cx - 76, cy - 30], [cx, cy - 170], [cx + 76, cy - 30]], 'base'));
+    if (f.tip === 'leaf') { B.push(fL([[cx, cy - 80], [cx, cy - 130]], 'leafD', 8)); B.push(fP([[cx, cy - 120], [cx - 44, cy - 150], [cx - 56, cy - 126], [cx - 20, cy - 110]], 'leaf')); B.push(fP([[cx, cy - 126], [cx + 40, cy - 160], [cx + 56, cy - 136], [cx + 18, cy - 114]], 'leafL')); }
+    if (f.tip === 'swirl') { T.push(fL([[cx + 90, cy + 10], [cx + 140, cy - 10], [cx + 150, cy - 50], [cx + 124, cy - 64], [cx + 110, cy - 44], [cx + 124, cy - 30]], 'light', 10)); T.push(fL([[cx - 170, cy - 30], [cx - 120, cy - 30], [cx - 176, cy + 10], [cx - 126, cy + 10]], 'light', 8)); }
+    if (f.tip === 'halo') { B.push({ ring: [cx, cy - 20, 128], c: 'gold', w: 7 }); }
+    const flat = f.tip === 'leaf';
+    B.push(fE(cx, flat ? cy + 20 : cy, flat ? 120 : rx, flat ? 70 : ry, 'base'));
+    B.push(fE(cx - 40, (flat ? cy + 20 : cy) - 40, 16, 20, 'light', 0));
+    const ey = flat ? cy + 14 : cy - 4;
+    R.face = { eyes: [[cx - 34, ey], [cx + 34, ey]], er: 13, kind: 'oval', mouth: [cx, ey + 30], ma: 6, blush: [[cx - 62, ey + 24], [cx + 62, ey + 24]], br: 11 };
+    R.hat = [cx, flat ? cy - 44 : cy - 82, 54]; R.neck = [cx, G - 30, 84]; R.em = [cx + 116, cy - 130];
+  } else if (f.k === 'seed' || f.k === 'young') {
+    const bonsai = f.pot === 'bonsai';
+    if (bonsai) { B.push(fP([[cx - 124, 372], [cx + 124, 372], [cx + 104, 444], [cx - 104, 444]], 'base')); B.push(fP([[cx - 136, 356], [cx + 136, 356], [cx + 136, 380], [cx - 136, 380]], 'light')); }
+    else { B.push(fP([[cx - 80, 344], [cx + 80, 344], [cx + 64, 444], [cx - 64, 444]], 'base')); B.push(fP([[cx + 34, 344], [cx + 80, 344], [cx + 64, 444], [cx + 34, 444]], 'shade', 0)); B.push(fP([[cx - 92, 326], [cx + 92, 326], [cx + 92, 352], [cx - 92, 352]], 'light')); }
+    const rimY = bonsai ? 356 : 326;
+    const tops = [];
+    if (f.k === 'seed') {
+      tops.push(fE(cx, rimY + 2, 70, 12, 'soil', 0));
+      tops.push(fE(cx, rimY - 12, 26, 20, 'tan'));
+      tops.push(fP([[cx - 2, rimY - 28], [cx - 22, rimY - 56], [cx - 4, rimY - 48], [cx, rimY - 30]], 'leafL'));
+      tops.push(fP([[cx + 2, rimY - 30], [cx + 24, rimY - 62], [cx + 6, rimY - 52], [cx + 4, rimY - 30]], 'leaf'));
+      R.hat = [cx, rimY - 56, 40];
+    } else {
+      const t = f.top;
+      const stem = (y1) => tops.push(fP([[cx - 5, rimY], [cx + 5, rimY], [cx + 5, y1], [cx - 5, y1]], 'leafD', 0));
+      const leaves = (y) => { tops.push(fP([[cx, y], [cx - 70, y - 30], [cx - 80, y - 6], [cx - 20, y + 12]], 'leaf')); tops.push(fP([[cx, y - 10], [cx + 70, y - 44], [cx + 82, y - 20], [cx + 20, y + 4]], 'leafD')); };
+      if (t === 'seedling') { stem(272); tops.push(fE(cx - 34, 262, 34, 20, 'leafL')); tops.push(fE(cx + 34, 254, 34, 20, 'leaf')); R.hat = [cx, 238, 40]; }
+      if (t === 'sunbud') { stem(196); leaves(280); tops.push(fE(cx, 180, 30, 34, 'leafD')); tops.push(fP([[cx - 12, 152], [cx, 132], [cx + 12, 152]], 'yellow')); R.hat = [cx, 148, 40]; }
+      if (t === 'daisybud') { stem(206); leaves(286); tops.push(fE(cx, 196, 24, 28, 'leaf')); tops.push(fE(cx, 176, 16, 14, 'white')); R.hat = [cx, 164, 38]; }
+      if (t === 'tulipbud') { stem(220); tops.push(fP([[cx, 300], [cx - 50, 200], [cx - 30, 196], [cx + 4, 290]], 'leaf')); tops.push(fP([[cx, 296], [cx + 50, 206], [cx + 30, 200], [cx - 4, 288]], 'leafD')); tops.push(fP([[cx - 26, 226], [cx - 22, 176], [cx, 146], [cx + 22, 176], [cx + 26, 226], [cx, 238]], 'leaf')); tops.push(fP([[cx - 18, 186], [cx, 150], [cx + 18, 186], [cx, 178]], 'hot', 0)); R.hat = [cx, 144, 38]; }
+      if (t === 'tomato') { stem(250); tops.push(fE(cx - 40, 264, 46, 32, 'leaf')); tops.push(fE(cx + 42, 250, 46, 32, 'leafD')); tops.push(fE(cx, 224, 40, 28, 'leaf')); tops.push(fE(cx - 34, 298, 22, 20, 'leafL')); tops.push(fE(cx + 40, 214, 10, 10, 'yellow')); R.hat = [cx, 200, 42]; }
+      if (t === 'sapling' || t === 'bonsai') { const ty = t === 'bonsai' ? 250 : 236; tops.push(fP([[cx - 7, rimY], [cx + 7, rimY], [cx + 6, ty + 30], [cx - 6, ty + 30]], 'brown', 0)); tops.push(fE(cx, ty, t === 'bonsai' ? 84 : 76, t === 'bonsai' ? 46 : 58, 'leaf')); tops.push(fE(cx - 24, ty - 14, 34, 22, 'leafL', 0)); if (t === 'sapling') [[-40, -6], [20, -30], [44, 14], [-6, 22], [-20, -36]].forEach(([dx, dy], i) => tops.push(fE(cx + dx, ty + dy, 8, 8, i % 2 ? 'pink' : 'white', 0))); R.hat = [cx, ty - (t === 'bonsai' ? 40 : 54), 42]; }
+      if (t === 'cactusball') { tops.push(fE(cx, rimY - 54, 70, 62, 'leaf')); tops.push(fL([[cx - 30, rimY - 108], [cx - 34, rimY - 6]], 'leafD', 4)); tops.push(fL([[cx + 30, rimY - 108], [cx + 34, rimY - 6]], 'leafD', 4)); tops.push(fE(cx, rimY - 120, 16, 12, 'pink')); R.hat = [cx, rimY - 124, 44]; }
+    }
+    tops.forEach((s) => B.push(s));
+    const ballFace = f.top === 'cactusball';
+    if (ballFace) R.face = { eyes: [[cx - 26, rimY - 56], [cx + 26, rimY - 56]], er: 11, kind: 'oval', mouth: [cx, rimY - 32], ma: 5, blush: [[cx - 46, rimY - 36], [cx + 46, rimY - 36]], br: 9 };
+    else R.face = { eyes: [[cx - 30, 392], [cx + 30, 392]], er: 10, kind: 'oval', mouth: [cx, 416], ma: 5, blush: [[cx - 54, 410], [cx + 54, 410]], br: 9 };
+    R.neck = [cx, rimY + 10, bonsai ? 130 : 92]; R.deco = f.k === 'young' ? [cx, (R.hat[1] + rimY) / 2 + 20, 70] : [cx, rimY + 10, 92]; R.em = [cx + 100, R.hat[1] - 30];
+  } else if (f.k === 'seedBig' || f.k === 'vine') {
+    B.push(fE(cx, G - 18, 140, 30, 'soil'));
+    if (f.k === 'seedBig') {
+      B.push(fP([[cx, G - 196], [cx + 56, G - 120], [cx + 52, G - 60], [cx, G - 34], [cx - 52, G - 60], [cx - 56, G - 120]], 'cream'));
+      B.push(fP([[cx, G - 190], [cx + 50, G - 120], [cx + 46, G - 64], [cx, G - 40], [cx + 22, G - 110]], 'creamShade', 0));
+      R.face = { eyes: [[cx - 22, G - 112], [cx + 22, G - 112]], er: 11, kind: 'oval', mouth: [cx, G - 88], ma: 5, blush: [[cx - 40, G - 92], [cx + 40, G - 92]], br: 9 };
+      R.hat = [cx, G - 186, 44]; R.em = [cx + 90, G - 220];
+    } else {
+      B.push(fL([[cx - 120, G - 30], [cx - 80, G - 70], [cx - 30, G - 60]], 'leafD', 8));
+      B.push(fE(cx - 100, G - 86, 40, 28, 'leaf')); B.push(fE(cx + 110, G - 70, 36, 26, 'leafD'));
+      B.push(fE(cx + 96, G - 120, 14, 14, 'yellow'));
+      B.push(fE(cx, G - 74, 84, 62, 'leafL'));
+      B.push(fL([[cx - 30, G - 130], [cx - 36, G - 16]], 'leaf', 5)); B.push(fL([[cx + 30, G - 130], [cx + 36, G - 16]], 'leaf', 5));
+      B.push(fP([[cx - 6, G - 134], [cx - 8, G - 160], [cx + 10, G - 168], [cx + 8, G - 134]], 'brown'));
+      R.face = { eyes: [[cx - 28, G - 84], [cx + 28, G - 84]], er: 12, kind: 'oval', mouth: [cx, G - 58], ma: 6, blush: [[cx - 52, G - 62], [cx + 52, G - 62]], br: 10 };
+      R.hat = [cx, G - 136, 50]; R.em = [cx + 110, G - 190];
+    }
+    R.neck = [cx, G - 40, 90]; R.deco = [cx, G - 80, 110];
+  } else if (f.k === 'spore' || f.k === 'button') {
+    if (f.k === 'spore') {
+      B.push(fE(cx, G - 40, 120, 48, 'leaf'));
+      B.push(fE(cx, G - 58, 100, 22, 'leafL', 0));
+      [[-60, -50], [40, -70], [70, -40], [-20, -76]].forEach(([dx, dy]) => B.push(fE(cx + dx, G + dy, 6, 6, 'white', 0)));
+      B.push(fE(cx + 20, G - 96, 22, 18, 'base')); B.push(fP([[cx + 14, G - 82], [cx + 26, G - 82], [cx + 26, G - 64], [cx + 14, G - 64]], 'cream'));
+      R.face = { eyes: [[cx - 30, G - 40], [cx + 30, G - 40]], er: 11, kind: 'oval', mouth: [cx, G - 16], ma: 5, blush: [[cx - 56, G - 22], [cx + 56, G - 22]], br: 9 };
+      R.hat = [cx - 20, G - 96, 44]; R.em = [cx + 110, G - 150]; R.neck = [cx, G - 30, 100];
+    } else {
+      B.push(fP([[cx - 44, G], [cx - 40, G - 110], [cx + 40, G - 110], [cx + 44, G]], 'cream'));
+      const pts = []; for (let i = 0; i <= 18; i++) { const t = Math.PI + (Math.PI * i) / 18; pts.push([cx + 100 * Math.cos(t), G - 104 + 92 * Math.sin(t)]); }
+      B.push(fP(pts, 'base'));
+      B.push(fP([[cx - 100, G - 104], [cx + 100, G - 104], [cx + 90, G - 92], [cx - 90, G - 92]], 'creamShade'));
+      [[-50, -150, 14], [20, -170, 12], [56, -130, 10]].forEach(([dx, dy, r]) => B.push(fE(cx + dx, G + dy, r, r * 0.8, 'white', 0)));
+      R.face = { eyes: [[cx - 20, G - 62], [cx + 20, G - 62]], er: 10, kind: 'oval', mouth: [cx, G - 38], ma: 5, blush: [[cx - 34, G - 40], [cx + 34, G - 40]], br: 8 };
+      R.hat = [cx, G - 190, 50]; R.em = [cx + 110, G - 210]; R.neck = [cx, G - 98, 96];
+    }
+  }
+  return R;
+};
+
+const FORM_COL = (c) => NAMED[c] || c;
+const IX = (x) => r1(280 + 0.6 * (x - 256));
+const IY = (y) => r1(81.2 + 0.6 * y);
+const IR = (r) => r1(0.6 * r);
+const FTONE = { base: T4, light: ['light', 'light', 'base', 'shade'], shade: DK, deep: ['deep', 'deep', 'deep', 'deep'], cream: CR, creamShade: CR2, skin: ['skin', 'skin', 'skinD', 'skinD'], skinD: ['skinD', 'skinD', 'skinD', 'skinD'], beak: ['beak', 'beak', 'beakD', 'beakD'] };
+const hexTone = (h) => {
+  const n = parseInt(h.slice(1), 16);
+  const c = [n >> 16, (n >> 8) & 255, n & 255];
+  const f = (k) => '#' + c.map((v) => Math.max(0, Math.min(255, Math.round(k > 0 ? v + (255 - v) * k : v * (1 + k)))).toString(16).padStart(2, '0')).join('').toUpperCase();
+  return [f(0.22), h, f(-0.12), f(-0.24)];
+};
+const formSpec = (id, stage, base) => {
+  const R = formPrims(id, stage);
+  if (!R) return null;
+  const mp = (pts) => pts.map(([x, y]) => [IX(x), IY(y)]);
+  const conv = (s) => {
+    const c = FORM_COL(s.c);
+    if (s.e) {
+      const [cx, cy, rx, ry] = s.e;
+      if (s.o) return blob(IX(cx), IY(cy), IR(rx), IR(ry), 12, FTONE[s.c] || hexTone(c));
+      return [E(IX(cx), IY(cy), IR(rx), IR(ry)), c];
+    }
+    if (s.p) return [P(mp(s.p)), c];
+    if (s.l) return ['M' + mp(s.l).map(([x, y]) => pt(x, y)).join('L'), 'none', c, r1(s.w * 0.55)];
+    if (s.ring) return [E(IX(s.ring[0]), IY(s.ring[1]), IR(s.ring[2]), IR(s.ring[2])), 'none', c, r1(s.w * 0.6)];
+    return null;
+  };
+  const list = (l) => l.map(conv).filter(Boolean);
+  const F = R.face;
+  const face = { eyes: F.eyes.map(([x, y]) => [IX(x), IY(y)]), er: r1(F.er * 0.62), kind: F.kind, mouth: F.mouth ? [IX(F.mouth[0]), IY(F.mouth[1])] : null, ma: r1(F.ma * 0.6), blush: F.blush.map(([x, y]) => [IX(x), IY(y)]), br: r1(F.br * 0.6) };
+  const anc = (a) => (a ? [IX(a[0]), IY(a[1]), IR(a[2])] : a);
+  return { name: base.name, coat: base.coat, food: base.food, pivot: [IX(R.pivot[0]), IY(R.pivot[1])], tail: list(R.tail), body: list(R.body), face, hat: [IX(R.hat[0]), IY(R.hat[1]), Math.round(R.hat[2] * 0.55)], em: [IX(R.em[0]), IY(R.em[1])], neck: anc(R.neck), deco: anc(R.deco) };
+};
+const accShapes = (spec, neck, deco, list, ow, groundY) => {
+  const front = [];
+  const back = [];
+  const [x, y, a] = spec.hat;
+  const sh = (d, f) => (ow ? [d, f, 'O', r1(a * ow)] : [d, f]);
+  const ln = (d, c, w) => [d, 'none', c, r1(w)];
+  if (list.includes('cape') && spec.capeShell) {
+    const [cm, ch, cs, cc] = spec.capeShell;
+    front.push(sh(cm, '#E5484D'));
+    front.push([cs, '#B8323A']);
+    front.push(sh(ch, '#F2C14E'));
+    front.push(sh(cc, '#F2C14E'));
+  } else if (neck && list.includes('cape')) {
+    const [nx, ny, hw] = neck;
+    const gy = groundY - 2;
+    const box = xRange(spec.body, ny + (gy - ny) * 0.25) || [nx - hw * 1.6, nx + hw * 1.6];
+    const mg = Math.max(hw * 0.35, (box[1] - box[0]) * 0.1);
+    const bl = Math.min(box[0], nx - hw * 1.3) - mg;
+    const br = Math.max(box[1], nx + hw * 1.3) + mg;
+    const bc = (bl + br) / 2;
+    const tl = nx - hw * 1.1;
+    const tr = nx + hw * 1.1;
+    const sag = (br - bl) * 0.05;
+    back.push(sh('M' + pt(tl, ny) + 'L' + pt(tr, ny) + 'C' + pt(tr + (br - tr) * 0.25, ny + (gy - ny) * 0.4) + ' ' + pt(br, gy - (gy - ny) * 0.3) + ' ' + pt(br, gy) + 'Q' + pt(bc, gy + sag) + ' ' + pt(bl, gy) + 'C' + pt(bl, gy - (gy - ny) * 0.3) + ' ' + pt(tl - (tl - bl) * 0.25, ny + (gy - ny) * 0.4) + ' ' + pt(tl, ny) + 'Z', '#E5484D'));
+    const hem = Math.max(3, (gy - ny) * 0.07);
+    back.push(['M' + pt(bl, gy - hem) + 'Q' + pt(bc, gy - hem + sag) + ' ' + pt(br, gy - hem) + 'L' + pt(br, gy) + 'Q' + pt(bc, gy + sag) + ' ' + pt(bl, gy) + 'Z', '#F2C14E']);
+    back.push(ln('M' + pt(nx - hw * 0.55, ny + hw * 0.3) + 'Q' + pt(bc - (br - bl) * 0.2, (ny + gy) / 2) + ' ' + pt(bc - (br - bl) * 0.28, gy - hem) + 'M' + pt(nx + hw * 0.55, ny + hw * 0.3) + 'Q' + pt(bc + (br - bl) * 0.2, (ny + gy) / 2) + ' ' + pt(bc + (br - bl) * 0.28, gy - hem), '#B8323A', Math.max(2, hw * 0.1)));
+    front.push(sh('M' + pt(nx - hw * 1.15, ny - hw * 0.08) + 'Q' + pt(nx - hw * 0.6, ny + hw * 0.22) + ' ' + pt(nx - hw * 0.12, ny + hw * 0.1) + 'L' + pt(nx - hw * 0.3, ny + hw * 0.42) + 'Q' + pt(nx - hw * 0.9, ny + hw * 0.45) + ' ' + pt(nx - hw * 1.25, ny + hw * 0.25) + 'Z', '#E5484D'));
+    front.push(sh('M' + pt(nx + hw * 1.15, ny - hw * 0.08) + 'Q' + pt(nx + hw * 0.6, ny + hw * 0.22) + ' ' + pt(nx + hw * 0.12, ny + hw * 0.1) + 'L' + pt(nx + hw * 0.3, ny + hw * 0.42) + 'Q' + pt(nx + hw * 0.9, ny + hw * 0.45) + ' ' + pt(nx + hw * 1.25, ny + hw * 0.25) + 'Z', '#E5484D'));
+    front.push(sh(E(nx, ny + hw * 0.16, hw * 0.16, hw * 0.16), '#F2C14E'));
+  }
+  if (neck && list.includes('scarf')) {
+    const [nx, ny, hw] = neck;
+    front.push(sh('M' + pt(nx - hw, ny - hw * 0.16) + 'Q' + pt(nx, ny + hw * 0.16) + ' ' + pt(nx + hw, ny - hw * 0.16) + 'L' + pt(nx + hw, ny + hw * 0.2) + 'Q' + pt(nx, ny + hw * 0.52) + ' ' + pt(nx - hw, ny + hw * 0.2) + 'Z', '#E5484D'));
+    front.push(sh('M' + pt(nx + hw * 0.3, ny + hw * 0.22) + 'L' + pt(nx + hw * 0.62, ny + hw * 0.95) + 'L' + pt(nx + hw * 0.36, ny + hw * 1.02) + 'L' + pt(nx + hw * 0.1, ny + hw * 0.3) + 'Z', '#C93A40'));
+    front.push(ln('M' + pt(nx - hw * 0.5, ny - hw * 0.02) + 'L' + pt(nx - hw * 0.5, ny + hw * 0.3) + 'M' + pt(nx, ny + hw * 0.1) + 'L' + pt(nx, ny + hw * 0.36) + 'M' + pt(nx + hw * 0.5, ny - hw * 0.02) + 'L' + pt(nx + hw * 0.5, ny + hw * 0.3), '#F2F0EC', hw * 0.07));
+  }
+  if (neck && list.includes('collar')) {
+    const [nx, ny, hw] = neck;
+    front.push(sh('M' + pt(nx - hw, ny - hw * 0.06) + 'Q' + pt(nx, ny + hw * 0.2) + ' ' + pt(nx + hw, ny - hw * 0.06) + 'L' + pt(nx + hw, ny + hw * 0.1) + 'Q' + pt(nx, ny + hw * 0.38) + ' ' + pt(nx - hw, ny + hw * 0.1) + 'Z', '#B5533C'));
+    front.push(sh(E(nx, ny + hw * 0.38, hw * 0.12, hw * 0.12), '#F2C14E'));
+  }
+  if (neck && list.includes('bowtie')) {
+    const [nx, ny, hw] = neck;
+    front.push(sh('M' + pt(nx, ny + hw * 0.1) + 'L' + pt(nx - hw * 0.42, ny - hw * 0.14) + 'L' + pt(nx - hw * 0.42, ny + hw * 0.34) + 'Z' + 'M' + pt(nx, ny + hw * 0.1) + 'L' + pt(nx + hw * 0.42, ny - hw * 0.14) + 'L' + pt(nx + hw * 0.42, ny + hw * 0.34) + 'Z', '#2E3B55'));
+    front.push(sh(E(nx, ny + hw * 0.1, hw * 0.09, hw * 0.09), '#F2C14E'));
+  }
+  if (list.includes('lights')) {
+    const [lx, ly, lw] = deco || neck || [x, y + a, a];
+    const cols = ['#FF5A5F', '#FFD25E', '#5BB8F0', '#7DDB5C'];
+    const bulbs = ['', '', '', ''];
+    let glow = '';
+    let wire = '';
+    [[ly, 0.3, 0.95], [ly + lw * 0.38, 0.25, 0.8]].forEach(([yy, sag, span], k) => {
+      const x0 = lx - lw * span;
+      const x1 = lx + lw * span;
+      wire += 'M' + pt(x0, yy) + 'Q' + pt(lx, yy + lw * sag) + ' ' + pt(x1, yy);
+      for (let i = 0; i < 6; i++) {
+        const t = 0.08 + (i * 0.84) / 5;
+        const bx = (1 - t) * (1 - t) * x0 + 2 * (1 - t) * t * lx + t * t * x1;
+        const by = (1 - t) * (1 - t) * yy + 2 * (1 - t) * t * (yy + lw * sag) + t * t * yy;
+        glow += E(bx, by + lw * 0.09, lw * 0.16, lw * 0.16);
+        bulbs[(i + k * 2) % 4] += E(bx, by + lw * 0.09, lw * 0.075, lw * 0.105);
+      }
+    });
+    front.push([glow, 'rgba(255,236,160,0.45)']);
+    front.push(ln(wire, '#2E3B55', Math.max(2, lw * 0.035)));
+    bulbs.forEach((d, i) => front.push([d, cols[i], '#2E3B55', r1(Math.max(1, lw * 0.015))]));
+  }
+  const e = spec.face.er;
+  const eyes = spec.face.eyes;
+  if (list.includes('starshades')) {
+    let d = '';
+    let lens = '';
+    let gl = '';
+    eyes.forEach(([ex, ey]) => { d += starP(ex, ey, e * 2.1, e * 1.1, 5); lens += E(ex, ey, e * 0.95, e * 0.9); gl += E(ex + e * 0.35, ey - e * 0.35, e * 0.22, e * 0.22); });
+    front.push([d, '#F27A8E', '#C9577A', r1(e * 0.22)]);
+    front.push([lens, '#263040']);
+    front.push([gl, '#FFFFFF']);
+    if (eyes.length > 1) front.push(ln('M' + pt(eyes[0][0] + e * 1.4, eyes[0][1]) + 'L' + pt(eyes[1][0] - e * 1.4, eyes[1][1]), '#C9577A', e * 0.3));
+  } else if (list.includes('sunglasses')) {
+    let d = '';
+    let sh2 = '';
+    eyes.forEach(([ex, ey]) => { d += E(ex, ey, e * 1.35, e * 1.15); sh2 += 'M' + pt(ex - e * 0.75, ey - e * 0.2) + 'L' + pt(ex - e * 0.25, ey - e * 0.7); });
+    front.push([d, '#263040', '#1C2330', r1(e * 0.25)]);
+    front.push(ln(sh2, '#FFFFFF', e * 0.18));
+    if (eyes.length > 1) front.push(ln('M' + pt(eyes[0][0] + e * 1.35, eyes[0][1] - e * 0.2) + 'Q' + pt((eyes[0][0] + eyes[1][0]) / 2, eyes[0][1] - e * 0.7) + ' ' + pt(eyes[1][0] - e * 1.35, eyes[1][1] - e * 0.2), '#1C2330', e * 0.28));
+  } else if (list.includes('glasses')) {
+    let d = '';
+    eyes.forEach(([ex, ey]) => { d += E(ex, ey, e * 1.3, e * 1.25); });
+    front.push([d, 'rgba(255,255,255,0.22)', '#B07A2A', r1(e * 0.28)]);
+    if (eyes.length > 1) front.push(ln('M' + pt(eyes[0][0] + e * 1.3, eyes[0][1] - e * 0.2) + 'Q' + pt((eyes[0][0] + eyes[1][0]) / 2, eyes[0][1] - e * 0.8) + ' ' + pt(eyes[1][0] - e * 1.3, eyes[1][1] - e * 0.2), '#B07A2A', e * 0.28));
+  }
+  if (list.includes('book') || list.includes('mug') || list.includes('lamp')) {
+    const gy = groundY - 1;
+    const box = xRange(spec.body, gy - 140) || [x - a * 1.2, x + a * 1.2];
+    const u = Math.max(a * 0.5, Math.min(a * 0.85, (box[1] - box[0]) * 0.2));
+    const bc = (box[0] + box[1]) / 2;
+    const bw = box[1] - box[0];
+    if (list.includes('lamp')) {
+      const lx = box[0] + u * 0.15;
+      front.push(['M' + pt(lx + u * 1.9, gy - u * 2.6) + 'L' + pt(lx + u * 3.6, gy) + 'L' + pt(lx + u * 0.4, gy) + 'Z', 'rgba(255,214,107,0.28)']);
+      front.push(sh(E(lx, gy - u * 0.18, u * 0.75, u * 0.22), '#3E4A5C'));
+      front.push(ln('M' + pt(lx, gy - u * 0.2) + 'L' + pt(lx - u * 0.25, gy - u * 1.7) + 'L' + pt(lx + u * 0.9, gy - u * 2.7), '#3E4A5C', u * 0.2));
+      front.push(sh('M' + pt(lx + u * 0.55, gy - u * 3.15) + 'L' + pt(lx + u * 1.55, gy - u * 2.85) + 'L' + pt(lx + u * 2.05, gy - u * 2.05) + 'L' + pt(lx + u * 0.75, gy - u * 2.35) + 'Z', '#F2C14E'));
+      front.push([E(lx + u * 1.45, gy - u * 2.2, u * 0.22, u * 0.18), '#FFF3B0']);
+    }
+    if (list.includes('mug')) {
+      const mx = bc - bw * 0.24;
+      front.push(ln('M' + pt(mx + u * 0.45, gy - u * 0.95) + 'Q' + pt(mx + u * 0.95, gy - u * 0.8) + ' ' + pt(mx + u * 0.45, gy - u * 0.35), '#F2F0EC', u * 0.16));
+      front.push(sh('M' + pt(mx - u * 0.5, gy - u * 1.1) + 'L' + pt(mx + u * 0.5, gy - u * 1.1) + 'L' + pt(mx + u * 0.44, gy) + 'L' + pt(mx - u * 0.44, gy) + 'Z', '#F2F0EC'));
+      front.push(['M' + pt(mx - u * 0.48, gy - u * 0.7) + 'L' + pt(mx + u * 0.48, gy - u * 0.7) + 'L' + pt(mx + u * 0.46, gy - u * 0.45) + 'L' + pt(mx - u * 0.46, gy - u * 0.45) + 'Z', '#E5484D']);
+      front.push([E(mx, gy - u * 1.1, u * 0.44, u * 0.1), '#8A5A3C']);
+      front.push(['M' + pt(mx - u * 0.15, gy - u * 1.3) + 'q' + r1(u * 0.15) + ' ' + r1(-u * 0.2) + ' 0 ' + r1(-u * 0.4) + 'M' + pt(mx + u * 0.18, gy - u * 1.32) + 'q' + r1(u * 0.15) + ' ' + r1(-u * 0.2) + ' 0 ' + r1(-u * 0.4), 'none', '#C9D2DC', r1(u * 0.08)]);
+    }
+    if (list.includes('book')) {
+      const bx = bc + bw * 0.2;
+      front.push(sh('M' + pt(bx - u * 1.2, gy - u * 0.15) + 'L' + pt(bx + u * 1.2, gy - u * 0.15) + 'L' + pt(bx + u * 1.1, gy) + 'L' + pt(bx - u * 1.1, gy) + 'Z', '#5B7FB5'));
+      front.push(sh('M' + pt(bx, gy - u * 0.2) + 'Q' + pt(bx - u * 0.5, gy - u * 0.75) + ' ' + pt(bx - u * 1.15, gy - u * 0.55) + 'L' + pt(bx - u * 1.1, gy - u * 0.12) + 'Q' + pt(bx - u * 0.5, gy - u * 0.3) + ' ' + pt(bx, gy - u * 0.05) + 'Z', '#FBF6EC'));
+      front.push(sh('M' + pt(bx, gy - u * 0.2) + 'Q' + pt(bx + u * 0.5, gy - u * 0.75) + ' ' + pt(bx + u * 1.15, gy - u * 0.55) + 'L' + pt(bx + u * 1.1, gy - u * 0.12) + 'Q' + pt(bx + u * 0.5, gy - u * 0.3) + ' ' + pt(bx, gy - u * 0.05) + 'Z', '#FBF6EC'));
+      front.push(['M' + pt(bx - u * 0.85, gy - u * 0.45) + 'q' + r1(u * 0.35) + ' ' + r1(-u * 0.12) + ' ' + r1(u * 0.65) + ' ' + r1(u * 0.05) + 'M' + pt(bx + u * 0.2, gy - u * 0.38) + 'q' + r1(u * 0.35) + ' ' + r1(-u * 0.14) + ' ' + r1(u * 0.65) + ' ' + r1(-u * 0.05), 'none', '#C9BBA6', r1(u * 0.06)]);
+    }
+  }
+  const hk = HEAD_ACC.find((k) => list.includes(k));
+  const band = 'M' + pt(x - a * 1.08, y - a * 0.12) + 'h' + r1(a * 2.16) + 'v' + r1(a * 0.36) + 'h' + r1(-a * 2.16) + 'Z';
+  if (hk === 'beanie') {
+    front.push(sh('M' + pt(x - a, y) + 'Q' + pt(x - a, y - a * 1.15) + ' ' + pt(x, y - a * 1.15) + 'Q' + pt(x + a, y - a * 1.15) + ' ' + pt(x + a, y) + 'Z', '#E5484D'));
+    front.push(ln('M' + pt(x - a * 0.5, y - a * 0.1) + 'L' + pt(x - a * 0.35, y - a * 0.92) + 'M' + pt(x, y - a * 0.1) + 'L' + pt(x, y - a * 1.05) + 'M' + pt(x + a * 0.5, y - a * 0.1) + 'L' + pt(x + a * 0.35, y - a * 0.92), '#C93A40', a * 0.08));
+    front.push(sh(band, '#F2F0EC'));
+    front.push(sh(E(x, y - a * 1.22, a * 0.24, a * 0.24), '#F2F0EC'));
+  } else if (hk === 'sunhat') {
+    front.push(sh(E(x, y - a * 0.1, a * 1.8, a * 0.42), '#E8C77A'));
+    front.push(sh('M' + pt(x - a * 0.85, y - a * 0.15) + 'Q' + pt(x - a * 0.85, y - a * 1.1) + ' ' + pt(x, y - a * 1.1) + 'Q' + pt(x + a * 0.85, y - a * 1.1) + ' ' + pt(x + a * 0.85, y - a * 0.15) + 'Z', '#F0D592'));
+    front.push(sh('M' + pt(x - a * 0.86, y - a * 0.5) + 'h' + r1(a * 1.72) + 'v' + r1(a * 0.28) + 'h' + r1(-a * 1.72) + 'Z', '#E5484D'));
+  } else if (hk === 'crown') {
+    front.push(sh('M' + pt(x - a * 0.8, y) + 'L' + pt(x - a * 0.88, y - a * 0.85) + 'L' + pt(x - a * 0.42, y - a * 0.42) + 'L' + pt(x, y - a * 1.0) + 'L' + pt(x + a * 0.42, y - a * 0.42) + 'L' + pt(x + a * 0.88, y - a * 0.85) + 'L' + pt(x + a * 0.8, y) + 'Z', '#F2C14E'));
+    front.push(sh(E(x, y - a * 0.28, a * 0.14, a * 0.14) + E(x - a * 0.5, y - a * 0.22, a * 0.1, a * 0.1) + E(x + a * 0.5, y - a * 0.22, a * 0.1, a * 0.1), '#E5484D'));
+  } else if (hk === 'flowers') {
+    let leaves = '';
+    const cols = ['#F27A8E', '#FFD66B', '#F2F0EC'];
+    const pet = ['', '', ''];
+    let centers = '';
+    [-1, -0.5, 0, 0.5, 1].forEach((k, i) => {
+      const fx = x + k * a * 0.95;
+      const fy = y - a * 0.1 - (1 - k * k) * a * 0.22;
+      pet[i % 3] += E(fx, fy, a * 0.22, a * 0.22);
+      centers += E(fx, fy, a * 0.08, a * 0.08);
+      if (i < 4) leaves += E(fx + a * 0.24, fy + a * 0.02, a * 0.16, a * 0.08);
+    });
+    front.push(sh(leaves, '#7DBB4C'));
+    pet.forEach((d, i) => front.push(sh(d, cols[i])));
+    front.push([centers, '#E59A3C']);
+  } else if (hk === 'headphones') {
+    front.push(ln('M' + pt(x - a * 1.05, y + a * 0.5) + 'C' + pt(x - a * 1.15, y - a * 0.95) + ' ' + pt(x + a * 1.15, y - a * 0.95) + ' ' + pt(x + a * 1.05, y + a * 0.5), '#3E4A5C', a * 0.18));
+    front.push(sh(E(x - a * 1.05, y + a * 0.6, a * 0.26, a * 0.4) + E(x + a * 1.05, y + a * 0.6, a * 0.26, a * 0.4), '#5B7FB5'));
+  } else if (hk === 'witch') {
+    front.push(sh(E(x, y - a * 0.05, a * 1.75, a * 0.4), '#5E4592'));
+    front.push(sh('M' + pt(x - a * 0.8, y - a * 0.2) + 'L' + pt(x + a * 0.1, y - a * 1.9) + 'Q' + pt(x + a * 0.45, y - a * 2.15) + ' ' + pt(x + a * 0.8, y - a * 1.75) + 'Q' + pt(x + a * 0.45, y - a * 1.8) + ' ' + pt(x + a * 0.32, y - a * 1.6) + 'L' + pt(x + a * 0.8, y - a * 0.2) + 'Z', '#7A5BB5'));
+    front.push(sh('M' + pt(x - a * 0.72, y - a * 0.62) + 'L' + pt(x + a * 0.72, y - a * 0.62) + 'L' + pt(x + a * 0.78, y - a * 0.32) + 'L' + pt(x - a * 0.78, y - a * 0.32) + 'Z', '#F28C38'));
+    front.push(['M' + pt(x - a * 0.14, y - a * 0.6) + 'h' + r1(a * 0.28) + 'v' + r1(a * 0.26) + 'h' + r1(-a * 0.28) + 'Z', '#F2C14E']);
+  } else if (hk === 'santa') {
+    front.push(sh('M' + pt(x - a, y) + 'Q' + pt(x - a * 0.7, y - a * 1.6) + ' ' + pt(x + a * 0.3, y - a * 1.55) + 'Q' + pt(x + a * 1.1, y - a * 1.4) + ' ' + pt(x + a * 1.3, y - a * 0.6) + 'L' + pt(x + a, y) + 'Z', '#E5484D'));
+    front.push(sh(band, '#F2F0EC'));
+    front.push(sh(E(x + a * 1.3, y - a * 0.55, a * 0.26, a * 0.26), '#F2F0EC'));
+  } else if (hk === 'party') {
+    front.push(sh('M' + pt(x - a * 0.7, y) + 'L' + pt(x + a * 0.05, y - a * 1.9) + 'L' + pt(x + a * 0.7, y) + 'Z', '#5B7FB5'));
+    front.push(ln('M' + pt(x - a * 0.5, y - a * 0.5) + 'L' + pt(x + a * 0.55, y - a * 0.38) + 'M' + pt(x - a * 0.32, y - a * 1.0) + 'L' + pt(x + a * 0.36, y - a * 0.92) + 'M' + pt(x - a * 0.14, y - a * 1.45) + 'L' + pt(x + a * 0.18, y - a * 1.42), '#F2C14E', a * 0.14));
+    front.push(sh(E(x + a * 0.05, y - a * 1.95, a * 0.22, a * 0.22), '#F27A8E'));
+  } else if (hk === 'bunnyears') {
+    front.push(sh(E(x - a * 0.48, y - a * 1.25, a * 0.28, a * 0.9) + E(x + a * 0.48, y - a * 1.25, a * 0.28, a * 0.9), '#F7F5F2'));
+    front.push([E(x - a * 0.48, y - a * 1.2, a * 0.13, a * 0.65) + E(x + a * 0.48, y - a * 1.2, a * 0.13, a * 0.65), '#F2B8C0']);
+    front.push(ln('M' + pt(x - a, y + a * 0.15) + 'Q' + pt(x, y - a * 0.55) + ' ' + pt(x + a, y + a * 0.15), '#7A5BB5', a * 0.16));
+  } else if (hk === 'leafcrown') {
+    const cols = ['#F28C38', '#E5484D', '#F2C14E'];
+    const lv = ['', '', ''];
+    for (let i = 0; i < 7; i++) {
+      const k = -1 + i / 3;
+      const bx = x + k * a * 0.95;
+      const by = y - a * 0.1 - (1 - k * k) * a * 0.2;
+      lv[i % 3] += leafP(bx, by, a * 0.6, -Math.PI / 2 + k * 0.9);
+    }
+    lv.forEach((d, i) => front.push(sh(d, cols[i])));
+  } else if (hk === 'heartband') {
+    front.push(ln('M' + pt(x - a, y + a * 0.15) + 'Q' + pt(x, y - a * 0.55) + ' ' + pt(x + a, y + a * 0.15), '#F27A8E', a * 0.14));
+    front.push(ln('M' + pt(x - a * 0.45, y - a * 0.22) + 'L' + pt(x - a * 0.55, y - a * 0.8) + 'M' + pt(x + a * 0.45, y - a * 0.22) + 'L' + pt(x + a * 0.55, y - a * 0.8), '#F27A8E', a * 0.08));
+    front.push(sh(heartP(x - a * 0.55, y - a * 1.0, a * 0.3) + heartP(x + a * 0.55, y - a * 1.0, a * 0.3), '#E5484D'));
+  } else if (hk === 'maple') {
+    front.push(ln('M' + pt(x - a, y + a * 0.15) + 'Q' + pt(x, y - a * 0.55) + ' ' + pt(x + a, y + a * 0.15), '#F2F0EC', a * 0.2));
+    front.push(sh(mapleP(x, y - a * 0.72, a * 0.62), '#E5484D'));
+  } else if (hk === 'knot') {
+    const kx = x + a * 0.55;
+    const ky = y - a * 0.62;
+    front.push(ln('M' + pt(x - a, y + a * 0.15) + 'Q' + pt(x, y - a * 0.55) + ' ' + pt(x + a, y + a * 0.15), '#F2C14E', a * 0.12));
+    front.push(ln('M' + pt(kx, ky + a * 0.3) + 'L' + pt(kx, ky + a * 0.62) + 'M' + pt(kx - a * 0.08, ky + a * 0.62) + 'L' + pt(kx - a * 0.12, ky + a * 0.95) + 'M' + pt(kx + a * 0.08, ky + a * 0.62) + 'L' + pt(kx + a * 0.12, ky + a * 0.95), '#F2C14E', a * 0.09));
+    front.push(sh(E(kx, ky - a * 0.42, a * 0.13, a * 0.13) + diamondP(kx, ky, a * 0.36), '#E5484D'));
+    front.push([diamondP(kx, ky, a * 0.15), '#F2C14E']);
+  } else if (hk === 'visor') {
+    front.push(ln('M' + pt(x - a, y + a * 0.15) + 'Q' + pt(x, y - a * 0.5) + ' ' + pt(x + a, y + a * 0.15), '#F2F0EC', a * 0.22));
+    front.push(sh('M' + pt(x - a * 0.95, y + a * 0.02) + 'Q' + pt(x, y - a * 0.3) + ' ' + pt(x + a * 0.95, y + a * 0.02) + 'Q' + pt(x + a * 0.5, y + a * 0.42) + ' ' + pt(x, y + a * 0.4) + 'Q' + pt(x - a * 0.5, y + a * 0.42) + ' ' + pt(x - a * 0.95, y + a * 0.02) + 'Z', '#5BB8F0'));
+    front.push(['M' + pt(x - a * 0.6, y + a * 0.02) + 'Q' + pt(x, y - a * 0.12) + ' ' + pt(x + a * 0.6, y + a * 0.02), 'none', '#9FD3F5', r1(a * 0.08)]);
+  } else if (hk === 'gradcap') {
+    front.push(sh('M' + pt(x - a * 0.72, y + a * 0.05) + 'L' + pt(x - a * 0.62, y - a * 0.5) + 'L' + pt(x + a * 0.62, y - a * 0.5) + 'L' + pt(x + a * 0.72, y + a * 0.05) + 'Q' + pt(x, y - a * 0.12) + ' ' + pt(x - a * 0.72, y + a * 0.05) + 'Z', '#263040'));
+    front.push(sh('M' + pt(x - a * 1.35, y - a * 0.6) + 'L' + pt(x, y - a * 0.98) + 'L' + pt(x + a * 1.35, y - a * 0.6) + 'L' + pt(x, y - a * 0.24) + 'Z', '#2E3B55'));
+    front.push(ln('M' + pt(x, y - a * 0.61) + 'L' + pt(x + a * 1.02, y - a * 0.5) + 'L' + pt(x + a * 1.06, y + a * 0.05), '#F2C14E', a * 0.08));
+    front.push([E(x, y - a * 0.61, a * 0.1, a * 0.07) + E(x + a * 1.06, y + a * 0.12, a * 0.1, a * 0.14), '#F2C14E']);
+  } else if (hk === 'shamrock') {
+    front.push(ln('M' + pt(x - a, y + a * 0.15) + 'Q' + pt(x, y - a * 0.55) + ' ' + pt(x + a, y + a * 0.15), '#3E8A3A', a * 0.14));
+    [-0.55, 0.55].forEach((k) => {
+      const sx = x + k * a;
+      const sy = y - a * 0.95;
+      const r = a * 0.2;
+      front.push(ln('M' + pt(sx, sy + r * 0.4) + 'L' + pt(sx + k * a * 0.08, y - a * 0.25), '#3E8A3A', a * 0.07));
+      front.push(sh(E(sx, sy - r * 0.75, r, r) + E(sx - r * 0.8, sy + r * 0.35, r, r) + E(sx + r * 0.8, sy + r * 0.35, r, r), '#5BBF4E'));
+    });
+  } else if (hk === 'rainbow') {
+    ['#E5484D', '#F28C38', '#FFD25E', '#5BBF4E', '#5B9BE0', '#8E6BD6'].forEach((c, i) => {
+      const rr = a * (1.12 - i * 0.12);
+      front.push(ln('M' + pt(x - rr, y + a * 0.12) + 'A' + r1(rr) + ' ' + r1(rr * 0.82) + ' 0 0 1 ' + pt(x + rr, y + a * 0.12), c, a * 0.13));
+    });
+  }
+  return { front, back };
+};
+const palmLeaves = () => {
+  const c = [415, 138];
+  const tips = [[338, 170], [360, 108], [420, 84], [478, 110], [494, 168]];
+  let light = '';
+  let dark = '';
+  let snow = '';
+  tips.forEach(([tx, ty]) => {
+    const mx = (c[0] + tx) / 2;
+    const my = (c[1] + ty) / 2;
+    const dx = tx - c[0];
+    const dy = ty - c[1];
+    const l = Math.hypot(dx, dy);
+    let px = (-dy / l) * 10;
+    let py = (dx / l) * 10;
+    if (py > 0) { px = -px; py = -py; }
+    light += P([c, [mx + px, my + py - 6], [tx, ty]]);
+    dark += P([c, [mx - px, my - py - 2], [tx, ty]]);
+    snow += P([c, [mx + px, my + py - 6], [tx, ty], [mx + px * 0.3, my + py * 0.3 - 4]]);
+  });
+  return { light, dark, snow };
+};
+const buildSlots = (list, pal, prefix, cap) => {
+  const slots = [];
+  const idx = {};
+  list.forEach((item, pi) => {
+    const items = typeof item[0] === 'string' ? [item] : item;
+    items.forEach((sh) => {
+      const f = colr(sh[1], pal);
+      const s = sh[2] ? colr(sh[2], pal) : (f !== 'none' ? f : 'none');
+      const w = sh[2] ? sh[3] : (f !== 'none' ? 1.2 : 0);
+      const key = pi + '|' + f + '|' + s + '|' + w;
+      if (idx[key] === undefined) { idx[key] = slots.length; slots.push({ d: '', f, s, w }); }
+      slots[idx[key]].d += sh[0];
+    });
+  });
+  const out = {};
+  for (let i = 0; i < cap; i++) out[prefix + i] = slots[i] || { d: '', f: 'none', s: 'none', w: 0 };
+  return out;
+};
+const face = (f, mood) => {
+  const e = f.er;
+  const o = { eyes: '', shine: '', lines: '', brows: '', mouthF: '', mouthL: '', tongue: '', tear: '', blush: '', blushC: '#F2B8C0', lw: r1(e * 0.38), bw: r1(e * 0.34), mw: r1((f.ma || 6) * 0.6), blink: '1 1;1 1;1 0.1;1 1', ey: f.eyes[0][1] };
+  const eye = (x, y, sx, sy) => (f.kind === 'almond'
+    ? 'M' + pt(x - e * sx, y) + 'L' + pt(x, y - e * 0.75 * sy) + 'L' + pt(x + e * sx, y) + 'L' + pt(x, y + e * 0.85 * sy) + 'Z'
+    : E(x, y, e * 0.7 * sx, e * sy));
+  const open = (sx, sy, dy, shine) => f.eyes.forEach(([x, y]) => {
+    o.eyes += eye(x, y + dy * e, sx, sy);
+    if (shine) o.shine += E(x + e * 0.3, y + dy * e - e * 0.38, e * 0.26, e * 0.26);
+  });
+  const lines = (fn) => { f.eyes.forEach(([x, y], i) => { o.lines += fn(x, y, i); }); o.blink = '1 1;1 1;1 1;1 1'; };
+  const a = f.ma || 6;
+  const m = f.mouth;
+  const mx = m ? m[0] : 0;
+  const my = m ? m[1] : 0;
+  if (mood === 'happy') {
+    lines((x, y) => 'M' + pt(x - e * 0.8, y + e * 0.3) + 'Q' + pt(x, y - e * 0.95) + ' ' + pt(x + e * 0.8, y + e * 0.3));
+    if (m) { o.mouthF = 'M' + pt(mx - a * 1.8, my - a * 0.2) + 'Q' + pt(mx, my + a * 2.6) + ' ' + pt(mx + a * 1.8, my - a * 0.2) + 'Z'; o.tongue = E(mx, my + a * 1.0, a * 0.75, a * 0.42); }
+  } else if (mood === 'sad') {
+    open(0.85, 0.9, 0.15, true);
+    f.eyes.forEach(([x, y], i) => { const s = i === 0 ? 1 : -1; o.brows += 'M' + pt(x - s * e * 0.9, y - e * 1.2) + 'L' + pt(x + s * e * 0.6, y - e * 1.55); });
+    if (m) o.mouthL = 'M' + pt(mx - a * 1.6, my + a) + 'Q' + pt(mx, my - a * 0.5) + ' ' + pt(mx + a * 1.6, my + a);
+    o.tear = drop(f.eyes[0][0] - e * 0.6, f.eyes[0][1] + e * 1.5, e * 0.42);
+  } else if (mood === 'mad') {
+    open(0.8, 0.6, 0.25, false);
+    f.eyes.forEach(([x, y], i) => { const s = i === 0 ? 1 : -1; o.brows += 'M' + pt(x - s * e * 0.9, y - e * 1.3) + 'L' + pt(x + s * e * 0.8, y - e * 0.7); });
+    if (m) o.mouthL = 'M' + pt(mx - a * 1.6, my + a * 0.4) + 'L' + pt(mx - a * 0.5, my - a * 0.2) + 'L' + pt(mx + a * 0.5, my + a * 0.4) + 'L' + pt(mx + a * 1.6, my - a * 0.2);
+    o.blushC = '#F29A9A';
+  } else if (mood === 'sick') {
+    lines((x, y) => 'M' + pt(x - e * 0.8, y - e * 0.1) + 'Q' + pt(x, y + e * 0.55) + ' ' + pt(x + e * 0.8, y - e * 0.1) + 'M' + pt(x - e * 0.6, y + e * 0.7) + 'Q' + pt(x, y + e * 0.95) + ' ' + pt(x + e * 0.6, y + e * 0.7));
+    if (m) o.mouthL = 'M' + pt(mx - a * 1.6, my) + 'Q' + pt(mx - a * 0.8, my - a * 0.7) + ' ' + pt(mx, my) + 'Q' + pt(mx + a * 0.8, my + a * 0.7) + ' ' + pt(mx + a * 1.6, my);
+    o.blushC = '#A8D08D';
+  } else if (mood === 'sleepy') {
+    lines((x, y) => 'M' + pt(x - e * 0.8, y) + 'Q' + pt(x, y + e * 0.6) + ' ' + pt(x + e * 0.8, y));
+    if (m) o.mouthF = E(mx, my + a * 0.3, a * 0.45, a * 0.55);
+  } else if (mood === 'focus') {
+    f.eyes.forEach(([x, y]) => {
+      o.eyes += 'M' + pt(x - e * 0.72, y + e * 0.05) + 'Q' + pt(x, y + e * 1.05) + ' ' + pt(x + e * 0.72, y + e * 0.05) + 'Z';
+      o.lines += 'M' + pt(x - e * 0.9, y) + 'Q' + pt(x, y - e * 0.12) + ' ' + pt(x + e * 0.9, y);
+    });
+    o.blink = '1 1;1 1;1 1;1 1';
+    if (m) o.mouthL = 'M' + pt(mx - a * 0.9, my + a * 0.3) + 'L' + pt(mx + a * 0.9, my + a * 0.3);
+  } else if (mood === 'cold') {
+    open(0.95, 1, 0, true);
+    if (m) o.mouthL = 'M' + pt(mx - a * 1.4, my + a * 0.5) + 'Q' + pt(mx - a * 0.7, my - a * 0.1) + ' ' + pt(mx, my + a * 0.5) + 'Q' + pt(mx + a * 0.7, my - a * 0.1) + ' ' + pt(mx + a * 1.4, my + a * 0.5);
+    o.blushC = '#A6CFF0';
+  } else if (mood === 'celebrate') {
+    lines((x, y) => 'M' + pt(x - e * 0.8, y + e * 0.3) + 'Q' + pt(x, y - e * 0.95) + ' ' + pt(x + e * 0.8, y + e * 0.3));
+    if (m) { o.mouthF = 'M' + pt(mx - a * 2, my - a * 0.3) + 'Q' + pt(mx, my + a * 3) + ' ' + pt(mx + a * 2, my - a * 0.3) + 'Z'; o.tongue = E(mx, my + a * 1.2, a * 0.85, a * 0.5); }
+  } else if (mood === 'hungry') {
+    open(1, 1, 0, true);
+    if (m) { o.mouthF = E(mx, my + a * 0.5, a, a * 1.1); o.tongue = E(mx, my + a * 1.1, a * 0.6, a * 0.38); o.tear = drop(mx + a * 1.4, my + a * 1.8, a * 0.42); }
+  } else {
+    open(1, 1, 0, true);
+    if (m) o.mouthL = 'M' + pt(mx - a * 2, my) + 'Q' + pt(mx - a, my + a * 1.3) + ' ' + pt(mx, my) + 'Q' + pt(mx + a, my + a * 1.3) + ' ' + pt(mx + a * 2, my);
+  }
+  f.blush.forEach(([x, y]) => { o.blush += E(x, y, f.br, f.br * 0.6); });
+  return o;
+};
+const hatOf = (h, on) => {
+  const [x, y, a] = h;
+  if (!on) return { show: 'none', dome: '', band: '', pom: '', stripe: '', half: '', sw: 0 };
+  return {
+    show: 'inline',
+    dome: 'M' + pt(x - a, y) + 'Q' + pt(x - a, y - a * 1.15) + ' ' + pt(x, y - a * 1.15) + 'Q' + pt(x + a, y - a * 1.15) + ' ' + pt(x + a, y) + 'Z',
+    half: 'M' + pt(x + a * 0.1, y) + 'L' + pt(x + a * 0.1, y - a * 1.12) + 'Q' + pt(x + a, y - a * 1.1) + ' ' + pt(x + a, y) + 'Z',
+    stripe: 'M' + pt(x - a * 0.5, y - a * 0.1) + 'L' + pt(x - a * 0.35, y - a * 0.92),
+    band: 'M' + pt(x - a * 1.08, y - a * 0.12) + 'h' + r1(a * 2.16) + 'v' + r1(a * 0.36) + 'h' + r1(-a * 2.16) + 'Z',
+    pom: E(x, y - a * 1.22, a * 0.24, a * 0.24),
+    sw: r1(a * 0.08)
+  };
+};
+const ITEM_ON = { ball: 1, yarn: 1, donut: 1, meat: 1, juice: 1, cake: 1 };
+
+return { COATS, PETS, FORMS, formSpec, tintSpec, TINTS, accShapes, face, colr, NECK, LIGHTS, HEAD_ACC, E, xRange, palmLeaves };
+})();
+const MP_PX = (function () {
+
+const COATS = {
+  butter: { light: '#FBE7B4', base: '#F4DFA8', shade: '#E2C281', deep: '#CFA862', cream: '#FBF1D6', creamShade: '#EEDDB8' },
+  lavender: { light: '#E2DCF2', base: '#CFC6E6', shade: '#A99DCC', deep: '#8C80B4', cream: '#F8F6FC', creamShade: '#E4DFF2' },
+  sky: { light: '#DDE7F3', base: '#C6D5E8', shade: '#9FB4D0', deep: '#8099BC', cream: '#F6F9FC', creamShade: '#DFE7F1' },
+  peach: { light: '#FDDCC8', base: '#F7C6A8', shade: '#E59F7D', deep: '#CC8262', cream: '#FFF4EC', creamShade: '#F6DCCB' },
+  mint: { light: '#D7F0E3', base: '#BCE3CF', shade: '#8FC8AC', deep: '#6FAE90', cream: '#F5FBF8', creamShade: '#DCEEE5' },
+  charcoal: { light: '#8D93A3', base: '#6E7486', shade: '#555A6A', deep: '#41464F', cream: '#F2F0EC', creamShade: '#D9D6D0' },
+  sand: { light: '#F6E3BD', base: '#E9CB97', shade: '#D2A96C', deep: '#B98A4E', cream: '#FBF3E3', creamShade: '#EFDFC2' },
+  rose: { light: '#FBE0E6', base: '#F4C3CF', shade: '#E39DAF', deep: '#C97C91', cream: '#FFF3F5', creamShade: '#F6DCE2' },
+  snow: { light: '#FFFFFF', base: '#FBF8F3', shade: '#E6DCCD', deep: '#C7B6A0', cream: '#FFFFFF', creamShade: '#EFE6D9' },
+  ginger: { light: '#F9C48E', base: '#F0A462', shade: '#D9813F', deep: '#B8652B', cream: '#FFF3E4', creamShade: '#F5DCC0' },
+  caramel: { light: '#E8B886', base: '#D49A64', shade: '#B87A46', deep: '#985E32', cream: '#FBF0E2', creamShade: '#EFD9BE' },
+  cocoa: { light: '#B8907A', base: '#9C735C', shade: '#7E5844', deep: '#634332', cream: '#F6EBDD', creamShade: '#E5D2BC' },
+  olive: { light: '#C8D69A', base: '#A8BC72', shade: '#869C52', deep: '#6A7E3E', cream: '#F6F3DC', creamShade: '#E6E0B8' },
+  teal: { light: '#9FDCD0', base: '#6FC2B4', shade: '#4FA396', deep: '#3A8579', cream: '#F0FAF6', creamShade: '#D2EEE6' },
+  aqua: { light: '#A8F0E4', base: '#62D9C8', shade: '#35BBAE', deep: '#1F9A92', cream: '#EFFFFB', creamShade: '#CDF3EC' },
+  burgundy: { light: '#D98A9A', base: '#B24A5E', shade: '#93394B', deep: '#74283A', cream: '#FBEFF1', creamShade: '#EFD3D9' },
+  ember: { light: '#FFB98A', base: '#FF8E5E', shade: '#E86A44', deep: '#C24E30', cream: '#FFF1C9', creamShade: '#FFD98A' }
+};
+const MOCHI = [
+'................................',
+'................................',
+'................................',
+'................................',
+'....OO....................OO....',
+'....OBO..................OBO....',
+'....OBPO................OPBO....',
+'...OBPPBO..............OBPPBO...',
+'...OBBBBOOOOOOOOOOOOOOOOBBBBO...',
+'...OBBBBBLLLLLLLLLLLBBBBBBBBO...',
+'..OBBBBBBBBBBBBBBBBBBBBBBBBBBO..',
+'..OBBBBBBBBBBBBBBBBBBBBBBBBBBO..',
+'.OBBBBBOWBBBBBBBBBBBBBBOWBBBBBO.',
+'.OBBBBBOOBBBBBBBBBBBBBBOOBBBBBO.',
+'.OBBPPPBBBBBBBBNNBBBBBBBBPPPBBO.',
+'.OBBBBBBBBBBBBBOOBBBBBBBBBBBBBO.',
+'..OBBBBBBBBBBBOBBOBBBBBBBBBBBOO.',
+'..OBBBBBBBBBBBBBBBBBBBBBBBBBBOBO',
+'..OBBSSSSSSSSSSSSSSSSSSSSSSBBOBO',
+'..OBBBBBBBCCCCCCCCCCCCBBBBBBBOBO',
+'..OBBBBBBCCCCCCCCCCCCCCBBBBBBOBO',
+'..OBBBBBBCCCCCCCCCCCCCCBBBBBBOBO',
+'..OBBBBBBCCCCCCCCCCCCCCBBBBBBOBO',
+'..OBBBBBBCCCCCCCCCCCCCCBBBBBBOSO',
+'..OBBBBBBCCCCCCCCCCCCCCBBBBBSOSO',
+'..OBBBBBBBCCCCCCCCCCCCBBBBBBSOSO',
+'..OBBBBBBBBBCCCCCCCCBBBBBBBSSOSO',
+'..OBBBBBBBBBBBBBBBBBBBBBBBBSSOSO',
+'..OBBBOCCCCOBBBBBBBBOCCCCOSSSOO.',
+'...OOOOOOOOOOOOOOOOOOOOOOOOOO...',
+'................................',
+'................................'
+];
+const PIP = [
+'................................',
+'................................',
+'......O.............O...........',
+'.....OBO...........OBO..........',
+'.....OBPO.........OPBO..........',
+'....OBPPO.........OPPSO.........',
+'....OBPPBOOOOOOOOOBPPSO.........',
+'...OBBLLLLLLLLLLBBBBBSSO........',
+'..OBBBLLLLBBBBBBBBBBBBSSO.......',
+'..OBBBBBBBBBBBBBBBBBBBSSO.......',
+'.OBBBBBOWBBBBBBBOWBBBBSSSO..OO..',
+'.OBBBBBOOBBBBBBBOOBBBBSSSO.OLLO.',
+'.OBBPPPBBBBBBNBBBPPPBSSSSO.OLBO.',
+'.OBBBBBBBBBBOBOBBBBBBBSSSO.OBSO.',
+'..OBBBBBBBBBBBBBBBBBBSSSO..OBSO.',
+'...OBBBBBCCCCCCCCCBBBSSSO..OBSO.',
+'.....OBBBCCCCCCCCCBBSO.....OBSO.',
+'.....OBBBCCCCCCCCCBSSO.....OBSO.',
+'.....OBBBCCCCCCCCCBSSO....OBSO..',
+'....OBBBBCCCCCCCCGBSSSO..OBSO...',
+'....OBBBBCCCCCCCGGBSSSO..OBSO...',
+'....OBBBBBCCCCCGGBBSSSO.OBSO....',
+'....OBBBBBCCCCGGBBBSSSO.OBSO....',
+'...OBBBBBBCCCGGBBBBSSSSOBSO.....',
+'...OBBBBBBBGGGBBBBBSSSSOBSO.....',
+'...OBBBBBBBBBBBBBBSSSSSOBSO.....',
+'...OLBBBBBBBBBBBBSSSSSSOBSO.....',
+'...OBBBBBBBBBBBBSSSSSSSOBSO.....',
+'...OBBOCCCCOBOCCCCOSSSSOSSO.....',
+'...OSSOGGGGOSOGGGGODDDDOOO......',
+'....OOOOOOOOOOOOOOOOOOO.........',
+'................................'
+];
+const BAO = [
+'................................',
+'................................',
+'................................',
+'................................',
+'........OOOOOOOOOOOOOOOO........',
+'....OOOOBBBBBBBBBBBBBBBBOOOO....',
+'...ODDDOBBBLLLLLLLLLLBSSODDDO...',
+'..ODDDDOBBLLLBBBBBBLLLSSODDDDO..',
+'..ODDDDOBBBBBBBBBBBBBBSSODDDDO..',
+'..ODDDOBBBBBBBBBBBBBBBSSSODDDO..',
+'...ODDOBBBOWBBBBBBBBOWSSSODDO...',
+'....OOOBBBOOBBBBBBBBOOSSSOOO....',
+'.....OBBBBBBBCCCCCCBBBSSSSO.....',
+'.....OBBPPBBCCOOOOCCBBPPSSO.....',
+'.....OBBBBBBCCCOOCCCBBSSSSO.....',
+'.....OBBBBBBCCOCCOCCBBSSSSO.....',
+'.....OBBBBBBCCCTTCCCBBSSSSO.....',
+'......OBBBBBCCCCCCCCBBSSSO......',
+'......ORRRRRRRRRRRRRRRRRRO......',
+'.....OBBBBBBBCCJJCCBBBSSSSO..OO.',
+'....OBBBBBBBCCCCCCCCBBSSSSSOOBSO',
+'....OBBBBBBCCCCCCCCCCBSSSSSOOBO.',
+'...OBBBBBBCCCCCCCCCCCCSSSSSSOO..',
+'...OBBBBBBCCCCCCCCCCCCSSSSSSO...',
+'...OBBBBBBCCCCCCCCCCCCSSSSSSO...',
+'...OBBBBBOCCCCOCCOCCCGOSSSSSO...',
+'...OBBBBBOCCCCOBBOCCCGOSSSSSO...',
+'...OBBBBBOCCCCOBBOCCCGOSSSSSO...',
+'...OBBBBOCCCCCCOOCCCCGGOSSSSO...',
+'....OOOOOOOOOOOOOOOOOOOOOOOO....',
+'................................',
+'................................'
+];
+const ROOK = [
+'................................',
+'................................',
+'...OO......................OO...',
+'...ODO....................ODO...',
+'...ODDO..................ODDO...',
+'...ODPDO................ODPDO...',
+'...ODPPDO..............ODPPDO...',
+'...ODPPBBOOOOOOOOOOOOOOBBPPDO...',
+'..OBBBBBBBBBBBLCCLBBSSSSSSSSSO..',
+'..OBBBBBLLBBBBCCCCBBSSLLSSSSSO..',
+'..OBBBBBOWBBBCCCCCCBSSOWSSSSSO..',
+'..OBBBBBOOBBCCCCCCCCSSOOSSSSSO..',
+'..OBBBBBBBCCCCCCCCCCCGSSSSSSSO..',
+'...OBBBBBCCCCCCCCCCCCGGSSSSSO...',
+'....OBBBCCCCCCCCCCCCCGGGSSSO....',
+'.....OBCCCCCCCCCCCCCCGGGGSO.....',
+'......OCCCCCCCCCCCCCCGGGGO......',
+'.......OCCCCCCOOOOCCCGGGO.......',
+'........OCCCCCOOOOCCCGGO........',
+'.........OCCCCOCCOCCCGO....O....',
+'..........OCCCCTTCCCCO....OLO...',
+'.........ORRRRRRRRRRRRO...OBO...',
+'........OBBBBBCJJCBBSSSO..OBO...',
+'.......OBBBBBCCCCCCBSSSSO.OBO...',
+'......OBBBBBCCCCCCCCSSSSSOOBO...',
+'......OBBBBBCCCCCCCCSSSSSOOBO...',
+'......OBBBBOCCCCCCCCOSSSSO......',
+'.....OBBBBBOCCOBBOCCOSSSSSO.....',
+'.....OBBBBOCCCCOOCCCCOSSSSO.....',
+'......OOOOOOOOOOOOOOOOOOOO......',
+'................................',
+'................................'
+];
+const POM = [
+'................................',
+'................................',
+'................................',
+'..............O..O..............',
+'.............OBOOBO.............',
+'.........OOOOOBBBBOOOOO.........',
+'.......OOBBBBLLLLLLBBBSOO.......',
+'......OBBBBLLLLLLLLLLBSSSO......',
+'.....OBBBBBBBBBBBBBBBBSSSSO.....',
+'....OBBBBBBBBBBBBBBBBBSSSSSO....',
+'....OBBBBBBBBBBBBBBBBBSSSSSO....',
+'...OBBBBBOWBBBBBBBBBBOWSSSSSO...',
+'...OBBBBBOOBBBBBBBBBBOOSSSSSO...',
+'...OBBPPBBBBBBKKKKBBBBSSPPSSO...',
+'..OBBBBBBBBBBBBKQBBBBBSSSSSSSO..',
+'..OSBBBBBCCCCCCCCCCCCCCSSSSSDO..',
+'..OSSBBBCCCCCCCCCCCCCCCCSSSDDO..',
+'..OSSSBCCCCCCCCCCCCCCCCCCSDDDO..',
+'..OSSSBCCCCCCCCCCCCCCCCCCSDDDOO.',
+'..OSSSBCCCCCCCCCCCCCCCCCCSDDDOSO',
+'..OSSSBCCCCCCCCCCCCCCCCCCSDDDODO',
+'..OSSBBCCCCCCCCCCCCCCCCCCSSDDOO.',
+'..OSBBBBCCCCCCCCCCCCCCCCSSSSDO..',
+'...OBBBBBCCCCCCCCCCCCCCSSSSSO...',
+'...OBBBBBBCCCCCCCCCCCCSSSSSSO...',
+'....OBBBBBBBCCCCCCCCBBSSSSSO....',
+'.....OBBBBBBBBBBBBBBBBSSSSO.....',
+'......OOBBBBBBBBBBBBBBSSOO......',
+'........OOOOOOOOOOOOOOOO........',
+'.........K..K......K..K.........',
+'........KK.KK......KK.KK........',
+'................................'
+];
+const KITE = [
+'................................',
+'................................',
+'...............OO...............',
+'..............ODDO..............',
+'.............ODDDDO.............',
+'...........OOODDDDOOO...........',
+'..........OBBBBDDBBBSO..........',
+'.........OBBLLLLLLLLSSO.........',
+'........OBBBLLLLLLLLSSSO........',
+'.......OBBBBBBBBBBBBSSSSO.......',
+'......OBBBBBBBBBBBBBSSSSSO......',
+'......OBBOWBBBBBBBBBSOWSSO......',
+'......OBBOOBBBBBBBBBSOOSSO......',
+'.......OBBBBBBKKQQBBSSSSO.......',
+'........OBBBBBBKQBBBSSSO........',
+'.......OBBBBBCCCCCCBSSSSO.......',
+'......OBBBBBCCCCCCCCSSSSSO......',
+'.....OSBBBBCCCCCCCCCCSSSSDO.....',
+'....OSSBBBBCCCCCCCCCCSSSSDDO....',
+'...OSSSBBBCCCCCCCCCCCCSSSDDDO...',
+'...OSSSSBBCCCCCCCCCCCCSSDDDDO...',
+'....OSSSBBCCCCCCCCCCCCSSDDDO....',
+'.....OSSBBBCCCCCCCCCCSSSDDO.....',
+'......OSBBBBCCCCCCCCSSSSDDO.....',
+'.......OBBBBBCCCCCCBSSSSODDO....',
+'........OBBBBBBBBBBBSSSO..DDO...',
+'.........OBBBBBBBBBBSSO....DSO..',
+'..........OOOOOOOOOOOO......DSO.',
+'............K......K.........OO.',
+'............K......K............',
+'..........KKK......KKK..........',
+'................................'
+];
+const SPROUT = [
+'................................',
+'................................',
+'................................',
+'....OOOO................OOOO....',
+'...OEEEEOO............OOFFFFO...',
+'..OEEEEEEEOO........OOFFFFFFFO..',
+'..OEEFFFFFFFO......OHHHHHHHFFO..',
+'...OFFFFFFFFFO....OHHHHHHHHHO...',
+'....OOFFFFFFFHO..OHHHHHHHHOO....',
+'......OOOHHHHHOHHOHHHHHOOO......',
+'...........OOOOHHOOOO...........',
+'..............OHHO..............',
+'..............OHHO..............',
+'..............OHHO..............',
+'..............OHHO..............',
+'....OOOOOOOOOOOOOOOOOOOOOOOO....',
+'...OSSSSSSSSSSSSSSSSSSSSDDDDO...',
+'...OSSSSSSSSSSSSSSSSSSSSDDDDO...',
+'...OOOOOOOOOOOOOOOOOOOOOOOOOO...',
+'....OBBBBBBBBBBBBBBBBBSSSSSO....',
+'....OLBBBBBBBBBBBBBBBBSSSSLO....',
+'....OLBBOWBBBBBBBBBBBBOWSSLO....',
+'....OLBBOOBBBBBBBBBBBBOOSSLO....',
+'.....OBPPBBBBBBBBBBBBBSPPSO.....',
+'.....OBBBBBBBBBOOBBBBBSSSSO.....',
+'......OBBBBBBBOBBOBBBBSSSO......',
+'......OBBBBBBBBBBBBBBBSSSO......',
+'......ODDDDDDDDDDDDDDDDDDO......',
+'.......OOOOOOOOOOOOOOOOOO.......',
+'................................',
+'................................',
+'................................'
+];
+const SPIKE = [
+'................................',
+'..............OOOO..............',
+'.............OYYYYO.............',
+'..........OOOOYYYYOOOO..........',
+'.........OEEEEFFHHFFFFO.........',
+'.........OEFFFFFHHHHHFO.........',
+'.........OEFFFFFHHHHHFO.........',
+'...OO....OEFFFFFHHHHHFO....OO...',
+'..OEFO...OEFFFFFHHHHHFO...OHFO..',
+'..OEFO...OEFOWFFHHOWHFO...OHFO..',
+'..OEFO...OEFOOFFHHOOHFO...OHFO..',
+'..OEFO...OEFFFFFHHHHHFO...OHFO..',
+'..OEFO...OEPPFFFHHHPPFO...OHFO..',
+'..OEFFOOOOEFFFFOOHHHHFOOOOHHFO..',
+'..OEFFFFFFEFFFOFHOHHHFHHHHHHFO..',
+'...OEEEEEEEFFFFFHHHHHFFFFFFFO...',
+'....OOOOOOEFFFFFHHHHHFOOOOOO....',
+'.........OEFFFFFHHHHHFO.........',
+'.........OEFFFFFHHHHHFO.........',
+'......OOOOOOOOOOOOOOOOOOOO......',
+'.....OSSSSSSSSSSSSSSSSSSSSO.....',
+'.....OOOOOOOOOOOOOOOOOOOOOO.....',
+'......OBBBBBBBBBBBBBBBSSSO......',
+'......OLBBBBBBBBBBBBBBSSLO......',
+'......OLBBBBBBBBBBBBBBSSLO......',
+'.......OBBBBBBBBBBBBBBSSO.......',
+'.......OBBBBBBBBBBBBBBSSO.......',
+'.......ODDDDDDDDDDDDDDDDO.......',
+'........OOOOOOOOOOOOOOOO........',
+'................................',
+'................................',
+'................................'
+];
+const SUNNY = [
+'..O..........................O..',
+'..OO........................OO..',
+'..OBO......................OBO..',
+'..OBPO....................OPBO..',
+'..OBPPO..................OPPBO..',
+'..OBPPPO................OPPPBO..',
+'..OBPPPPO..............OPPPPBO..',
+'..OBPPPPBO............OBPPPPBO..',
+'..OBBPPPBBO..........OBBPPPBBO..',
+'...OBBPPBBBOOOOOOOOOOSSSPPSSO...',
+'....OBBBBBBBLLLLLLLLBSSSSSSO....',
+'....OBBBBBBBBBBBBBBBBSSSSSSO....',
+'...OBBBBBBBBBBBBBBBBBSSSSSSSO...',
+'...OBBBBOWBBBBBBBBBBBSOWSSSSO...',
+'...OBBBBOOBBBBCCCCBBBSOOSSSSO...',
+'...OCCBPPBBBCCCCCCCCBSSPPSGGO...',
+'...OCCCCCCCCCCCOOCCCCGGGGGGGO...',
+'....OCCCCCCCCCOCCOCCCGGGGGGO....',
+'.....OCCCCCCCCCCCCCCCGGGGGO.....',
+'......OOCCCCCCCCCCCCCGGGOO......',
+'........OOOOOOOOOOOOOOOO...OOO..',
+'.......OBBBBBBCCCCBBBSSSO.OBBBO.',
+'......OBBBBBCCCCCCCCBSSSSOBBBSSO',
+'......OBBBBBCCCCCCCCBSSSSOBBSSSO',
+'......OBBBBBCCCCCCCCBSSSSOSSSDDO',
+'......OBBBBOCCCCCCCCOSSSSOSSDDO.',
+'......OBBBBOCCOBBOCCOSSSSOSDDO..',
+'......OBBBOCCCCOOCCCCOSSSOOOO...',
+'.......OOOOOOOOOOOOOOOOOO.......',
+'................................',
+'................................',
+'................................'
+];
+const ZEPHYR = [
+'...O........................O...',
+'...OO......................OO...',
+'...OBO....................OBO...',
+'...OBPO..................OPBO...',
+'...OBPPO................OPPBO...',
+'...OBPPPO..............OPPPBO...',
+'...OBPPPPO............OPPPPBO...',
+'...OBPPPPBO..........OBPPPPBO...',
+'....OBPPPBBOOOOOOOOOOBBPPPBO....',
+'....OBBBBBBBBLLLLLLBSSSSSSSO....',
+'.....OBBBBBBBBBBBBBBSSSSSSO.....',
+'.....OBBOWBBBBBBBBBBSSOWSSO.....',
+'.....OBBOOBBBBCCCCBBSSOOSSO.....',
+'......OBBBBBCCCCCCCCSSSSSO......',
+'.......OBBBCCCCCCCCCGSSSO.......',
+'........OBCCCCCCCCCCGGSO........',
+'.........OCCCCCOOCCCGGO.........',
+'..........OCCCOCCOCCGO..........',
+'...........OCCCCCCCCO...........',
+'............OOOOOOOO............',
+'..........OBBBCCCCBBSO..........',
+'.........OBBBCCCCCCBSSO.........',
+'........OBBBCCCCCCCCSSSO.OO.....',
+'........OBBBCCCCCCCCSSSOOBBO....',
+'.......OBBBBCCCCCCCCSSSSOBBSO...',
+'.......OBBBBCCCCCCCCSSSSOSSSO...',
+'.......OBBBOCCCCCCCCOSSSOSDDO...',
+'.......OBBOCCOBBBBOCCOSSODDDO...',
+'........OOOOOOOOOOOOOOOOOOOO....',
+'................................',
+'................................',
+'................................'
+];
+const PEBBLE = [
+'................................',
+'................................',
+'................................',
+'................................',
+'................................',
+'................................',
+'................................',
+'................................',
+'................................',
+'................OOOOO...........',
+'.............OOOBBBBBOOO........',
+'............OBBBDBBBDBBBO.......',
+'...........OBBBBDLLBDBBSSO......',
+'..........OBBBBBDLBBDBBSSSO.....',
+'....OOOO.OBBBBBBDBBBDBBSSSSO....',
+'...OVVVVOOBBBDDDDDDDDDDDSSSO....',
+'..OVVVVVVBBBBDBBBBBBBBBDSSSSO...',
+'.OVVOWVVVVBBBDLLBBBBBBBDSSSSO...',
+'.OVVOOVVVVVBBDBBBBBBBBBDSSSSSO..',
+'.OVVVVVVUVVBBDBBBBBBBBBDSSSSSO..',
+'..OOOVVVVUVBBDBBBBBBBBBDSSSSSO..',
+'...OVVVVVVVBBDBBBBBBBBBDSSSSSO..',
+'....OOOODDDDDDDDDDDDDDDDDDDDDUO.',
+'........OOVVVOOOOOOOOOOUUUOOOO..',
+'.........OVVVO........OUUUO.....',
+'.........OVVVO........OUUUO.....',
+'..........OOO..........OOO......',
+'................................',
+'................................',
+'................................',
+'................................',
+'................................'
+];
+const MESA = [
+'................................',
+'................................',
+'................................',
+'................................',
+'................................',
+'................................',
+'................................',
+'................................',
+'................................',
+'................................',
+'................................',
+'............OOOOOOOOOOOOO.......',
+'...........OLLLLLLLLLLLLLO......',
+'...........OLLLLLLLLLLSSSSO.....',
+'..........ODDDDDDDDDDDDDDDO.....',
+'...OOOO...OBBBBDBBBDBBBDSSSO....',
+'.OOVVVVOOOBBBBBDBBBDBBBDSSSO....',
+'OVVOWVVVVOBBBBBDBBBDBBBDSSSSO...',
+'OVVOOVVVVVBBBBDBBBDBBBBBDSSSO...',
+'.OOOVVVVVVVBBBDBBBDBBBBBDSSSSO..',
+'..OOOUVVVVVBBBDBBBDBBBBBDSSSSO..',
+'.....OOOBBBBBBDBBBDBBBBBDBSSSSOO',
+'......ODDDDDDDDDDDDDDDDDDDDDDDDU',
+'.......OOVVVOOOOOOOOOOOOUUUOOOOO',
+'........OVVVO..........OUUUO....',
+'........OVVVO..........OUUUO....',
+'.........OOO............OOO.....',
+'................................',
+'................................',
+'................................',
+'................................',
+'................................'
+];
+const CLOVER = [
+'......OOO..............OOO......',
+'.....OBBBO............OSSSO.....',
+'.....OBPBO............OSPSO.....',
+'.....OBPBO............OSPSO.....',
+'.....OBPBO............OSPSO.....',
+'.....OBPBO............OSPSO.....',
+'.....OBPBO............OSPSO.....',
+'.....OBPBO............OSPSO.....',
+'......OBPBO..........OSPSO......',
+'......OBBBOOOOOOOOOOOOSSSO......',
+'.....OBBBBBLLLLLLLLLLSSSSSO.....',
+'....OBBBBBBBBBBBBBBBBSSSSSSO....',
+'....OBBBBBBBBBBBBBBBBSSSSSSO....',
+'...OBBBBOWBBBBBBBBBBBSOWSSSSO...',
+'...OBBBBOOBBBBBBBBBBBSOOSSSSO...',
+'...OBBPPBBBBBCCCCCCBBSSSPPSSO...',
+'...OBBBBBBBBCCCNNCCCBSSSSSSSO...',
+'....OBBBBBBBCCOCCOCCBSSSSSSO....',
+'.....OBBBBBBBCCCCCCBBSSSSSO.....',
+'......OOBBBBBBBBBBBBBSSSOO......',
+'.....OBBBBBBCCCCCCCCBSSSSSO.....',
+'....OBBBBBBCCCCCCCCCGSSSSSSO....',
+'...OBBBBBBCCCCCCCCCCGGSSSSSSO...',
+'...OBBBBBBCCCCCCCCCCGGSSSSSSO...',
+'...OBBBBBBCCCCCCCCCCGGSSSSSSO...',
+'...OBBBBBBBCCCCCCCCCGSSSSSSSO...',
+'...OBBBOCCCOBBBBBBBBOGGGOSSSO...',
+'..OBBBBOCCCOBBBBBBBBOGGGOSSSSO..',
+'..OOOOOOOOOOOOOOOOOOOOOOOOOOOO..',
+'................................',
+'................................',
+'................................'
+];
+const NIB = [
+'................................',
+'................................',
+'................................',
+'................................',
+'................................',
+'......OOO..............OOO......',
+'.....OBPBO............OBPBO.....',
+'.....OBPPOOOOOOOOOOOOOOPPBO.....',
+'....OBBBBBBBLLLLLLLLBSSSSSSO....',
+'...OBBBBBBBBBBBBBBBBBSSSSSSSO...',
+'..OBBBBBBBBBBBBBBBBBBSSSSSSSSO..',
+'..OBBBBBOWBBBBBBBBBBBSOWSSSSSO..',
+'.OBBBBBBOOBBBBCCCCBBBSOOSSSSSSO.',
+'.OCCCPPCBBBBCCCCCCCCBSSSGPPGGGO.',
+'.OCCCCCCCBCCCCCNNCCCCCSGGGGGGGO.',
+'.OCCCCCCCCCCCCOCCOCCCCGGGGGGGGO.',
+'.OCCCCCCCCCCCCCCCCCCCCGGGGGGGGO.',
+'..OCCCCCCCCCCCCCCCCCCCGGGGGGGO..',
+'..OBBCCCCCCGGKKKKKKGGCGGGGGSSO..',
+'..OBBCCCCCCGGKQKKQKGGCGGGGGSSO..',
+'..OBBBCCCCCCCCCCCCCCCCGGGGSSSO..',
+'..OBBBCCCCCCCCCCCCCCCCGGGGSSSO..',
+'...OBBBCCCCCCCCCCCCCCCGGGSSSO...',
+'...OBBBBCCCCCCCCCCCCCCGGSSSSO...',
+'....OBBBBBCCCCCCCCCCCCSSSSSO....',
+'....OBBOGGOBBBBBBBBBBOGGOSSO....',
+'.....OOOOOOOOOOOOOOOOOOOOOO.....',
+'................................',
+'................................',
+'................................',
+'................................',
+'................................'
+];
+const LOTL = [
+'................................',
+'................................',
+'................................',
+'................................',
+'................................',
+'................................',
+'.D............................D.',
+'.DD.....OOOOOOOOOOOOOOOO.....DD.',
+'..DD..OOBBBBBBBBBBBBBSSSOO..DD..',
+'DDDDDOBBBBBLLLLLLLLLLSSSSSODDDDD',
+'....OBBBBBBBBBBBBBBBBSSSSSSO....',
+'.DDDOBBBBBBBBBBBBBBBBSSSSSSODDD.',
+'DD.OBBBOWBBBBBBBBBBBBSSOWSSSO.DD',
+'...OBBBOOBBBBBBBBBBBBSSOOSSSO...',
+'...OBBBBBBBBBBBBBBBBBSSSSSSSO...',
+'...OBBPPBBBBBBOBBOBBBSSSPPSSO...',
+'....OBBBBBBBBBBOOBBBBSSSSSSO....',
+'.....OBBBBBBBBBBBBBBBSSSSSO.....',
+'......OOBBBBBBBBBBBBBSSSOO......',
+'.......OBBBBBCCCCCCBBSSSO.......',
+'......OBBBBCCCCCCCCCCSSSSO......',
+'....OBOBBBBCCCCCCCCCCSSSSOSO....',
+'....OBOBBBBCCCCCCCCCCSSSSOSO....',
+'.....OOBBBBBCCCCCCCCBSSSOOO.....',
+'.......OBBBBBBBBBBBBBSSSBBO.....',
+'........OOOOOOOOOOOOOOOOSBBO....',
+'.........................SLLO...',
+'..........................OLO...',
+'...........................O....',
+'................................',
+'................................',
+'................................'
+];
+const EMBER = [
+'................................',
+'................................',
+'....O......................O....',
+'....OO....................OO....',
+'....OLO..................OLO....',
+'.....OLO................OLO.....',
+'.....OLOOOOOOOOOOOOOOOOOOLO.....',
+'....OBBBBBBBLLLLLLLLBSSSSSSO....',
+'...OBBBBBBBBBBBBBBBBBSSSSSSSO...',
+'..OBBBBBBBBBBBBBBBBBBSSSSSSSSO..',
+'..OBBBBOWBBBBBBBBBBBBSSOWSSSSO..',
+'..OBBBBOOBBBBBBBBBBBBSSOOSSSSO..',
+'..OBBPPBBBBBCCCCCCCCBSSSSPPSSO..',
+'...OBBBBBBBCCNCCCCNCCSSSSSSSO...',
+'....OBBBBBBCCCOCCOCCCSSSSSSO....',
+'.....OBBBBBBCCCCCCCCBSSSSSO.....',
+'......OOOBBBBBBBBBBBBSSOOO......',
+'.OO....OBBBBBCCCCCCBBSSSO....OO.',
+'ODDO..OBBBBBCCGCCGCCBSSSSO..ODDO',
+'ODDDOOBBBBBCCCCCCCCCCSSSSSOODDDO',
+'.ODDDOBBBBBCCGCCCCGCCSSSSSODDDO.',
+'..ODDOBBBBBCCCCCCCCCCSSSSSODDO..',
+'...OOOBBBBBCCGCCCCGCCSSSSSOOO...',
+'.....OBBBBBCCCCCCCCCCSSSSSBSO...',
+'.....OBBBOCCCOBBBBOCCGOSSSSSO...',
+'.....OBBBOCCCOBBBBOCCGOSSSOSSO..',
+'......OOOOOOOOOOOOOOOOOOOO..DDO.',
+'...........................ODDDO',
+'............................OOO.',
+'................................',
+'................................',
+'................................'
+];
+const DUNE = [
+'................................',
+'................................',
+'.......O........................',
+'..OOOOOBO.......................',
+'.OBBBBBBO.......................',
+'OBBBOWBBBO......................',
+'OCCCOOBBBO......................',
+'CCCCCBBBBBO.....................',
+'OCCCCBBBBBO...OOOO.....O........',
+'OCCCOOOBBBO..OBBBBO..OOBOO......',
+'.OOO...OBBBOOBBLLBBOOBBBSSO.....',
+'.......OBBBOOBBBBBBOBBLBSSSO....',
+'.......OBBBOBBBBBBBBBBBBSSSO....',
+'........OBBBOBBBBBBBBBBBSSSO....',
+'........OBBBBBBBBBBBBBBBSSSO....',
+'........OBBBBLLLBBBBBBBBSSSSO...',
+'.........OBBBBBBBBBBBBBBSSSSSO..',
+'.........OBBBBBBBBBBBBBBSSSSSSO.',
+'.........OBBBBBBBBBBBBBBSSSSSSO.',
+'..........OBBBBBBBBBBBBBSSSSOODO',
+'...........OBBBBBBBBBBBBSSSO..O.',
+'...........OOBBBBBBBBBBBSSO.....',
+'..........OBBOBBBBBBBBSSOSSO....',
+'..........OBBOBBOOOOOOSSOSSO....',
+'..........OBBOBBO....OSSOSSO....',
+'..........OBBOBBO....OSSOSSO....',
+'..........OBBOBBO....OSSOSSO....',
+'..........OBBOBBO....OSSOSSO....',
+'..........ODDODDO....ODDODDO....',
+'...........OO.OO......OO.OO.....',
+'................................',
+'................................'
+];
+const SOL = [
+'............OOOOOOO.............',
+'...........OAAAaAAAO............',
+'.........OOAAAaAAAaAOO..........',
+'........OaAAAaAAAaAAAaO.........',
+'........OAAAaAmmmAAAaAO.........',
+'.......OAAAammMMMmmaAAAO........',
+'.......OAAammMMMMMmmAAaO........',
+'......OAAaAmOWMMMOWmAaAAO.......',
+'......OAaAAmOOMMMOOmaAAAO.......',
+'......OaAAAmMMMMMMMmAAAaO.......',
+'......OAAAamMMMMMMMmAAaAO.......',
+'.......OAaAmmMOMMOmmAaAO........',
+'.......OaAAAmmMOOmmAaAAO........',
+'........OAAaAAmmmAAaAAO.........',
+'........OAaAAAaAAAaAAAO.........',
+'.........OOAAaAAAaAAOO..........',
+'...........OaAAAaAAOOOO.........',
+'.........OOOOOOHHHHHHHHO........',
+'........OFFFFFOHHHHHHHHHO.......',
+'.......OFFFFFFFHHHHHHHHO........',
+'........OFFFFFOHHOOOOOO.........',
+'......OOOOOOOOOHHOOOOOOOOO......',
+'.....OSSSSSSSSSSSSSSSSSSSSO.....',
+'.....OSSSSSSSSSSSSSSSSSSSSO.....',
+'......OBBBBBBBBBBBBBSSSSSO......',
+'......OBBBBBBBBBBBBBSSSSSO......',
+'......OBBBBBBBBBBBBBSSSSSO......',
+'.......OBBBBBBBBBBBBSSSSO.......',
+'.......OBBBBBBBBBBBBSSSSO.......',
+'.......ODDDDDDDDDDDDDDDDO.......',
+'........OOOOOOOOOOOOOOOO........',
+'................................'
+];
+const RAD = [
+'..........O..OFFFFO..O..........',
+'.........OEO.OFFFFO.OHO.........',
+'........OEEEOFFFFFFOHHHO........',
+'.......OEEEEEFFFFFFHHHHHO.......',
+'.......OEEEEEFFFFFFHHHHHO.......',
+'.......OEEEEEFFFFFFHHHHHO.......',
+'.......OEEEEEFFFFFFHHHHHO.......',
+'.......OEEEEEOFFFFOHHHHHO.......',
+'.......OEEEEEOFFFFOHHHHHO.......',
+'........OEEEO.OHHO.OHHHO........',
+'.........OEO.OOHHOO.OHO.........',
+'..........OOOBBBBBBOOO..........',
+'..........OBBBBBBBBBSO..........',
+'.........OBBBBBBBBBBSSO.........',
+'........OBBLLBBBBBBBSSSO........',
+'.......OBBLBBBBBBBBBSSSSO.......',
+'.......OBBBBBBBBBBBBSSSSO.......',
+'.......OBBBBBBBBBBBBSSSSO.......',
+'.......OBBBBOWBBBBOWSSSSO.......',
+'.......OBBBBOOBBBBOOSSSSO.......',
+'.......OBBBBBBBBBBBBSSSSO.......',
+'.......OBBPPBBOBBOBBPPSSO.......',
+'.......OBBBBBBBOOBBBSSSSO.......',
+'........OBBBBBBBBBBBSSSO........',
+'.........OBBBBBBBBBBSSO.........',
+'..........OBBBBBBBBBSO..........',
+'...........OOBBBBBBOO...........',
+'.............OODDOO.............',
+'..............ODO...............',
+'...............ODO..............',
+'................O...............',
+'................................'
+];
+const BO = [
+'.............OOOOOO.............',
+'............OEEEEEEO.O..........',
+'...........OEEEEEEEEOFOOO.......',
+'.......OOOOEEEEEEEEEEFFFFO......',
+'......OFFFFEEEEEEEEEEFFFFFO.....',
+'.....OFFFFFEEEEEEEEEEFFFFFFO....',
+'....OFFFFFFFEEEEEEEEFFFFFFFO....',
+'....OFFFFFFFFEEEEEEHHHHHHFFO....',
+'....OFFHHHHHHFFOFFHHHHHHHHFO....',
+'....OFHHHHHHHHFOOFHHHHHHHHO.....',
+'.....OFHHHHHHZOOOOFHHHHHHO......',
+'......OFFFFFFOZZzOOOOFOOO.......',
+'.......OOOOOO.OZzO...O..........',
+'...............OZzO.............',
+'...............OZzO.............',
+'..............OZzO..............',
+'..............OZzO..............',
+'...............OZzO.............',
+'.....OOOOOOOOOOOZzOOOOOOOOO.....',
+'....OSSSSSSSSSSSSSSSSSSSSSSO....',
+'....OSSSSSSSSSSSSSSSSSSSSSSO....',
+'.....OBBBBBBBBBBBBBBBSSSSSO.....',
+'.....OBBBBOWBBBBBBBBOWSSSSO.....',
+'.....OBBBBOOBBBBBBBBOOSSSSO.....',
+'.....OBBBBBBBBOBBOBBBSSSSSO.....',
+'.....OBBPPBBBBBOOBBBBSPPSSO.....',
+'.....OBBBBBBBBBBBBBBBSSSSSO.....',
+'.....OBBBBBBBBBBBBBBBSSSSSO.....',
+'......ODDDDDDDDDDDDDDDDDDO......',
+'.......OOOOOOOOOOOOOOOOOO.......',
+'................................',
+'................................'
+];
+const PEEP = [
+'................................',
+'................................',
+'................................',
+'...........OO.OOOO.OO...........',
+'..........ORROORROORRO..........',
+'..........ORRRRRRRRRRO..........',
+'........OOOOOOOOOOOOOOOO........',
+'.......OBBBBBBBBBBBBBSSSO.......',
+'......OBBBBBBBBBBBBBBSSSSO......',
+'......OBBOWBBBBBBBBBBOWSSO......',
+'......OBBOOBBBBBBBBBBOOSSO......',
+'......OPPBBBBOKKKKOBBSSPPO......',
+'......OBBBBBBBOQQOBBBSSSSO......',
+'.....OBBBBBBBBORROBBBSSSSSO.....',
+'....OBBBBBBBBBORROBBBSSSSSSO....',
+'...OBBBBBBBBBBBOOBBBBSSSSSSSO...',
+'..OBSSSBBBBBBBBBBBBBBSSSSDDDSO..',
+'..OSSSSSBBBBBBBBBBBBBSSSDDDDDO..',
+'.OSSSDSSSBBBBBBBBBBBBSSDDDDDDDO.',
+'.OSSDSSSSBBBBBBBBBBBBSSDDDDDDDO.',
+'.OSDSSSSBBBBBBBBBBBBBSSSDDDDDDO.',
+'.OBSSSSBBBBBBBBBBBBBBSSSSDDDDSO.',
+'..OBBBBBBBBBBBBBBBBBBSSSSSSSSO..',
+'...OBBBBBBBBBBBBBBBBBSSSSSSSO...',
+'....OOBBBBBBBBBBBBBBBSSSSSOO....',
+'......OOOOOOOOOOOOOOOOOOOO......',
+'.........OKO........OKO.........',
+'........OKKKO......OKKKO........',
+'........OOOOO......OOOOO........',
+'................................',
+'................................',
+'................................'
+];
+const HOP = [
+'................................',
+'................................',
+'................................',
+'................................',
+'..OOO......................OOO..',
+'.OBBBO....................OSSSO.',
+'OBPPBO....................OSPPSO',
+'OBPPPBO..................OSPPPSO',
+'OBPPPBO..................OSPPPSO',
+'OBBPPBBO................OSSPPSSO',
+'.OBBBBBO.OOOOOOOOOOOOOO.OSSSSSO.',
+'..OOBBBOOBBBBBBBBBBBBSSOOSSSOO..',
+'....OBBBBBBBBBBBBBBBBSSSSSSO....',
+'...OBBBBBBBBBBBBBBBBBSSSSSSSO...',
+'...OBBBOWBBBBBBBBBBBBSSOWSSSO...',
+'...OBBBOOBBBBBBBBBBBBSSOOSSSO...',
+'...OPPBBBBBBBBBNNBBBBSSSSSPPO...',
+'....OBBBBBBBBCCCCCCBBSSSSSSO....',
+'.....OBBBBBBBCCOOCCBBSSSSSO..DD.',
+'......OOBBBBBBBBBBBBBSSSOO...DDD',
+'.....OBBBBBCCCCCCCCCCSSSSSO...DD',
+'....OBBBBBCCCCCCCCCCCGSSSSSO...D',
+'....OBBBBCCCCCCCCCCCCGGSSSSO...D',
+'....OBBBBCCCCCCCCCCCCGGSSSSO...D',
+'....OBBBBBCCCCCCCCCCCGSSSSSO..D.',
+'...OBBBBBBBCCCCCCCCCCSSSSSSSO.D.',
+'..OBBBBOBBBBBBBBBBBBBSSSOSSSSD..',
+'.OCCCCCOOOOOOOOOOOOOOOOOOGGGGGO.',
+'.OOOOOOO................OOOOOOO.',
+'................................',
+'................................',
+'................................'
+];
+const ZIG = [
+'................................',
+'................................',
+'................................',
+'................................',
+'................................',
+'................................',
+'...OOOO..................OOOO...',
+'..OBBBBO.OOOOOOOOOOOOOO.OSSSSO..',
+'.OBBOWBBOBBBBBBBBBBBBSSOSSOWSSO.',
+'.OBBOOBBBBBBBBBBBBBBBSSSSSOOSSO.',
+'.OBBBBBBBBBKBBBBBBBBKSSSSSSSSSO.',
+'..OBBBBBBBBBBBBBBBBBBSSSSSSSSO..',
+'..OPPBBBBBBBBBBBBBBBBSSSSSSPPO..',
+'...OBBBBBBBBOOOOOOOOBSSSSSSSO...',
+'....OBBBBBBBBBBBBBBBBSSSSSSO....',
+'.....OOBBBBBBBBBBBBBBSSSSOO.....',
+'....OBBKBBCCCCCCCCCCCGSSKSSO....',
+'...OBBBBBCCCCCCCCCCCCGGSSSSSO...',
+'..OBBBOBBCCCCCCCCCCCCGGSSOSSSO..',
+'.OBBBOOBBCCCCCCCCCCCCGGSSOOSSSO.',
+'OBOBOBOBBCCCCCCCCCCCCGGSSOSOSOSO',
+'OOOOOOOBBBCCCCCCCCCCCGSSSOOOOOOO',
+'......OBBBBBCCCCCCCCBSSSSO......',
+'.....OBBKBBBBBBBBBBBBSSKSSO.....',
+'....OBBBBBBBBBBBBBBBBSSSSSSO....',
+'...OBBBBBBOOOOOOOOOOOOSSSSSSO...',
+'..OBBBBBBO............OSSSSSSO..',
+'.OBOBOBOBO............OSOSOSOSO.',
+'.OOOOOOOOO............OOOOOOOOO.',
+'................................',
+'................................',
+'................................'
+];
+const KIT = [
+'................................',
+'................................',
+'................................',
+'........OOOOOOOOOOOOOOOO........',
+'......OOBBBBBBBBBBBBBSSSOO......',
+'.....OBBBBBBBBBBBBBBBSSSSSO.....',
+'...OOBBBBBBBBBBBBBBBBSSSSSSOO...',
+'..ODOBBBBBBBBBBBBBBBBSSSSSSODO..',
+'..OODDDDBBBBBBBBBBBBBSSSDDDDOO..',
+'...ODOWDBBBBBBBBBBBBBSSSDOWDO...',
+'...ODOODBBBBBBBCCBBBBSSSDOODO...',
+'....ODDBBBBBBCCCCCCBBSSSSDDO....',
+'.....OBBBBBBCCCNNCCCBSSSSSO.....',
+'......OBBBBBCCCOOCCCBSSSSO......',
+'.......OOBBBBBBBBBBBBSSOO.......',
+'......OBBBBBCCCCCCCCBSSSSO......',
+'.....OBBBBCCCCCCCCCCCGSSSSO.....',
+'.....OBBCCCCCCCCCCCCCGGGSSO.....',
+'.....OBBOCCCCCCCCCCCCGGOSSO.....',
+'.....OBBOCCCCCCCCCCCCGGOSSO...D.',
+'......OOBOCCCCCCCCCCCGOSOO....DD',
+'.....OBBBOCCCCCCCCCCCGOSSSO...SD',
+'.....OBBBBCCCCCCCCCCCGSSSSO...SD',
+'.....OBBBBCCCCCCCCCCCGSSSSO...S.',
+'.....OBBBBBCCCCCCCCCCSSSSSO...S.',
+'.....OBBBBBBCCCCCCCCBSSSSSO..S..',
+'.....OBBBBBBBBBBBBBBBSSSSSO..S..',
+'....OBBBBOOOBBBBBBBBOOOSSSSSS...',
+'...OBBBBO..OOOOOOOOOO..OSSSSO...',
+'...OOOOOO..............OOOOOO...',
+'................................',
+'................................'
+];
+const MORA = [
+'...............JI...............',
+'.........J.....II.....J.........',
+'................................',
+'................................',
+'.....J......OOOOOOOO......J.....',
+'...........OBBBBBBBBO...........',
+'..........OBBLLLLLLBBO..........',
+'.........OBBBBBBBBBBBSO.........',
+'........OBBBBBBBBBBBBSSO....J...',
+'....J...OBOWBBBBBBBBOWSO........',
+'........OBOOBBBBBBBBOOSO........',
+'........OPPBBBOOOOBBBPPO........',
+'........OBBBBBBBBBBBBSSO........',
+'.....J...OBBBBBBBBBBBSO...J.....',
+'..........OOBBBBBBBBOO..........',
+'......OZZZZZZZZZZZZZZZZZZO......',
+'......OzzzzzzzzzzzzzzzzzzO......',
+'.......OZOXXXXXXXXXXXXOZO.......',
+'.......OZ.OXBBBBBBBBXO.ZO.......',
+'.......OZ..OXBBBBBBXO..ZO.......',
+'.......OZ...OXBBBBXO...ZO.......',
+'.......OZ....OXBBXO....ZO.......',
+'.......OZ....OXBBXO....ZO.......',
+'.......OZ...OXXXXXXO...ZO.......',
+'.......OZ..OXXXBBXXXO..ZO.......',
+'.......OZ.OXBBBBBBBBXO.ZO.......',
+'.......OZOXBBBBBBBBBBXOZO.......',
+'......OZZZZZZZZZZZZZZZZZZO......',
+'......OzzzzzzzzzzzzzzzzzzO......',
+'......OOOOOOOOOOOOOOOOOOOO......',
+'................................',
+'................................'
+];
+const FLARE = [
+'................................',
+'.........................O......',
+'.........O...............J......',
+'.........J........O.............',
+'.................OSO............',
+'................OBSO............',
+'.............O..OBSO............',
+'............OBO.OBSSO..O........',
+'...........OBBO.OBSSO.OSO.......',
+'...........OBBBOBBSSSOSSO.......',
+'...........OBBBBBBSSSSSSO.......',
+'...........OBBBBBBSSSSSSSO......',
+'........O.OBBBBBBBSSSSSSSO......',
+'.......OBOBBBBBBBBSSSSSSSO......',
+'......OBBBBBBBBBBBSSSSSSSO......',
+'......OBBBBBBBBBBBSSSSSSSO......',
+'......OBBOWBBBBBBBSSSOWSSO......',
+'.....OBBBOOBBBBBBBSSSOOSSSO.....',
+'.....OBBBBBBBBBBBBSSSSSSSSO.....',
+'.....OBPPBBBBOCCCCOSSSSPPSO.....',
+'.....OBBBBBBCCOOOOCCSSSSSSO.....',
+'.....OBBBBBCCCCCCCCCCSSSSSO.....',
+'.....OBBBBBCCCCCCCCCCSSSSSO.....',
+'......OBBBBCCCCCCCCCCSSSSO......',
+'.......OBBBCCCCCCCCCCSSSO.......',
+'.......OBBBBCCCCCCCCSSSSO.......',
+'........OOBBBBCCCCSSSSOO........',
+'..........OBBBBBBBSSSO..........',
+'...........OOOOOOOOOO...........',
+'................................',
+'................................',
+'................................'
+];
+const RIPPLE = [
+'................................',
+'................................',
+'................................',
+'...............OO...............',
+'..............OBBO..............',
+'.............OBBBBO.............',
+'.............OBBBBO.............',
+'............OBBBBBSO............',
+'............OBBBBBSO............',
+'...........OBBBBBBSSO...........',
+'..........OBBBBBBBSSSO..........',
+'..........OBBBBBBBSSSO..........',
+'.........OBBLBBBBBSSSSO.........',
+'........OBBBLBBBBBSSSSSO........',
+'.......OBBBLBBBBBBSSSSSSO.......',
+'.......OBBBLBBBBBBSSSSSSO.......',
+'......OBBOWBBBBBBBSSSOWSSO......',
+'.....OBBBOOBBBBBBBSSSOOSSSO.....',
+'.....OBBBBBBBBBBBBSSSSSSSSO.....',
+'.....OBPPBBBBOBBBBOSSSSPPSO.....',
+'.....OBBBBBBBBOOOOSSSSSSSSO.....',
+'.....OBBBBBBBBBBBBSSSSSSSSO.....',
+'.....OBBBBBBBBBBBBSSSSSSSSO.....',
+'......OBBBBBBBBBBBSSSSSSSO......',
+'.......OBBBBBBBBBBSSSSSSO.......',
+'.......OBBBBBBBBBBSSSSSSO.......',
+'........OOBBBBBBBBSSSSOO........',
+'..........OBBBBBBBSSSO..........',
+'...........OOOOOOOOOO...........',
+'....xXxXxXxXxXxXxXxXxXxXxXxX....',
+'................................',
+'................................'
+];
+const GUST = [
+'................................',
+'................................',
+'................................',
+'................................',
+'................................',
+'.................OOOOOO.........',
+'................OBBSSSSO........',
+'...............OBBBSSSSSO.......',
+'.........OOOOOOBBBBSSSSSSO......',
+'.......OOBBBBBBBBBBSSSSSSSO.XX..',
+'......OBBBBBBBBBBBBSSSSSSSOX..X.',
+'......OBBBBBBBBBBBBSSSSSSSO...X.',
+'.....OBBBBBBBBBBBBBSSSSSSSO.XX..',
+'.....OBBBBBBBBBBBBBSSSSSSSSO....',
+'.....OBBBBBBBBBBBBBSSSSSSSSSO...',
+'.....OBBBBBBBBBBBBBSSSSSSSSSSO..',
+'XXX...OBBBBBBBBBBBBSSSSSSSSSSO..',
+'.....OBBBOWBBBBBBBBSSOWSSSSSSO..',
+'.....OBBBOOBBBBBBBBSSOOSSSSSSO..',
+'....OBBBBBBBBBBBBBBSSSSSSSSSO...',
+'XXXXOBBPPBBBBOBBBBOSSSSPPSSO....',
+'....OBBBBBBBBBOOOOBSSSSSSSSO....',
+'....OBBBBBBBBBBBBBBSSSSSSSSO....',
+'.....OBBBBBBBBBBBBBSSSSSSSO.....',
+'.....OBBBBBBBBBBBBBSSSSSSSO.....',
+'......OBBBBBBBBBBBBSSSSSSO......',
+'.......OBBBBBBBBBBBSSSSSO.......',
+'........OOBBBBBBBBBSSSOO........',
+'..........OOBBBBBBBSOO..........',
+'............OOOOOOOO............',
+'................................',
+'................................'
+];
+const MOSS = [
+'................................',
+'................................',
+'................................',
+'................................',
+'................................',
+'................................',
+'................................',
+'.....................O..........',
+'....................OFO.........',
+'..........O.......OOFFFO........',
+'.........OEOO...OOFFFFO.........',
+'........OEEEEOOOHFFFOO..........',
+'.........OEEEEEOHFFO............',
+'..........OOOEEOHOO.............',
+'.............OOOHO..............',
+'.........OOOOOOOHOOOOOO.........',
+'.......OOEEEEEEEEEEEEEEOO.......',
+'......OEEEEEEEEEEEEEEEEEEO......',
+'.....OEEEEEEEEEEEEEEEEEEEEO.....',
+'....OBFBBFBBFBBFBBFSSSSSSSSO....',
+'...OBBBBBBBBBBBBBBBSSSSSSSSSO...',
+'..OBBBBBBOWBBBBBBBBSSOWSSSSSSO..',
+'..OBBBBBBOOBBBBBBBBSSOOSSSSSSO..',
+'..OBBBBBBBBBBBBBBBBSSSSSSSSSSO..',
+'..OBBBBPPBBBBOBBBBOSSSSPPSSSSO..',
+'...OBBBBBBBBBBOOOOBSSSSSDSSSO...',
+'....OBBBBDBBBBBBBBBSSSSSSSSO....',
+'.....OOBBBBBBBBBBBBSDSSSSOO.....',
+'.......OOBBBBBBBBBBSSSSOO.......',
+'.........OOOOOOOOOOOOOO.........',
+'................................',
+'................................'
+];
+const FAE = [
+'................................',
+'................................',
+'..........I..........I..........',
+'...........O....O...O...........',
+'...........OOOOOSOOOO...........',
+'.........OOBBBBBSSSSSOO.........',
+'........OBBBLLBBSSSSSSSO........',
+'.....OOOBBBLBBBBSSSSSSSSOO......',
+'...OOXXXBBBBBBBBSSSSSSSSXXOO....',
+'..OXXXXXBBBBBBBBSSSSSSSSXXXXO...',
+'.OXXXxXXBBBBBBBBSSSSSSSSXXXXXO..',
+'.OXXxXXxXBCCCCCCCCCCCCSXXxXXXO..',
+'OXXxXXxXXCCCCCCCCCCCCCCXxXXxXXO.',
+'OXXXXxXXxCCCOWCCCCOWCCCxXXxXXXO.',
+'OXXXxXXxXCCCOOCCCCOOCCCXXxXXXXO.',
+'OXXxXXxXXXCPPCCCCCCPPCXXxXXxXXO.',
+'OXXXXxXXXXCCCCCOOCCCCCXxXXxXXXO.',
+'OXXXXXXXXXXCCCCCCCCCCXXXXxXXXXO.',
+'.OXXXXXXXXXXCCCCCCCCXXXXXXXXXO..',
+'.OXXXXxxxxXXBBBBSSSSXxxxxXXXXO..',
+'..OXXxxxxxxCBBBBSSSSCxxxxxXXO...',
+'...OxxxxxxCBBBBBSSSSSCxxxxxO....',
+'...OxxxxxxxBBBBBSSSSSxxxxxxO....',
+'...OxxxxxxBBBBBBSSSSSSxxxxxO....',
+'...OxxxxxxBBBBBBSSSSSSxxxxxO....',
+'....OxxxxBBBBBBBSSSSSSBxxxO.....',
+'.....OxxxBBBBBBBSSSSSSBxxO......',
+'......OOBBBBBBBBSSSSSSBBO.......',
+'........OOOOOOOOOOOOOOOO........',
+'................................',
+'................................',
+'................................'
+];
+const CINDER = [
+'................................',
+'..............O....O............',
+'.............ORO..ORO...........',
+'.............ORKO.ORKO..........',
+'............ORKJKORKJKO.........',
+'.............OKJJKKJJO..........',
+'..............OKJJJJKO..........',
+'...............OOKKOO...........',
+'................................',
+'.............OOOOOO.............',
+'..........OOOBBBBBBOOO..........',
+'.........OBBBBBBBBBBBSO.........',
+'........OBBBBBBBBBBBBSSO........',
+'.......OBBBBBBBBBBBBBSSSO.......',
+'......OBBBBBBBBBBBBBBSSSSO......',
+'.....OSBBBBBBBBBBBBBBSSSSDO.....',
+'....OSSSBBOWBBBBBBBBOWSSDDDO....',
+'...OSSSSSBOOBCCCCCCBOOSSDDDDO...',
+'...OSSSSPPBBCCCCCCCCBSPPDDDDO...',
+'...OSSSSSBBCCCOKKOCCCSSSDDDDO...',
+'...OSSSSSBCCCCCQQCCCCGSSDDDDO...',
+'...OSSSSSBCCCCCCCCCCCGSSDDDDO...',
+'...OSSSSSBCCCCCCCCCCCGSSDDDDO.OO',
+'....OSSSBBCCCCCCCCCCCGSSDDDO.OJO',
+'.....OSOBBBCCCCCCCCCCSSSODO.OKO.',
+'......OOOBBBCCCCCCCCBSSOOO...O..',
+'.........OBBBCCCCCCBBSO.........',
+'..........OOOBBBBBBOOO..........',
+'...........OKKOOOOKKO...........',
+'...........OOOO..OOOO...........',
+'................................',
+'................................'
+];
+const MAC = [
+'..........OOOOOOOOOOOO..........',
+'........OOFFFFFFFFFFFFOO........',
+'.......OFFEEEEEEFFFFFFFFO.......',
+'......OFEEEEEEEEEEFFFFFFFO......',
+'.....OFEEEEEEEEEEEEFFFFFFFO.....',
+'....OFEEEEEEEEERWEEEFFFFFFFO....',
+'....OFEEEEEEEEERTEEEFFFFFFFO....',
+'...OFFEEEEEEEEEEEEEEFFFFFFRWO...',
+'...OFFEEEEEEEEEEEEEERWFFFFRTO...',
+'...OFFFEERWEEEEEEEEFRTFFFFFFO...',
+'...OFFFFERTEEHHHHHHHHHHHHHHFO...',
+'....OFFFFFEEEHHHHHHHHHHHRWHO....',
+'....OFFFFFFFFHHHHHHHHHHHRTHO....',
+'.....OFFFFFFRWHHHHHHHHHHHHHO....',
+'......OFFFFFRTHHHHRWHHHHHHO.....',
+'.......OFFFFFFFFHHRTHHHHOO......',
+'........OOFFFFFFFFFFFFOO........',
+'..........OOOOZZzzOOOO..........',
+'..............OZzO..............',
+'....OOOOOOOOOOOZzOOOOOOOOOOO....',
+'...OSSSSSSSSSSSSSSSSSSSSSSSSO...',
+'...OSSSSSSSSSSSSSSSSSSSSSSSSO...',
+'....OBBBBBBBBBBBBBBBBSSSSSSO....',
+'....OLBBBBOWBBBBBBBBOWSSSSSO....',
+'....OLBBBBOOBBOBBOBBOOSSSSSO....',
+'....OBBBPPBBBBBOOBBBBSPPSSSO....',
+'....OBBBBBBBBBBBBBBBBSSSSSSO....',
+'....OBBBBBBBBBBBBBBBBSSSSSSO....',
+'....OBDDDDDDDDDDDDDDDDDDDDSO....',
+'.....OOOOOOOOOOOOOOOOOOOOOO.....',
+'................................',
+'................................'
+];
+const DAISY = [
+'...........OOWWOOWWOO...........',
+'..........OWWWWWWWWWWO..........',
+'........OOWWWWWWWWWWWWOO........',
+'.......OWWWWWWWWWWWWWWWWO.......',
+'.......OWWWWWWJJJJWWWWWWO.......',
+'......OWWWWWJJJJJJJaWWWWWO......',
+'.......OWWWJJJJJJJJaaXXXO.......',
+'......OWWWWJJJJJJJJaaXXXXO......',
+'.....OWWWWWJJOWJJOWJaXXXXXO.....',
+'.....OWWWWWJJOOJJOOJaXXXXXO.....',
+'......OWWWWJJJOJJOJaaXXXXO......',
+'.......OWWWJJJJOOJJaaXXXO.......',
+'......OWWWWWJJJJJJJaXXXXXO......',
+'.......OWWWWWWJJJJWWXXXXO.......',
+'.......OWWWWWWWWWWWWXXXXO.......',
+'........OOWWWWWWWWWWXXOO........',
+'.........OOWWWWFHWWWXO..........',
+'........OEEEEWWFHWWOOOO.........',
+'........OFFFEEOFHOOEEFFO........',
+'.........OOOOOOFHOEEFFFO........',
+'......OOOOOOOOOFHOOOOOOOOO......',
+'.....OSSSSSSSSSSSSSSSSSSSSO.....',
+'.....OSSSSSSSSSSSSSSSSSSSSO.....',
+'......OBBBBBBBBBBBBBSSSSSO......',
+'......OBBBBBBBBBBBBBSSSSSO......',
+'......OBBBBBBBBBBBBBSSSSSO......',
+'......OBBBBBBBBBBBBBSSSSSO......',
+'......OBBBBBBBBBBBBBSSSSSO......',
+'......OBDDDDDDDDDDDDDDDDSO......',
+'.......OOOOOOOOOOOOOOOOOO.......',
+'................................',
+'................................'
+];
+const DART = [
+'................................',
+'................................',
+'.........OO....OO....OO.........',
+'........ODDO..ODDO..ODDO........',
+'........ODDO..ODDO..ODDO........',
+'.......ODDDDOODDDDOODDDDO.......',
+'......OBBBBBBBBBSSSSSSSSSO......',
+'.....OBBBBBBBBBBSSSSSSSSSSO.....',
+'....OBBBBBBBBBBBSSSSSSSSSSSO....',
+'...OBBBBBBBBBBBBSSSSSSSSSSSO....',
+'...OBBBOBBOBBBBBSSSSSOSSOSSSO...',
+'..OBBBBBOWBBBBBBSSSSSSOWSSSSSO..',
+'.OBBBBBBOOBBBBBBSSSSSSOOSSSSSSO.',
+'.OBBBBBBBBBBBBBBSSSSSSSSSSSSSSO.',
+'..OBBBBBBBBBBBBBSSSSSSSSSSSSSO..',
+'...OBBBBBBBBBBBBSSSSSSSSSSSSO...',
+'...OBBBPPBBBBBOOOOSSSSSPPSSO....',
+'....OBBBBBBBBBBBSSSSSSSSSSSO....',
+'.....OBBBBBBBBBBSSSSSSSSSSO..O..',
+'......OBBBBBBBBBSSSSSSSSSO..OSO.',
+'.......OOOOOOBBBSSSOOOOOO..OSSSO',
+'..........OBBBBBSSSSOO....OSSSSO',
+'........OOBBBBBCGSSSSSOO.OSSSSO.',
+'.......OBBBBBCCCGGGDSSSSOSSSSO..',
+'......OBBBBBCCDCGGGGSSSSSSSSO...',
+'.......OBBBBCCCCGGGGSSSSOOSO....',
+'......OBBBBBCCCCGGDGSSSSSOO.....',
+'.....OBBBBBBCCCCGGGGSSSSSSO.....',
+'....OBBBBBBBCCCCGGGGSSSSSSSO....',
+'.....OOOOOOOOOOOOOOOOOOOOOO.....',
+'................................',
+'................................'
+];
+const PUDDLE = [
+'................................',
+'................................',
+'................................',
+'................................',
+'......OOOOOO........OOOOOO......',
+'.....OBBBBBBO......OSSSSSSO.....',
+'....OBBBBBBBBO....OSSSSSSSSO....',
+'...OBBBBBBBBBBOOOOSSSSSSSSSSO...',
+'...OBBBBOWBBBBBBBSSSSSOWSSSSO...',
+'...OBBBBOOBBBBBBBSSSSSOOSSSSO...',
+'...OBBBBBBBBBBBBBSSSSSSSSSSSO...',
+'...OBBBBBBBBBBBBBSSSSSSSSSSSO...',
+'..OBBBBBBBBBBBBBBSSSSSSSSSSSSO..',
+'.OBBBBBBBBBBBBBBBSSSSSSSSSSSSSO.',
+'.OBBBPPBBBBBBBBBBSSSSSSSSPPSSSO.',
+'.OBBBBBBBBBOBBBBBSSSOSSSSSSSSSO.',
+'.OBBBBBBBBBBOOOOOOOOSSSSSSSSSSO.',
+'..OBBBBBBBBBBBBBBSSSSSSSSSSSSO..',
+'...OBBBBBBBBBBBBBSSSSSSSSSSSO...',
+'....OBBBBBBBBBBBBSSSSSSSSSSO....',
+'....OBBBBBBBBBBBBSSSSSSSSSSO....',
+'....OBBBBBBBBBBBBSSSSSSSSSSO....',
+'....OBBBBBCCCCCCCGGGGGSSSSSO....',
+'....OBBBBBCCCCCCCGGGGGSSSSSO....',
+'...OOOBBBBCCCCCCCGGGGGSSSSOOO...',
+'.OOBBBBBBBCCCCCCCGGGGGSSSSSSSOO.',
+'OBBBBBBBBBBCCCCCCGGGGSSSSSSSSSSO',
+'OBBBBBBBBBBBCCCCCGGGSSSSSSSSSSSO',
+'OBBBBBBBBBBOBBBBBSSSOSSSSSSSSSSO',
+'.OOBBBBBBOO.OOOOOOOO.OOSSSSSSOO.',
+'...OOOOOO..............OOOOOO...',
+'................................'
+];
+const CAP = [
+'................................',
+'................................',
+'............OOOOOOOO............',
+'.........OOOBBBBBBBSOOO.........',
+'.......OOBBBBBBBWWWSSSSOO.......',
+'.....OOBBBBBBBBBWWWSSSSSSOO.....',
+'....OBBBBWBBBBBBWWWSSSSSSSSO....',
+'...OBBBBWWWBBBBBBBBSSSSSSSSSO...',
+'..OBBBBWWWWWBBBBBBBSSSSWSSSSSO..',
+'..OBBBBBWWWBBBBBBBBSSSWWWSSSSO..',
+'.OBBBBBBBWBBBBBBBBBSSWWWWWSSSSO.',
+'.OBBBBBBBBBBBWBBBBBSSSWWWSSSSSO.',
+'OBBBBWBBBBBBWWWBBBBSSSSWSSSWSSSO',
+'OBBBWWWBBBBBBWBBBBBSSSSSSSWWWSSO',
+'OBBBBWBBBBBBBBBBBBBSSSSSSSSWSSSO',
+'.OSSSSSSSSSSSSSSSSSSSSSSSSSSSSSO',
+'..OOOOOOOOOOOOOOOOOOOOOOOOOOOOO.',
+'.........OCCCCCCCCGGGGO.........',
+'.........OCCCCCCCCGGGGO.........',
+'.........OCCCCCCCCGGGGO.........',
+'.........OCCOWCCCCOWGGO.........',
+'.........OCCOOCCCCOOGGO.........',
+'.........OCPCCOCCOGGPGO.........',
+'.........OCCCCCOOCGGGGO.........',
+'.........OCCCCCCCCGGGGO.........',
+'.........OCCCCCCCCGGGGO.........',
+'.........OCCCCCCCCGGGGO.........',
+'.........OCCCCCCCCGGGGO.........',
+'.........OCCCCCCCCGGGGO.........',
+'..........OOOOOOOOOOOO..........',
+'................................',
+'................................'
+];
+const TULI = [
+'...............OO.....O.........',
+'.........O....OppO...OTO........',
+'........OYO..OpppO..OTTO........',
+'........OYYO.OppppOOTTTO........',
+'........OYYYOppppppTTTTO........',
+'........OYYYYppppppTTTTO........',
+'........OYYYOWppppOWTTTO........',
+'........OYYYOOppppOOTTTO........',
+'........OYYYYpOppOpTTTTO........',
+'........OYYYYppOOppTTTTO........',
+'........OOYYYppppppTTTO.........',
+'.......OEOOYYppppppTTO.O........',
+'.......OEEOOYYYYYYYTO.OFO.......',
+'........OEO.OOOFHOOO.OFFO.......',
+'........OEEO..OFHO..OFFO........',
+'........OEEEO.OFHO.OFFFO........',
+'........OEEEEOOFHO.OFFFO........',
+'.........OEEEOOFHOOFFFO.........',
+'..........OEEEOFHOFFFO..........',
+'...........OEEEFHFFFO...........',
+'.....OOOOOOOOEOFHFFOOOOOOOO.....',
+'....OSSSSSSSSSSSSSSSSSSSSSSO....',
+'....OSSSSSSSSSSSSSSSSSSSSSSO....',
+'.....OBBBBBBBBBBBBBBSSSSSSO.....',
+'.....OBBBBBBBBBBBBBBSSSSSSO.....',
+'.....OBBBBBBBBBBBBBBSSSSSSO.....',
+'.....OBBBBBBBBBBBBBBSSSSSSO.....',
+'.....OBBBBBBBBBBBBBBSSSSSSO.....',
+'.....OBDDDDDDDDDDDDDDDDDDSO.....',
+'......OOOOOOOOOOOOOOOOOOOO......',
+'................................',
+'................................'
+];
+const TOMO = [
+'................................',
+'................O...............',
+'...............OHO..............',
+'..........OOOOOOHOOOO.........O.',
+'.O.......OFRRRRRHRRrFOO......OFO',
+'OEO.....ORRFFFRRHFFFrrrO....OFFO',
+'OEEO...ORRRRFFFFFFFrrrrrO..OFFO.',
+'.OEEO.ORRWWRRRFFFFRrrrrrrO.OFFO.',
+'.OEO.ORRRWRRRRRFFRRrrrrrrrO.OFO.',
+'..O..ORRRRRRRRRRRRRrrrrrrrO..O..',
+'....ORRRRRRRRRRRRRRrrrrrrrrO....',
+'....ORRRRRRRRRRRRRRrrrrrrrrO....',
+'....ORRRRRROWRRRRRROWrrrrrrO....',
+'....ORRRRRROORRRRRROOrrrrrrO....',
+'....ORRRRRRRRRRRRRRrrrrrrrrO....',
+'....ORRRRPPRRRORRORrrPPrrrrO....',
+'.....ORRRRRRRRROORRrrrrrrrO.....',
+'.....ORRRRRRRRRRRRRrrrrrrrO.....',
+'......ORRRRRRRRRRRRrrrrrrO......',
+'.......ORRRRRRRRRRRrrrrrO.......',
+'.....OOOORRRRRRRRRRrrrrOOOO.....',
+'....OSSSSSSRRRRRRRRrrSSSSSSO....',
+'....OSSSSSSSSSSSSSSSSSSSSSSO....',
+'.....OBBBBBBBBBBBBBBSSSSSSO.....',
+'.....OBBBBBBBBBBBBBBSSSSSSO.....',
+'.....OBBBBBBBBBBBBBBSSSSSSO.....',
+'.....OBBBBBBBBBBBBBBSSSSSSO.....',
+'.....OBBBBBBBBBBBBBBSSSSSSO.....',
+'.....OBDDDDDDDDDDDDDDDDDDSO.....',
+'......OOOOOOOOOOOOOOOOOOOO......',
+'................................',
+'................................'
+];
+const KABO = [
+'................................',
+'................................',
+'................................',
+'................................',
+'................................',
+'..................O....OO.......',
+'.......OO.......OOZO..OFFO......',
+'......OEEO.....OZZO.OOFFFFO.....',
+'.....OEEEEOO..OZZZOOFFFFFFFO....',
+'....OEEEEEEEO.OZZZOFFFFFFFFO....',
+'.....OEEEEEEEOOZZZOFFFFFFOO.....',
+'......OOEEEEEOOZZOOOOFFOO.......',
+'......OOOOEEOBBZZBBOOOOOOO......',
+'....OOBBBBBBBBBBBBBSSSSSSSOO....',
+'...OBBBBBBBBDBBBBBBSDSSSSSSSO...',
+'..OBBBBBBBBBDBBBBBBSDSSSSSSSSO..',
+'.OBBBBBBBBBBDBBBBBBSDSSSSSSSSSO.',
+'.OBBBBBBBBBBDBBBBBBSDSSSSSSSSSO.',
+'OBBBBBBBBBBBDBBBBBBSDSSSSSSSSSSO',
+'OBBBBBBBBBOWDBBBBBBSOWSSSSSSSSSO',
+'OBBBBBBBBBOODBBBBBBSOOSSSSSSSSSO',
+'OBBBBBBBBBBBDBBBBBBSDSSSSSSSSSSO',
+'OBBBBBBBPPBBDBOBBOBSDSPPSSSSSSSO',
+'OBBBBBBBBBBBDBBOOBBSDSSSSSSSSSSO',
+'.OBBBBBBBBBBDBBBBBBSDSSSSSSSSSO.',
+'.OBBBBBBBBBBDBBBBBBSDSSSSSSSSSO.',
+'..OBBBBBBBBBDBBBBBBSDSSSSSSSSO..',
+'...OBBBBBBBBDBBBBBBSDSSSSSSSO...',
+'....OOBBBBBBDBBBBBBSDSSSSSOO....',
+'......OOOOOOOBBBBBBOOOOOOO......',
+'.............OOOOOO.............',
+'................................'
+];
+const PETS = {
+  mochi: { art: MOCHI, food: 'fish', coat: 'butter', biome: 'meadow', eyes: [[7, 12], [23, 12]], eyeBg: ['B', 'B'], mouth: [14, 15], mBg: 'B', em: [27, 2], head: [16, 8, 13, 13], neck: [4, 27, 17], name: 'Mochi' },
+  pip: { art: PIP, food: 'fish', coat: 'lavender', biome: 'meadow', eyes: [[7, 10], [16, 10]], eyeBg: ['B', 'B'], mouth: [12, 13], mBg: 'B', em: [23, 0], head: [13, 6, 11, 11], neck: [6, 20, 15], name: 'Pip' },
+  bao: { art: BAO, food: 'bone', coat: 'peach', biome: 'meadow', eyes: [[10, 10], [20, 10]], eyeBg: ['B', 'B'], mouth: [14, 15], mBg: 'C', em: [26, 3], head: [16, 4, 9, 10], neck: [7, 24, 18], name: 'Bao' },
+  rook: { art: ROOK, food: 'bone', coat: 'charcoal', biome: 'meadow', eyes: [[8, 10], [22, 10]], eyeBg: ['B', 'S'], mouth: [14, 19], mBg: 'C', em: [27, 1], head: [16, 7, 13, 11], neck: [10, 21, 21], name: 'Rook' },
+  pom: { art: POM, food: 'berry', coat: 'sky', biome: 'meadow', eyes: [[9, 11], [21, 11]], eyeBg: ['B', 'B'], mouth: null, em: [25, 2], head: [16, 5, 12, 11], neck: [5, 26, 15], name: 'Pom' },
+  kite: { art: KITE, food: 'berry', coat: 'mint', biome: 'meadow', eyes: [[9, 11], [21, 11]], eyeBg: ['B', 'S'], mouth: null, em: [24, 1], head: [16, 5, 9, 11], neck: [8, 23, 14], name: 'Kite' },
+  sprout: { deco: [4, 27, 9], art: SPROUT, food: 'drop', coat: 'peach', biome: 'meadow', eyes: [[8, 21], [22, 21]], eyeBg: ['B', 'B'], mouth: [14, 24], mBg: 'B', em: [27, 1], head: [16, 9, 7, 12], neck: [5, 26, 19], name: 'Gemma' },
+  spike: { deco: [9, 22, 14], art: SPIKE, food: 'drop', coat: 'sky', biome: 'desert', eyes: [[12, 9], [18, 9]], eyeBg: ['F', 'H'], mouth: [14, 13], mBg: 'F', em: [24, 0], head: [16, 3, 7, 9], neck: [10, 21, 17], name: 'Ceri' },
+  sunny: { art: SUNNY, food: 'berry', coat: 'ginger', biome: 'desert', eyes: [[8, 13], [22, 13]], eyeBg: ['B', 'S'], mouth: [14, 17], mBg: 'C', em: [29, 1], head: [16, 9, 12, 14], neck: [8, 23, 20], name: 'Sunny' },
+  zephyr: { art: ZEPHYR, food: 'berry', coat: 'snow', biome: 'desert', eyes: [[8, 11], [22, 11]], eyeBg: ['B', 'S'], mouth: [14, 17], mBg: 'C', em: [28, 0], head: [16, 8, 10, 12], neck: [10, 21, 20], name: 'Zephyr' },
+  pebble: { shellCape: [9, 29, 9, 19], art: PEBBLE, food: 'leaf', coat: 'olive', biome: 'desert', eyes: [[4, 17]], eyeBg: ['V'], mouth: null, em: [12, 12], head: [6, 14, 4, 17], neck: [7, 10, 19], name: 'Pebble' },
+  mesa: { shellCape: [10, 31, 11, 20], art: MESA, food: 'leaf', coat: 'burgundy', biome: 'desert', eyes: [[3, 17]], eyeBg: ['V'], mouth: null, em: [12, 13], head: [5, 15, 4, 17], neck: [6, 9, 19], name: 'Mesa' },
+  clover: { art: CLOVER, food: 'carrot', coat: 'cocoa', biome: 'meadow', eyes: [[8, 13], [22, 13]], eyeBg: ['B', 'S'], mouth: [14, 17], mBg: 'C', em: [26, 1], head: [16, 9, 12, 14], neck: [6, 25, 19], name: 'Clover' },
+  nib: { art: NIB, food: 'seed', coat: 'ginger', biome: 'meadow', eyes: [[8, 11], [22, 11]], eyeBg: ['B', 'S'], mouth: [14, 15], mBg: 'C', em: [27, 4], head: [16, 7, 14, 12], neck: [4, 27, 17], name: 'Nib' },
+  lotl: { art: LOTL, food: 'fish', coat: 'rose', biome: 'lake', eyes: [[7, 12], [23, 12]], eyeBg: ['B', 'S'], mouth: [14, 15], mBg: 'B', em: [28, 4], head: [16, 7, 12, 12], neck: [8, 23, 18], name: 'Lotl' },
+  ember: { art: EMBER, food: 'chili', coat: 'teal', biome: 'cave', eyes: [[7, 10], [23, 10]], eyeBg: ['B', 'S'], mouth: [14, 14], mBg: 'C', em: [28, 1], head: [16, 6, 13, 10], neck: [7, 24, 16], name: 'Ember' },
+  dune: { art: DUNE, food: 'drop', coat: 'caramel', biome: 'desert', eyes: [[4, 5]], eyeBg: ['B'], mouth: null, em: [11, 1], head: [5, 3, 4, 6], neck: [7, 11, 12], name: 'Dune' },
+  sol: { art: SOL, food: 'drop', coat: 'lavender', biome: 'meadow', eyes: [[12, 7], [17, 7]], eyeBg: ['M', 'M'], mouth: [14, 11], mBg: 'M', em: [25, 0], head: [15, 0, 8, 7], neck: [6, 25, 21], deco: [8, 23, 15], name: 'Heli' },
+  rad: { art: RAD, food: 'drop', coat: 'rose', biome: 'meadow', eyes: [[12, 18], [18, 18]], eyeBg: ['B', 'B'], mouth: [14, 21], mBg: 'B', em: [26, 1], head: [16, 11, 8, 18], neck: [8, 23, 13], deco: [8, 24, 9], name: 'Rad' },
+  peep: { art: PEEP, food: 'seed', coat: 'snow', biome: 'meadow', eyes: [[9, 9], [21, 9]], eyeBg: ['B', 'S'], mouth: null, em: [27, 1], head: [16, 6, 9, 10], neck: [6, 25, 13], name: 'Peep' },
+  hop: { art: HOP, food: 'seed', coat: 'cocoa', biome: 'desert', eyes: [[7, 14], [23, 14]], eyeBg: ['B', 'S'], mouth: [14, 17], mBg: 'C', em: [27, 3], head: [16, 10, 12, 15], neck: [7, 24, 19], name: 'Hop' },
+  zig: { art: ZIG, food: 'berry', coat: 'teal', biome: 'desert', eyes: [[4, 8], [26, 8]], eyeBg: ['B', 'S'], mouth: [14, 12], mBg: 'B', em: [28, 2], head: [16, 7, 13, 9], neck: [7, 24, 15], name: 'Zig' },
+  kit: { art: KIT, food: 'berry', coat: 'charcoal', biome: 'desert', eyes: [[5, 9], [25, 9]], eyeBg: ['D', 'D'], mouth: [14, 13], mBg: 'C', em: [28, 1], head: [16, 3, 11, 10], neck: [9, 22, 14], name: 'Kit' },
+  mora: { art: MORA, food: 'drop', coat: 'lavender', biome: 'meadow', eyes: [[10, 9], [20, 9]], eyeBg: ['B', 'B'], mouth: [14, 11], mBg: 'B', em: [24, 1], head: [16, 4, 6, 10], neck: [12, 19, 14], name: 'Mora' },
+  flare: { art: FLARE, food: 'chili', coat: 'ember', biome: 'cave', eyes: [[9, 16], [21, 16]], eyeBg: ['B', 'S'], mouth: [14, 19], mBg: 'C', em: [26, 2], head: [16, 9, 8, 16], neck: [7, 24, 23], name: 'Flare' },
+  ripple: { art: RIPPLE, food: 'drop', coat: 'sky', biome: 'lake', eyes: [[9, 16], [21, 16]], eyeBg: ['B', 'S'], mouth: [14, 19], mBg: 'B', em: [26, 2], head: [16, 5, 6, 16], neck: [7, 24, 23], name: 'Ripple' },
+  gust: { art: GUST, food: 'berry', coat: 'aqua', biome: 'grove', eyes: [[9, 17], [21, 17]], eyeBg: ['B', 'S'], mouth: [14, 20], mBg: 'B', em: [27, 3], head: [16, 7, 9, 17], neck: [6, 25, 24], name: 'Gust' },
+  moss: { art: MOSS, food: 'leaf', coat: 'cocoa', biome: 'grove', eyes: [[9, 21], [21, 21]], eyeBg: ['B', 'S'], mouth: [14, 24], mBg: 'B', em: [27, 8], head: [16, 16, 10, 21], neck: [5, 26, 27], name: 'Moss' },
+  fae: { art: FAE, food: 'berry', coat: 'rose', biome: 'grove', eyes: [[12, 13], [18, 13]], eyeBg: ['C', 'C'], mouth: [14, 16], mBg: 'C', em: [27, 2], head: [16, 5, 8, 13], neck: [12, 19, 19], name: 'Fae' },
+  cinder: { art: CINDER, food: 'berry', coat: 'butter', biome: 'cave', eyes: [[10, 16], [20, 16]], eyeBg: ['B', 'B'], mouth: null, em: [26, 2], head: [16, 9, 10, 17], neck: [9, 22, 22], name: 'Cinder' },
+  mac: { art: MAC, food: 'drop', coat: 'butter', biome: 'meadow', eyes: [[10, 23], [20, 23]], eyeBg: ['B', 'S'], mouth: [14, 24], mBg: 'B', em: [28, 0], head: [16, 0, 12, 7], neck: [5, 26, 20], deco: [5, 26, 10], name: 'Malu' },
+  daisy: { art: DAISY, food: 'drop', coat: 'rose', biome: 'meadow', eyes: [[13, 8], [17, 8]], eyeBg: ['J', 'J'], mouth: [14, 10], mBg: 'J', em: [26, 0], head: [16, 1, 8, 8], neck: [6, 25, 21], deco: [6, 25, 14], name: 'Beli' },
+  dart: { art: DART, food: 'berry', coat: 'lavender', biome: 'desert', eyes: [[8, 11], [22, 11]], eyeBg: ['B', 'S'], mouth: [14, 15], mBg: 'B', em: [27, 1], head: [16, 6, 10, 12], neck: [9, 23, 20], name: 'Dart' },
+  puddle: { art: PUDDLE, food: 'berry', coat: 'mint', biome: 'lake', eyes: [[8, 8], [22, 8]], eyeBg: ['B', 'S'], mouth: [14, 15], mBg: 'B', em: [27, 2], head: [16, 7, 7, 12], neck: [5, 26, 20], name: 'Puddle' },
+  cap: { art: CAP, food: 'drop', coat: 'burgundy', biome: 'grove', eyes: [[12, 20], [18, 20]], eyeBg: ['C', 'G'], mouth: [14, 22], mBg: 'C', em: [27, 1], head: [16, 2, 13, 10], neck: [10, 21, 17], deco: [3, 29, 14], name: 'Cap' },
+  tuli: { art: TULI, food: 'drop', coat: 'mint', biome: 'meadow', eyes: [[12, 6], [18, 6]], eyeBg: ['p', 'p'], mouth: [14, 8], mBg: 'p', em: [26, 0], head: [16, 1, 8, 7], neck: [6, 25, 21], deco: [8, 23, 14], name: 'Tuli' },
+  tomo: { art: TOMO, food: 'drop', coat: 'snow', biome: 'meadow', eyes: [[11, 12], [19, 12]], eyeBg: ['R', 'r'], mouth: [14, 15], mBg: 'R', em: [27, 0], head: [16, 4, 10, 12], neck: [6, 25, 21], deco: [5, 26, 7], name: 'Sola' },
+  kabo: { art: KABO, food: 'drop', coat: 'ginger', biome: 'meadow', eyes: [[10, 19], [20, 19]], eyeBg: ['B', 'S'], mouth: [14, 22], mBg: 'B', em: [27, 4], head: [16, 13, 12, 20], neck: [4, 27, 24], deco: [3, 28, 15], name: 'Pepo' },
+  bo: { art: BO, food: 'drop', coat: 'charcoal', biome: 'meadow', eyes: [[10, 22], [20, 22]], eyeBg: ['B', 'B'], mouth: [14, 24], mBg: 'B', em: [28, 1], head: [16, 0, 10, 7], neck: [5, 26, 18], deco: [4, 27, 9], name: 'Juni' }
+};
+const GLYPHS = {
+  focus: ['.ddd.ddd.', 'dwwwdwwwd', 'dwwwdwwwd', 'dwwwdwwwd', '.ddddddd.'],
+  cold: ['..d.d..', '...d...', 'd.ddd.d', '.ddddd.', 'd.ddd.d', '...d...', '..d.d..'],
+  celebrate: ['h..n..h', '..nnn..', 'nnnnnnn', '.nnnnn.', '.nn.nn.', 'd.....a'],
+  happy: ['.hh.hh.', 'hhhhhhh', 'hhhhhhh', '.hhhhh.', '..hhh..', '...h...'],
+  sad: ['..ccc..', '.ccccc.', 'ccccccc', '.......', '.d.d.d.', 'd.d.d..'],
+  mad: ['.a...a.', 'aa...aa', '.......', '.......', 'aa...aa', '.a...a.'],
+  sick: ['.ssss..', 's....s.', 's.ss.s.', 's.s..s.', 's..ss..', '.s.....'],
+  sleepy: ['zzzz...', '..z....', '.z.....', 'zzzz...', '....yyy', '.....y.', '....yyy'],
+  fish: ['.wwwwwww.', 'w..fff.fw', 'w.ffffffw', 'wffeffffw', 'w.ffffffw', 'w..fff.fw', '.wwwwwww.'],
+  bone: ['.wwwwwww.', 'wbb...bbw', 'wbbbbbbbw', 'wbb...bbw', '.wwwwwww.'],
+  berry: ['.wwwwwww.', 'w..g.g..w', 'w.rrrrr.w', 'wrrrrrrrw', 'w.rrrrr.w', '.wwwwwww.'],
+  drop: ['.wwwwwww.', 'w...d...w', 'w..ddd..w', 'w.ddddd.w', 'w..ddd..w', '.wwwwwww.'],
+  leaf: ['.wwwwwww.', 'w....gg.w', 'w..gggg.w', 'w.ggggg.w', 'w.g.gg..w', '.wwwwwww.'],
+  carrot: ['.wwwwwww.', 'w....gg.w', 'w...oog.w', 'w..ooo..w', 'w.ooo...w', '.wwwwwww.'],
+  seed: ['.wwwwwww.', 'w..nnn..w', 'w.nmnnn.w', 'w.nnnnn.w', 'w..nnn..w', '.wwwwwww.'],
+  chili: ['.wwwwwww.', 'w....g..w', 'w...rr..w', 'w..rrr..w', 'w.rrr...w', 'w.r.....w', '.wwwwwww.']
+};
+const HEADWEAR = {
+  beanie: { art: ['...WW...', '..RRRR..', '.RRLRRR.', '.RRRRRR.', 'WWWWWWWW'], map: { W: 'AW', R: 'AR', L: 'HL' } },
+  sunhat: { art: ['...SSSSSS...', '..SSSSSSSS..', '..RRRRRRRR..', 'SSSSSSSSSSSS'], map: { S: 'AS', R: 'AR' } },
+  crown: { art: ['J..J..J', 'JJ.J.JJ', 'JJJJJJJ', 'JRJJJRJ'], map: { J: 'AJ', R: 'AR' } },
+  flowers: { art: ['p.y.p.y.p', 'ggggggggg'], map: { p: 'AP', y: 'AY', g: 'AL' } },
+  witch: { art: ['......Vv....', '.....VVv....', '....VVVv....', '...VVVVvv...', '...oooooo...', 'VVVVVVVVVVVV'], map: { V: 'AV', v: 'Av', o: 'AO' } },
+  santa: { art: ['.......WW.', '....RRRWW.', '...RRRR...', '..RRRRRR..', '.RRRRRRRR.', 'WWWWWWWWWW'], map: { R: 'AR', W: 'AW' } },
+  party: { art: ['...W..', '..JR..', '..RJ..', '.JRJR.', '.RJRJ.', 'JRJRJR'], map: { J: 'AJ', R: 'AR', W: 'AW' } },
+  bunnyears: { art: ['.ww....ww.', 'wppw..wppw', 'wppw..wppw', 'wppw..wppw', '.ww....ww.', '.ww....ww.', 'kkkkkkkkkk'], map: { w: 'AW', p: 'AP', k: 'AV' } },
+  leafcrown: { art: ['o.r.y.o.r.y', 'oorryyoorry'], map: { o: 'AO', r: 'AR', y: 'AY' } },
+  heartband: { art: ['h.h....h.h', 'hhh....hhh', '.h......h.', 'kkkkkkkkkk'], map: { h: 'AP', k: 'AR' } },
+  maple: { art: ['.....r.....', '..r.rrr.r..', '..rrrrrrr..', '.rrrrrrrrr.', '..rrrrrrr..', '...rr.rr...', '.....r.....', 'wwwwwwwwwww'], map: { r: 'AR', w: 'AW' } },
+  knot: { art: ['.......r..', '......rrr.', '.....rrjrr', '......rrr.', '.......j..', '......j.j.', 'jjjjjjjjjj'], map: { r: 'AR', j: 'AJ' } },
+  visor: { art: ['..wwwwwwww..', 'cccccccccccc'], map: { w: 'AW', c: 'AC' } },
+  gradcap: { art: ['....nnnn....', '..nnnnnnnn..', 'nnnnnnjnnnnn', '..nnnnnnnn.j', '...nnnnnn..j', '...nnnnnn..j'], map: { n: 'AN', j: 'AJ' } },
+  shamrock: { art: ['.g.......g.', 'ggg.....ggg', '.g.......g.', '..k.....k..', 'kkkkkkkkkkk'], map: { g: 'AL', k: 'AG' } },
+  rainbow: { art: ['...rrrrr...', '.rroooooor.', 'rooyyyyyoor', 'oyylllllyyo', 'ylllcccclly'], map: { r: 'AR', o: 'AO', y: 'AY', l: 'AL', c: 'AC' } }
+};
+const HEAD_KEYS = ['beanie', 'sunhat', 'crown', 'flowers', 'witch', 'santa', 'party', 'bunnyears', 'leafcrown', 'heartband', 'maple', 'knot', 'visor', 'gradcap', 'shamrock', 'rainbow'];
+const CRYSTAL = [
+'....c....',
+'...cC....',
+'...cC..c.',
+'.c.cC.cC.',
+'.cCcCccC.',
+'.cCcCcCC.',
+'ccCcCcCCc',
+'cCCcCcCCC'
+];
+const CANOPY = [
+'......aaaa......',
+'....aabbaaaa....',
+'...abbbbaaaaa...',
+'..abbbbaaaaaac..',
+'.aabbbaaaaaaacc.',
+'.abbaaaaaaaaacc.',
+'aabaaaaaaaaaaccc',
+'aaaaaaaaaaaacccc',
+'aaaaaaaaaaaccccc',
+'.aaaaaaaaaccccc.',
+'..aaaaaaaacccc..',
+'...ccaaaaccc....',
+'.....cccccc.....',
+'.......kk.......'
+];
+const FRONDS = [
+'....ffff..ffff....',
+'..fFFFFffFFFFFf...',
+'.fFF..fFFf...FFf..',
+'fF...fFccFf....Ff.',
+'....fF.cc.Ff.....f',
+'...fF......Ff.....',
+'..fF........Ff....',
+'.f............f...'
+];
+const SAGUARO = [
+'..g..',
+'..gG.',
+'g.gG.',
+'gGgG.',
+'.ggGg',
+'..gGg',
+'..gG.',
+'..gG.',
+'..gG.'
+];
+const CLOUD = [
+'.....aaaa.....',
+'...aaaaaaaa...',
+'..aaaaaaaaaab.',
+'.aaaaaaaaaaabb',
+'aaaaaaaaaaaabb',
+'.bbbbbbbbbbbb.'
+];
+const SUN = [
+'....yy....',
+'..yyyyyy..',
+'.yYYyyyyy.',
+'.yYYyyyyy.',
+'yyyyyyyyyy',
+'yyyyyyyyyy',
+'.yyyyyyyy.',
+'.yyyyyyyy.',
+'..yyyyyy..',
+'....yy....'
+];
+const MOON = [
+'..mmmm..',
+'.mmm....',
+'mmm.....',
+'mm......',
+'mm......',
+'mmm.....',
+'.mmm....',
+'..mmmm..'
+];
+const STARS = [[10, 6], [24, 12], [36, 4], [48, 14], [58, 8], [14, 22], [30, 26], [74, 20], [4, 14], [44, 24], [62, 26], [20, 4]];
+const N = 80;
+const TOP = 58;
+const hash = (x, y) => {
+  let v = (Math.imul(x + 11, 374761393) + Math.imul(y + 7, 668265263)) >>> 0;
+  v = Math.imul(v ^ (v >>> 13), 1274126177) >>> 0;
+  return (v ^ (v >>> 16)) >>> 0;
+};
+const makeGrid = (w, h, oy = 0) => ({ w, h, oy, c: new Array(w * h).fill(null) });
+const put = (g, x, y0, k) => { const y = y0 + g.oy; if (x >= 0 && x < g.w && y >= 0 && y < g.h) g.c[y * g.w + x] = k; };
+const at = (g, x, y0) => { const y = y0 + g.oy; return x >= 0 && x < g.w && y >= 0 && y < g.h ? g.c[y * g.w + x] : null; };
+const stamp = (g, art, ox, oy, map) => {
+  art.forEach((row, yy) => {
+    for (let xx = 0; xx < row.length; xx++) {
+      const ch = row[xx];
+      if (ch !== '.') put(g, ox + xx, oy + yy, map ? (map[ch] || ch) : ch);
+    }
+  });
+};
+const toPaths = (g) => {
+  const out = {};
+  for (let y = 0; y < g.h; y++) {
+    let x = 0;
+    while (x < g.w) {
+      const k = g.c[y * g.w + x];
+      if (!k) { x++; continue; }
+      let x2 = x;
+      while (x2 < g.w && g.c[y * g.w + x2] === k) x2++;
+      out[k] = (out[k] || '') + 'M' + x + ' ' + y + 'h' + (x2 - x) + 'v1h' + (x - x2) + 'z';
+      x = x2;
+    }
+  }
+  return out;
+};
+const outlineSet = (g, set, key) => {
+  const edge = [];
+  set.forEach((i) => {
+    const x = i % N;
+    const y = (i - x) / N;
+    [[1, 0], [-1, 0], [0, 1], [0, -1]].forEach(([dx, dy]) => { if (!at(g, x + dx, y + dy)) edge.push([x + dx, y + dy]); });
+  });
+  edge.forEach(([x, y]) => put(g, x, y, key));
+};
+const ITEMS = {
+  ball: ['..oooo..', '.orrrro.', 'orwwrrro', 'orrrrrro', 'owwwwwwo', 'orrrrrro', '.orrrro.', '..oooo..'],
+  yarn: ['..oooo..', '.opqppo.', 'opqppqpo', 'oqppqppo', 'oppqppqo', 'opqppqpo', '.oppqpo.', '..oooooq'],
+  donut: ['........', '..oooo..', '.oppppo.', 'opwopppo', 'opooopqo', 'obbbbbbo', '.obbbbo.', '..oooo..'],
+  meat: ['......oo', '..ooooww', '.obbbowo', 'obbbcbo.', 'obcbbbo.', 'obbbbo..', '.oooo...', '........'],
+  juice: ['....o...', '...oo...', '.oooooo.', '.okkkko.', '.okyyko.', '.okggko.', '.okkkko.', '.oooooo.'],
+  cake: ['....r...', '...owo..', '..owwwo.', '.oppppo.', 'occcccco', 'oppppppo', 'occcccco', 'oooooooo']
+};
+const buildGround = (weather, biome, item) => {
+  const snow = weather === 'snow';
+  const desert = biome === 'desert';
+  const lake = biome === 'lake';
+  const cave = biome === 'cave';
+  const g = makeGrid(N, N);
+  for (let y = TOP; y <= TOP + 2; y++) {
+    for (let x = 4; x <= 75; x++) {
+      if (y === TOP && (x === 4 || x === 75)) continue;
+      let k = y === TOP ? 'G1' : (x > 46 ? 'G3' : 'G2');
+      if (desert) k = y === TOP ? (hash(x, 4) % 9 === 0 ? 'D3' : 'D1') : (x > 46 ? 'D3' : 'D2');
+      if (cave) k = y === TOP ? (hash(x, 4) % 7 === 0 ? 'C2' : 'C1') : (x > 46 ? 'C3' : 'C2');
+      put(g, x, y, k);
+    }
+  }
+  for (let d = 0; d < 16; d++) {
+    const y = TOP + 3 + d;
+    const inset = Math.round((d * d) / 7) + (hash(1, y) % 2);
+    const l = 4 + inset;
+    const r = 75 - inset;
+    if (r - l < 5) break;
+    for (let x = l; x <= r; x++) {
+      const right = x > (l + r) / 2 + 6;
+      const band = Math.floor(d / 3) % 2 === 0;
+      let k;
+      if (desert) {
+        k = right ? (band ? 'R2' : 'R3') : (band ? 'R1' : 'R2');
+        if (hash(x, y) % 11 === 0) k = 'R3';
+      } else if (cave) {
+        k = right ? (band ? 'C4' : 'C5') : (band ? 'C3' : 'C4');
+        if (hash(x, y) % 9 === 0) k = 'Q1';
+      } else {
+        k = right ? 'T2' : 'T1';
+        if (hash(x, y) % 7 === 0) k = right ? 'T3' : 'T2';
+      }
+      if (x === l || x === r) k = desert ? 'R3' : (cave ? 'C5' : 'T3');
+      put(g, x, y, k);
+    }
+  }
+  for (let x = 0; x < N; x++) {
+    for (let y = N - 1; y > TOP + 2; y--) {
+      const k = at(g, x, y);
+      if (k && (k[0] === 'T' || k[0] === 'R' || k[0] === 'C' || k[0] === 'Q')) { put(g, x, y, desert ? 'R3' : (cave ? 'C6' : 'T3')); break; }
+    }
+  }
+  [[20, 66], [46, 70], [33, 63], [58, 64], [12, 62]].forEach(([x, y]) => {
+    if (at(g, x, y) && at(g, x + 1, y)) { put(g, x, y, cave ? 'Q3' : 'ST'); put(g, x + 1, y, cave ? 'Q3' : 'ST'); }
+  });
+  if (!desert && !cave) for (let x = 5; x <= 74; x++) if (hash(x, 9) % 3 === 0) put(g, x, TOP + 3, 'G3');
+  const px1 = lake ? 4 : 18;
+  for (let x = 8; x <= px1; x++) {
+    put(g, x, TOP, snow ? 'IC' : 'W1');
+    put(g, x, TOP + 1, snow ? 'IC' : 'W2');
+    if (lake && x > 9 && x < px1 - 1) put(g, x, TOP + 2, snow ? 'IC' : 'W2');
+  }
+  if (!snow) { put(g, 10, TOP, 'W3'); put(g, 11, TOP, 'W3'); put(g, 15, TOP + 1, 'W1'); }
+  const canopy = new Set();
+  const lx = lake ? 14 : 20;
+  if (desert) {
+    for (let y = 36; y < TOP; y++) {
+      const x0 = y >= 50 ? 66 : (y >= 43 ? 65 : 64);
+      const k = Math.floor(y / 2) % 2 === 0 ? 'P1' : 'P2';
+      put(g, x0, y, k); put(g, x0 + 1, y, k === 'P1' ? 'P2' : 'P1');
+    }
+    FRONDS.forEach((row, yy) => {
+      for (let xx = 0; xx < row.length; xx++) {
+        const ch = row[xx];
+        if (ch === '.') continue;
+        put(g, 56 + xx, 29 + yy, { f: 'F3', F: 'F1', c: 'CO' }[ch]);
+        if (ch !== 'c') canopy.add((29 + yy) * N + 56 + xx);
+      }
+    });
+    outlineSet(g, canopy, 'F0');
+    const cact = new Set();
+    SAGUARO.forEach((row, yy) => {
+      for (let xx = 0; xx < row.length; xx++) {
+        const ch = row[xx];
+        if (ch === '.') continue;
+        put(g, 3 + xx, 49 + yy, ch === 'g' ? 'CG' : 'CH');
+        cact.add((49 + yy) * N + 3 + xx);
+      }
+    });
+    outlineSet(g, cact, 'F0');
+    put(g, 5, 48, 'PK');
+    [[60, 57], [61, 57], [61, 56], [72, 57], [73, 57]].forEach(([x, y]) => put(g, x, y, 'ST'));
+  } else if (cave) {
+    for (let x = 0; x < N; x++) {
+      put(g, x, 0, 'C6'); put(g, x, 1, 'C5'); put(g, x, 2, 'C5');
+      const len = hash(x, 21) % 5;
+      for (let t = 0; t < len; t++) put(g, x, 3 + t, t === len - 1 ? 'C6' : 'C4');
+    }
+    const cr = new Set();
+    CRYSTAL.forEach((row, yy) => {
+      for (let xx = 0; xx < row.length; xx++) {
+        const ch = row[xx];
+        if (ch === '.') continue;
+        put(g, 60 + xx, 50 + yy, ch === 'c' ? 'Q2' : 'Q1');
+        cr.add((50 + yy) * N + 60 + xx);
+        if (xx < 6 && yy > 2) { put(g, 70 + Math.floor(xx / 2), 50 + yy + 2, ch === 'c' ? 'Q4' : 'Q3'); cr.add((52 + yy) * N + 70 + Math.floor(xx / 2)); }
+      }
+    });
+    outlineSet(g, cr, 'Q0');
+    [[5, 52], [6, 52], [5, 53], [6, 53], [4, 54], [5, 54], [6, 54], [7, 54], [4, 55], [5, 55], [6, 55], [7, 55], [3, 56], [4, 56], [5, 56], [6, 56], [7, 56], [8, 56], [3, 57], [8, 57]].forEach(([x, y]) => put(g, x, y, x > 5 ? 'C3' : 'C2'));
+    for (let x = 4; x <= 7; x++) put(g, x, 57, 'C3');
+  } else if (lake) {
+    for (let x = 5; x <= 74; x++) {
+      put(g, x, TOP, snow ? 'IC' : (hash(x, 2) % 9 === 0 ? 'W3' : 'W1'));
+      put(g, x, TOP + 1, snow ? 'IC' : 'W2');
+      if (x > 6 && x < 73) put(g, x, TOP + 2, snow ? 'IC' : 'W2');
+    }
+    for (let x = 14; x <= 58; x++) { if (x !== 40 && x !== 41) put(g, x, TOP, 'LP'); put(g, x, TOP + 1, 'LQ'); }
+    stamp(g, ['.rrww.', 'r....w', 'w....r', '.wwrr.'], 64, TOP - 2, { r: 'RR', w: 'RW' });
+    [7, 9, 11, 73].forEach((x, i) => {
+      for (let y = TOP - 7 - (i % 2) * 2; y < TOP; y++) put(g, x, y, 'G3');
+      put(g, x, TOP - 8 - (i % 2) * 2, 'RT'); put(g, x, TOP - 9 - (i % 2) * 2, 'RT');
+    });
+    if (!snow) { put(g, 14, TOP, 'LP'); put(g, 15, TOP, 'LP'); put(g, 15, TOP - 1, 'PK'); put(g, 69, TOP + 1, 'LP'); put(g, 70, TOP + 1, 'LP'); }
+  } else {
+    for (let y = 44; y < TOP; y++) { put(g, 66, y, 'K1'); put(g, 67, y, 'K2'); }
+    CANOPY.forEach((row, yy) => {
+      for (let xx = 0; xx < row.length; xx++) {
+        const ch = row[xx];
+        if (ch === '.') continue;
+        put(g, 59 + xx, 30 + yy, { a: 'F1', b: 'F2', c: 'F3', k: 'K1' }[ch]);
+        if (ch !== 'k') canopy.add((30 + yy) * N + 59 + xx);
+      }
+    });
+    outlineSet(g, canopy, 'F0');
+    if (lake) {
+      [[12, TOP], [13, TOP], [21, TOP], [22, TOP], [27, TOP + 1], [28, TOP + 1]].forEach(([x, y]) => { if (!snow) put(g, x, y, 'LP'); });
+      if (!snow) put(g, 22, TOP - 1, 'PK');
+      [33, 35, 37].forEach((x, i) => {
+        for (let y = TOP - 6 - i; y < TOP; y++) put(g, x, y, 'G3');
+        put(g, x, TOP - 7 - i, 'RT'); put(g, x, TOP - 8 - i, 'RT');
+      });
+    } else {
+      [61, 72].forEach((x) => {
+        put(g, x, TOP - 1, 'G3'); put(g, x, TOP - 2, 'FC');
+        put(g, x - 1, TOP - 2, 'FL'); put(g, x + 1, TOP - 2, 'FL'); put(g, x, TOP - 3, 'FL');
+      });
+      if (biome === 'grove') {
+        stamp(g, ['.SSS.', 'SSNSS', 'SNTNS', 'SSNST', 'SSSTT', 'SSSTT', 'SSSTT', 'SSSTT'], 2, TOP - 8, { S: 'RS', T: 'RT2', N: 'RN' });
+        stamp(g, ['.SS.', 'SNST', 'SSNT', 'SSST', 'SSTT'], 10, TOP - 5, { S: 'RS', T: 'RT2', N: 'RN' });
+        stamp(g, ['.RRRR.', 'RWRRWR', 'RRRRRR', '..SS..', '..SS..'], 58, TOP - 5, { R: 'MR', W: 'MW', S: 'MS' });
+        stamp(g, ['.RRR.', 'RRWRR', '..S..', '..S..'], 70, TOP - 4, { R: 'MR', W: 'MW', S: 'MS' });
+        stamp(g, ['RWR', '.S.'], 64, TOP - 2, { R: 'MR', W: 'MW', S: 'MS' });
+      } else {
+        [[5, 0], [7, 1]].forEach(([x, o]) => {
+          put(g, x, TOP - 1, 'G3'); put(g, x, TOP - 2, 'G3');
+          put(g, x, TOP - 3 - o, 'LV'); put(g, x, TOP - 4 - o, 'LV'); put(g, x, TOP - 5 - o, 'LV');
+        });
+      }
+    }
+  }
+  if (item && ITEMS[item]) stamp(g, ITEMS[item], 56, TOP - 8, { o: 'Io', r: 'Ir', w: 'Iw', p: 'Ip', q: 'Iq', b: 'Ib', c: 'Ic', y: 'Iy', g: 'Ig', k: 'Ik' });
+  stamp(g, ['.OOO.', 'OYYYO', 'OYYYO', 'OYYYO', '.OOO.'], lx, 42, { O: 'LO', Y: 'LY' });
+  put(g, lx + 2, 41, 'LO');
+  for (let y = 47; y < TOP; y++) put(g, lx + 2, y, 'LO');
+  put(g, lx + 1, TOP - 1, 'LO'); put(g, lx + 3, TOP - 1, 'LO');
+  if (snow) {
+    for (let x = 0; x < N; x++) {
+      const k = at(g, x, TOP);
+      if (k && ((k[0] === 'G' && k[1] !== 'L') || k[0] === 'D' || k === 'C1' || k === 'C2')) put(g, x, TOP, 'SN');
+      const k2 = at(g, x, TOP + 1);
+      if (k2 && (k2[0] === 'G' || k2[0] === 'D') && hash(x, 3) % 2 === 0) put(g, x, TOP + 1, 'SN2');
+    }
+    canopy.forEach((i) => {
+      const x = i % N;
+      const y = (i - x) / N;
+      if (!canopy.has((y - 1) * N + x)) put(g, x, y, 'SN');
+    });
+    put(g, lx + 2, 41, 'SN'); put(g, lx + 1, 42, 'SN'); put(g, lx + 2, 42, 'SN'); put(g, lx + 3, 42, 'SN');
+  }
+  return toPaths(g);
+};
+const buildSky = (weather, biome) => {
+  const s = makeGrid(N, N);
+  const c = makeGrid(N, N);
+  if (biome !== 'cave') {
+    if (weather === 'clear') stamp(s, SUN, 6, 5, { y: 'Y1', Y: 'Y2' });
+    if (weather === 'night') {
+      stamp(s, MOON, 66, 5, { m: 'M' });
+      STARS.forEach(([x, y], i) => put(s, x, y, i % 3 === 0 ? 'X2' : 'X1'));
+    }
+    const cm = { a: 'CL', b: 'CS' };
+    if (weather !== 'night') stamp(c, CLOUD, weather === 'clear' ? 24 : 6, 13, cm);
+    if (weather === 'cloudy' || weather === 'rain' || weather === 'snow') stamp(c, CLOUD, 50, 8, cm);
+    if (weather === 'cloudy' || weather === 'rain') stamp(c, CLOUD, 30, 20, cm);
+  }
+  if (biome === 'grove') {
+    [[10, 6], [26, 3], [44, 8], [58, 4], [74, 10], [18, 20], [64, 18]].forEach(([x, y], i) => put(s, x, y, i % 2 ? 'X2' : 'X1'));
+  }
+  if (biome === 'cave') {
+    [[12, 14], [30, 22], [50, 12], [70, 26], [8, 30], [40, 34]].forEach(([x, y], i) => put(s, x, y, i % 2 ? 'X2' : 'X1'));
+  }
+  return { sk: toPaths(s), cl: toPaths(c) };
+};
+const buildFx = (weather, biome) => {
+  const f = makeGrid(N, N + 80);
+  const add = (x, y, k) => put(f, x, y + 80, k);
+  if (weather === 'rain') {
+    for (let i = 0; i < 26; i++) {
+      const x = hash(i, 1) % N;
+      const y = hash(i, 2) % N;
+      for (let t = 0; t < 3; t++) { add(x, y + t, 'R'); add(x, y + t - 80, 'R'); }
+    }
+    [[12, TOP], [16, TOP], [9, TOP + 1]].forEach(([x, y]) => add(x, y, 'RP'));
+  }
+  if (weather === 'snow') {
+    for (let i = 0; i < 34; i++) {
+      const x = hash(i, 5) % N;
+      const y = hash(i, 6) % N;
+      add(x, y, 'SF'); add(x, y - 80, 'SF');
+    }
+  }
+  if (biome === 'grove') {
+    [[14, 30], [28, 44], [44, 26], [54, 40], [72, 34], [36, 52], [8, 46], [62, 22]].forEach(([x, y], i) => { add(x, y, 'GL'); if (i % 2) add(x + 1, y, 'GL'); });
+  }
+  if (weather === 'night' || biome === 'cave') {
+    const lx = 22;
+    for (let dy = -8; dy <= 8; dy++) {
+      for (let dx = -8; dx <= 8; dx++) {
+        const d2 = dx * dx + dy * dy;
+        if (d2 <= 64 && d2 >= 12 && (dx + dy) % 2 === 0) add(lx + dx, 44 + dy, 'GL');
+      }
+    }
+  }
+  const p = toPaths(f);
+  const shift = (d) => (d || '').replace(/M(\d+) (\d+)/g, (m, x, y) => 'M' + x + ' ' + (Number(y) - 80));
+  return { R: shift(p.R), SF: shift(p.SF), RP: shift(p.RP), GL: shift(p.GL) };
+};
+const applyMood = (g, spec, mood) => {
+  const set = (x, y, k) => put(g, x, y, k);
+  const openLike = mood === 'normal' || mood === 'hungry' || mood === 'cold';
+  spec.eyes.forEach(([x, y], i) => {
+    if (openLike) return;
+    const bg = spec.eyeBg[i];
+    for (let dy = 0; dy < 2; dy++) for (let dx = 0; dx < 2; dx++) set(x + dx, y + dy, bg);
+    if (mood === 'happy') {
+      if (i === 0) { set(x, y + 1, 'O'); set(x + 1, y, 'O'); } else { set(x, y, 'O'); set(x + 1, y + 1, 'O'); }
+    } else if (mood === 'sad') {
+      set(x, y, 'O'); set(x + 1, y, 'O'); set(x, y + 1, 'O'); set(x + 1, y + 1, 'O');
+      if (i === 0) { set(x, y + 2, 'TR'); set(x, y + 3, 'TR'); }
+    } else if (mood === 'mad') {
+      set(x, y + 1, 'O'); set(x + 1, y + 1, 'O');
+      if (i === 0) { set(x, y - 1, 'O'); set(x + 1, y, 'O'); } else { set(x + 1, y - 1, 'O'); set(x, y, 'O'); }
+    } else if (mood === 'focus') {
+      set(x, y + 1, 'O'); set(x + 1, y + 1, 'O');
+    } else if (mood === 'celebrate') {
+      if (i === 0) { set(x, y + 1, 'O'); set(x + 1, y, 'O'); } else { set(x, y, 'O'); set(x + 1, y + 1, 'O'); }
+    } else if (mood === 'sick') {
+      set(x, y + 1, 'O'); set(x + 1, y + 1, 'O'); set(x, y + 2, 'SK'); set(x + 1, y + 2, 'SK');
+    } else {
+      set(x, y + 1, 'O'); set(x + 1, y + 1, 'O');
+    }
+  });
+  if (mood === 'cold') for (let i = 0; i < g.c.length; i++) if (g.c[i] === 'P') g.c[i] = 'TR';
+  if (spec.mouth && mood !== 'normal') {
+    const [mx, my] = spec.mouth;
+    for (let dy = 0; dy < 2; dy++) for (let dx = 0; dx < 4; dx++) set(mx + dx, my + dy, spec.mBg);
+    const M = { happy: ['OTTO', '.OO.'], sad: ['.OO.', 'O..O'], mad: ['OOOO', '....'], sick: ['O.O.', '.O.O'], sleepy: ['.OO.', '....'], hungry: ['.OO.', '.TT.'], focus: ['....', '.OO.'], cold: ['.O.O', 'O.O.'], celebrate: ['OTTO', '.OO.'] }[mood];
+    M.forEach((row, dy) => {
+      for (let dx = 0; dx < 4; dx++) {
+        if (row[dx] === 'O') set(mx + dx, my + dy, 'O');
+        if (row[dx] === 'T') set(mx + dx, my + dy, 'TG');
+      }
+    });
+    if (mood === 'hungry') set(mx + 3, my + 2, 'TR');
+  }
+};
+const applyAcc = (g, spec, list) => {
+  const set = (x, y, k) => put(g, x, y, k);
+  const [cx, top, hw, my] = spec.head;
+  const [x0, x1, ny] = spec.neck;
+  const nc = Math.floor((x0 + x1) / 2);
+  if (list.includes('scarf')) {
+    for (let x = x0; x <= x1; x++) { set(x, ny, (x - x0) % 3 === 2 ? 'AW' : 'AR'); set(x, ny + 1, (x - x0) % 3 === 2 ? 'AW' : 'AD'); }
+    const tx = x0 + Math.max(1, Math.floor((x1 - x0) / 4));
+    for (let y2 = ny + 2; y2 <= ny + 4; y2++) { set(tx, y2, 'AR'); set(tx + 1, y2, 'AD'); }
+    set(tx, ny + 5, 'AW'); set(tx + 1, ny + 5, 'AW');
+  }
+  if (list.includes('collar')) {
+    for (let x = x0 + 1; x <= x1 - 1; x++) set(x, ny, 'AE');
+    set(nc, ny + 1, 'AJ'); set(nc + 1, ny + 1, 'AJ');
+  }
+  if (list.includes('bowtie')) {
+    stamp(g, ['k...k', 'kkJkk', 'k...k'], nc - 2, ny - 1, { k: 'AK', J: 'AJ' });
+  }
+  if (list.includes('cape') && spec.shellCape) {
+    const [sx0, sx1, sy0, sy1] = spec.shellCape;
+    for (let y = sy0; y <= sy1; y++) {
+      for (let x = sx0; x <= sx1; x++) {
+        const k = at(g, x, y);
+        if (!['B', 'S', 'L', 'D'].includes(k)) continue;
+        const scallop = y === sy1 - 1 && (x - sx0) % 4 === 3;
+        set(x, y, y === sy1 || scallop ? 'AJ' : (k === 'S' || k === 'D' ? 'AD' : 'AR'));
+      }
+    }
+    set(sx0 + 1, sy1 - 2, 'AJ'); set(sx0 + 2, sy1 - 2, 'AJ'); set(sx0 + 1, sy1 - 1, 'AJ'); set(sx0 + 2, sy1 - 1, 'AJ');
+  } else if (list.includes('cape')) {
+    [[x0 - 1, ny], [x0, ny], [x0 + 1, ny], [x0, ny + 1], [x0 - 1, ny + 1], [x1 + 1, ny], [x1, ny], [x1 - 1, ny], [x1, ny + 1], [x1 + 1, ny + 1]].forEach(([x, y]) => set(x, y, 'AR'));
+    set(nc, ny, 'AJ'); set(nc + 1, ny, 'AJ'); set(nc, ny + 1, 'AJ'); set(nc + 1, ny + 1, 'AJ');
+  }
+  if (list.includes('lights')) {
+    const [lx0, lx1, ly] = spec.deco || spec.neck;
+    const cols = ['Lr', 'Ly', 'Lb', 'Lw', 'Lp'];
+    let n = 0;
+    [[ly, 0, 1.8], [ly + 4, 2, 1.4]].forEach(([y0, inset, amp]) => {
+      const a0 = lx0 + inset;
+      const a1 = lx1 - inset;
+      for (let x = a0; x <= a1; x++) {
+        const yy = y0 + Math.round(amp * Math.sin((Math.PI * (x - a0)) / Math.max(1, a1 - a0)));
+        set(x, yy, 'AK');
+        if ((x - a0) % 2 === 1) { set(x, yy + 1, cols[n % 5]); n++; }
+      }
+    });
+  }
+  if (list.includes('starshades')) {
+    spec.eyes.forEach(([x, y]) => {
+      set(x, y, 'AN'); set(x + 1, y, 'AN'); set(x, y + 1, 'AN'); set(x + 1, y + 1, 'AN'); set(x + 1, y, 'AW');
+      [[-1, 0], [-1, 1], [2, 0], [2, 1], [0, -1], [1, -1], [0, 2], [1, 2], [-2, -1], [3, -1], [-1, 3], [2, 3], [0, -2]].forEach(([dx, dy]) => set(x + dx, y + dy, 'AP'));
+    });
+    if (spec.eyes.length > 1) { const a = spec.eyes[0]; const b = spec.eyes[1]; for (let x = a[0] + 3; x <= b[0] - 2; x++) set(x, a[1], 'AP'); }
+  } else if (list.includes('glasses') || list.includes('sunglasses')) {
+    const sun = list.includes('sunglasses');
+    const fr = sun ? 'AK' : 'AG';
+    spec.eyes.forEach(([x, y]) => {
+      if (sun) { set(x, y, 'AN'); set(x + 1, y, 'AN'); set(x, y + 1, 'AN'); set(x + 1, y + 1, 'AN'); set(x, y, 'AW'); }
+      for (let dx = 0; dx < 2; dx++) { set(x + dx, y - 1, fr); set(x + dx, y + 2, fr); }
+      set(x - 1, y, fr); set(x - 1, y + 1, fr); set(x + 2, y, fr); set(x + 2, y + 1, fr);
+    });
+    if (spec.eyes.length > 1) {
+      const a = spec.eyes[0];
+      const b = spec.eyes[1];
+      for (let x = a[0] + 3; x <= b[0] - 2; x++) set(x, a[1], fr);
+    } else {
+      const a = spec.eyes[0];
+      set(a[0] + 3, a[1], fr); set(a[0] + 4, a[1], fr);
+    }
+  }
+  if (list.includes('headphones')) {
+    for (let x = cx - hw + 1; x <= cx + hw - 1; x++) set(x, top - 1, 'AK');
+    for (let y = top; y <= my - 2; y++) { set(cx - hw, y, 'AK'); set(cx + hw, y, 'AK'); }
+    for (let y = my - 2; y <= my; y++) { set(cx - hw - 1, y, 'AC'); set(cx - hw, y, 'AC'); set(cx + hw, y, 'AC'); set(cx + hw + 1, y, 'AC'); }
+  }
+  if (list.includes('book') || list.includes('mug') || list.includes('lamp')) {
+    let bot = 31;
+    while (bot > 0 && !/[^.]/.test(spec.art[bot])) bot--;
+    let bl = 31;
+    let br = 0;
+    for (let y = Math.max(0, bot - 3); y <= bot; y++) {
+      const row = spec.art[y];
+      for (let x = 0; x < 32; x++) if (row[x] !== '.') { bl = Math.min(bl, x); br = Math.max(br, x); }
+    }
+    const items = [];
+    if (list.includes('lamp')) items.push([['..jjjj.', '.jjjjjj', '.k..yy.', 'k......', 'k......', 'k......', 'kkk....'], Math.max(0, bl - 2), bot - 6, { j: 'AJ', k: 'AK', y: 'AY' }]);
+    const pc = Math.round((bl + br) / 2);
+    if (list.includes('mug')) items.push([['bbbb..', 'wwwwww', 'rrrw.w', 'rrrw.w', 'wwwwww', 'wwww..'], Math.max(0, pc - 7), bot - 5, { w: 'AW', r: 'AR', b: 'AE' }]);
+    if (list.includes('book')) items.push([['ww...ww', 'wwww.ww', 'wwwwwww', 'wwwkwww', 'ccccccc'], Math.min(25, pc + 1), bot - 4, { w: 'AW', c: 'AC', k: 'AK' }]);
+    items.forEach(([art, ix, iy, map]) => {
+      const cells = [];
+      art.forEach((row, yy) => { for (let xx = 0; xx < row.length; xx++) if (row[xx] !== '.') cells.push([ix + xx, iy + yy]); });
+      cells.forEach(([cx2, cy2]) => [[1, 0], [-1, 0], [0, -1], [0, 1]].forEach(([dx, dy]) => { if (!cells.some(([a2, b2]) => a2 === cx2 + dx && b2 === cy2 + dy)) put(g, cx2 + dx, cy2 + dy, 'O'); }));
+      stamp(g, art, ix, iy, map);
+    });
+  }
+  const hk = HEAD_KEYS.find((k) => list.includes(k));
+  if (hk) {
+    const w = HEADWEAR[hk];
+    const wd = w.art[0].length;
+    const hx = Math.round(cx - wd / 2);
+    const hy = top - w.art.length + 1;
+    const cells = new Set();
+    w.art.forEach((row, yy) => { for (let xx = 0; xx < row.length; xx++) if (row[xx] !== '.') cells.add((hy + yy + 16) * 64 + hx + xx + 16); });
+    stamp(g, w.art, hx, hy, w.map);
+    cells.forEach((i) => {
+      const x = (i % 64) - 16;
+      const y = Math.floor(i / 64) - 16;
+      [[1, 0], [-1, 0], [0, -1]].forEach(([dx, dy]) => { if (!at(g, x + dx, y + dy)) set(x + dx, y + dy, 'O'); });
+    });
+  }
+};
+const HATCH = { pom: 1, kite: 1, peep: 1, pebble: 1, mesa: 1, zig: 1, dart: 1, ember: 1, cinder: 1, lotl: 1, puddle: 1 };
+const STAGE_CACHE = {};
+const stageSpec = (id, spec, stage) => {
+  if (stage === 3) return spec;
+  const key = id + stage;
+  if (STAGE_CACHE[key]) return STAGE_CACHE[key];
+  const s = stage === 1 ? 0.62 : 0.8;
+  const art = spec.art;
+  let bottom = 31;
+  while (bottom > 0 && !/[^.]/.test(art[bottom])) bottom--;
+  const gy = bottom + 1;
+  const src = art.map((r) => r.split(''));
+  const inside = (x, y) => y >= 0 && y < 32 && x >= 0 && x < 32 && src[y][x] !== '.';
+  const fill = src.map((r, y) => r.map((ch, x) => {
+    if (ch === '.' || (ch !== 'O' && ch !== 'W')) return ch;
+    if ([[1, 0], [-1, 0], [0, 1], [0, -1]].some(([dx, dy]) => !inside(x + dx, y + dy))) return 'O';
+    for (const [dx, dy] of [[-1, 0], [1, 0], [0, -1], [0, 1], [-2, 0], [2, 0], [0, -2], [0, 2]]) {
+      const k = inside(x + dx, y + dy) ? src[y + dy][x + dx] : null;
+      if (k && k !== 'O' && k !== 'W') return k;
+    }
+    return 'B';
+  }));
+  const T = (x, y) => [Math.round(16 + (x - 16) * s), Math.round(gy - (gy - y) * s)];
+  const g = Array.from({ length: 32 }, () => new Array(32).fill('.'));
+  for (let ty = 0; ty < 32; ty++) {
+    for (let tx = 0; tx < 32; tx++) {
+      const sx = Math.floor(16 + (tx + 0.5 - 16) / s);
+      const sy = Math.floor(gy - (gy - (ty + 0.5)) / s);
+      if (ty >= gy - 1 || sy < 0 || sy > 31 || sx < 0 || sx > 31) continue;
+      const k = fill[sy][sx];
+      if (k !== '.' && k !== 'O') g[ty][tx] = k;
+    }
+  }
+  if (stage === 1 && HATCH[id]) {
+    let top = 0;
+    while (top < gy && !g[top].some((c) => c !== '.')) top++;
+    const rows = Math.max(2, Math.round((gy - 1 - top) * 0.28));
+    const y0 = gy - 1 - rows;
+    let l = 31;
+    let r = 0;
+    for (let y = y0; y < gy - 1; y++) for (let x = 0; x < 32; x++) if (g[y][x] !== '.') { l = Math.min(l, x); r = Math.max(r, x); }
+    if (l <= r) {
+      for (let y = y0; y < gy - 1; y++) {
+        for (let x = l - 1; x <= r + 1; x++) {
+          if (x < 0 || x > 31) continue;
+          g[y][x] = y === y0 ? ((x - l) % 2 ? 'O' : 'W') : 'W';
+        }
+      }
+      for (let x = l + 1; x <= r; x += 4) if (y0 + 1 < gy - 1) g[y0 + 1][x] = 'G';
+    }
+  }
+  const out = g.map((row) => row.slice());
+  for (let y = 0; y < 32; y++) for (let x = 0; x < 32; x++) {
+    if (g[y][x] !== '.') continue;
+    if ([[1, 0], [-1, 0], [0, 1], [0, -1]].some(([dx, dy]) => g[y + dy] && g[y + dy][x + dx] && g[y + dy][x + dx] !== '.')) out[y][x] = 'O';
+  }
+  const eyes = spec.eyes.map(([x, y]) => T(x, y));
+  const eyeBg = eyes.map(([x, y], i) => (out[y] && out[y][x] && out[y][x] !== '.' && out[y][x] !== 'O' ? out[y][x] : spec.eyeBg[i]));
+  eyes.forEach(([x, y]) => { if (out[y] && out[y + 1]) { out[y][x] = 'O'; out[y][x + 1] = 'W'; out[y + 1][x] = 'O'; out[y + 1][x + 1] = 'O'; } });
+  const mouth = spec.mouth ? T(spec.mouth[0], spec.mouth[1]) : null;
+  if (mouth) mouth[1] = Math.max(mouth[1], eyes[0][1] + 2);
+  const [hcx, htop] = T(spec.head[0], spec.head[1]);
+  const [, hmy] = T(spec.head[0], spec.head[3]);
+  let top = htop;
+  while (top < 31 && !/[^.]/.test(out[top].join(''))) top++;
+  const tn = (n) => { const [a, y] = T(n[0], n[2]); const [b] = T(n[1], n[2]); return [a, b, y]; };
+  const res = {
+    ...spec,
+    art: out.map((r) => r.join('')),
+    eyes, eyeBg,
+    mouth, mBg: mouth && out[mouth[1]] && out[mouth[1]][mouth[0] + 1] && out[mouth[1]][mouth[0] + 1] !== 'O' ? out[mouth[1]][mouth[0] + 1] : spec.mBg,
+    head: [hcx, Math.max(top, htop), Math.max(3, Math.round(spec.head[2] * s)), hmy],
+    neck: tn(spec.neck),
+    deco: spec.deco ? tn(spec.deco) : spec.deco,
+    em: T(spec.em[0], spec.em[1]),
+    shellCape: spec.shellCape ? [...T(spec.shellCape[0], spec.shellCape[2]).slice(0, 1), T(spec.shellCape[1], 0)[0], T(0, spec.shellCape[2])[1], T(0, spec.shellCape[3])[1]] : spec.shellCape
+  };
+  STAGE_CACHE[key] = res;
+  return res;
+};
+const NAMED = { red: '#E5484D', redD: '#C93A40', gold: '#F2C14E', yellow: '#FFD25E', leaf: '#7DBB4C', leafL: '#A5D874', leafD: '#5A9A3C', pink: '#F2A0B4', hot: '#F27A8E', blush: '#F2B8C0', brown: '#8A5631', brownD: '#6E4426', white: '#FFFFFF', water: '#BFE6F5', waterD: '#7FBCE0', glow: '#FFF1A8', soil: '#6A4024', tan: '#D9A066', ink: '#2E3B55' };
+const FORMS = {
+  mochi: [{ k: 'basket', ears: 'cat' }, { k: 'cub', ears: 'cat', tail: 'curl', belly: 1 }],
+  pip: [{ k: 'basket', ears: 'pointy' }, { k: 'cub', ears: 'pointy', tail: 'thin', belly: 1 }],
+  bao: [{ k: 'basket', ears: 'dog' }, { k: 'cub', ears: 'dog', tail: 'stub', belly: 1, muzzle: 1, spots: 1 }],
+  rook: [{ k: 'basket', ears: 'pointy' }, { k: 'cub', ears: 'pointy', tail: 'stub', belly: 1, muzzle: 1, mask: 1 }],
+  pom: [{ k: 'egg', pat: 'speckle', tuft: 1 }, { k: 'baby', beak: 1, wings: 1, tuft: 1, belly: 1, feetB: 1 }],
+  kite: [{ k: 'egg', pat: 'speckle', crest: 1 }, { k: 'baby', beak: 1, wings: 1, crest: 1, belly: 1, feetB: 1 }],
+  peep: [{ k: 'egg', pat: 'speckle' }, { k: 'baby', beak: 1, wings: 1, comb: 1, belly: 1, feetB: 1 }],
+  clover: [{ k: 'burrow', ears: 'lop', ground: 'brown' }, { k: 'cub', ears: 'lop', tail: 'puff', belly: 1 }],
+  nib: [{ k: 'burrow', ears: 'round', ground: 'brown' }, { k: 'cub', ears: 'round', cheeks: 1, belly: 1 }],
+  sunny: [{ k: 'burrow', ears: 'fennec', ground: 'tan' }, { k: 'cub', ears: 'fennec', tail: 'fluffy', belly: 1, muzzle: 1 }],
+  zephyr: [{ k: 'burrow', ears: 'fennec', ground: 'tan' }, { k: 'cub', ears: 'fennec', tail: 'fluffy', belly: 1, muzzle: 1, mask: 1 }],
+  pebble: [{ k: 'egg', pat: 'scales' }, { k: 'turtle', shell: 'round' }],
+  mesa: [{ k: 'egg', pat: 'scales' }, { k: 'turtle', shell: 'angular' }],
+  zig: [{ k: 'egg', pat: 'spots' }, { k: 'baby', tail: 'lizard', spots: 1, belly: 1, feet: 1 }],
+  dart: [{ k: 'egg', pat: 'zigzag', crest: 1 }, { k: 'baby', tail: 'lizard', spikes: 1, belly: 1, feet: 1 }],
+  dune: [{ k: 'blanket' }, { k: 'cub', ears: 'camel', hump: 1, belly: 1, tail: 'stub', muzzle: 1, longLegs: 1 }],
+  hop: [{ k: 'burrow', ears: 'jerboa', ground: 'tan' }, { k: 'cub', ears: 'jerboa', tail: 'thin', belly: 1 }],
+  kit: [{ k: 'burrow', ears: 'round', ground: 'tan' }, { k: 'cub', ears: 'round', mask: 1, belly: 1, tail: 'thin' }],
+  lotl: [{ k: 'egg', pat: 'spawn' }, { k: 'baby', gills: 1, tail: 'fin', belly: 1, feet: 1 }],
+  puddle: [{ k: 'egg', pat: 'spawn' }, { k: 'tadpole' }],
+  ember: [{ k: 'egg', pat: 'scales', horns: 1 }, { k: 'baby', horns: 1, dwings: 1, tail: 'lizard', belly: 1, feet: 1 }],
+  cinder: [{ k: 'egg', pat: 'flame' }, { k: 'baby', beak: 1, wings: 1, flame: 1, belly: 1, feetB: 1 }],
+  flare: [{ k: 'orb' }, { k: 'sprite', tip: 'flame' }],
+  ripple: [{ k: 'orb' }, { k: 'sprite', tip: 'drop' }],
+  gust: [{ k: 'orb' }, { k: 'sprite', tip: 'swirl' }],
+  moss: [{ k: 'orb' }, { k: 'sprite', tip: 'leaf' }],
+  mora: [{ k: 'orb', star: 1 }, { k: 'sprite', tip: 'halo' }],
+  sprout: [{ k: 'seed' }, { k: 'young', top: 'seedling' }],
+  sol: [{ k: 'seed' }, { k: 'young', top: 'sunbud' }],
+  daisy: [{ k: 'seed' }, { k: 'young', top: 'daisybud' }],
+  tuli: [{ k: 'seed' }, { k: 'young', top: 'tulipbud' }],
+  tomo: [{ k: 'seed' }, { k: 'young', top: 'tomato' }],
+  mac: [{ k: 'seed' }, { k: 'young', top: 'sapling' }],
+  bo: [{ k: 'seed', pot: 'bonsai' }, { k: 'young', top: 'bonsai', pot: 'bonsai' }],
+  spike: [{ k: 'seed' }, { k: 'young', top: 'cactusball' }],
+  kabo: [{ k: 'seedBig' }, { k: 'vine' }],
+  cap: [{ k: 'spore' }, { k: 'button' }]
+};
+// primitives: { e: [cx, cy, rx, ry], c, o } | { p: [[x, y]...], c, o } | { l: [[x, y]...], c, w } | { ring: [cx, cy, r], c, w }
+const fE = (cx, cy, rx, ry, c, o = 1) => ({ e: [cx, cy, rx, ry], c, o });
+const fP = (p, c, o = 1) => ({ p, c, o });
+const fL = (l, c, w) => ({ l, c, w });
+const eggHW = (cy, rx, ry, y) => { const s = Math.max(-1, Math.min(1, (y - cy) / ry)); return rx * Math.sqrt(Math.max(0, 1 - s * s)) * (s < 0 ? 1 - 0.2 * -s : 1); };
+const eggPts = (cx, cy, rx, ry) => { const o = []; for (let i = 0; i < 32; i++) { const t = (i / 32) * Math.PI * 2; const s = Math.sin(t); o.push([cx + rx * Math.cos(t) * (s < 0 ? 1 - 0.2 * -s : 1), cy + ry * s]); } return o; };
+const eggBand = (cx, cy, rx, ry, y0, y1, zig) => {
+  const top = [];
+  const bot = [];
+  const n = 8;
+  for (let i = 0; i <= n; i++) {
+    const f = i / n;
+    const yt = y0 + (zig && i % 2 ? -zig : 0);
+    const yb = y1 + (zig && i % 2 ? -zig : 0);
+    const ht = eggHW(cy, rx, ry, yt) * 0.97;
+    const hb = eggHW(cy, rx, ry, yb) * 0.97;
+    top.push([cx - ht + 2 * ht * f, yt]);
+    bot.unshift([cx - hb + 2 * hb * f, yb]);
+  }
+  return top.concat(bot);
+};
+const mirror = (pts, cx) => pts.map(([x, y]) => [2 * cx - x, y]);
+const earShapes = (type, cx, top, w, s = 1) => {
+  // w = half width of head/body, top = top y of body
+  const out = [];
+  const tri = (pts, inner) => { out.push(fP(pts, 'base')); out.push(fP(mirror(pts, cx), 'base')); if (inner) { out.push(fP(inner, 'blush', 0)); out.push(fP(mirror(inner, cx), 'blush', 0)); } };
+  if (type === 'cat') tri([[cx - w * 0.78, top + 40 * s], [cx - w * 0.66, top - 40 * s], [cx - w * 0.18, top + 10 * s]], [[cx - w * 0.64, top + 24 * s], [cx - w * 0.6, top - 16 * s], [cx - w * 0.34, top + 12 * s]]);
+  if (type === 'pointy') tri([[cx - w * 0.72, top + 40 * s], [cx - w * 0.62, top - 64 * s], [cx - w * 0.2, top + 12 * s]], [[cx - w * 0.6, top + 22 * s], [cx - w * 0.57, top - 36 * s], [cx - w * 0.36, top + 12 * s]]);
+  if (type === 'fennec') tri([[cx - w * 0.6, top + 44 * s], [cx - w * 0.98, top - 86 * s], [cx - w * 0.08, top + 16 * s]], [[cx - w * 0.52, top + 28 * s], [cx - w * 0.82, top - 54 * s], [cx - w * 0.26, top + 14 * s]]);
+  if (type === 'dog') { out.push(fE(cx - w * 0.92, top + 64 * s, w * 0.26, 54 * s, 'deep')); out.push(fE(cx + w * 0.92, top + 64 * s, w * 0.26, 54 * s, 'deep')); }
+  if (type === 'lop') { out.push(fE(cx - w * 0.9, top + 80 * s, w * 0.24, 76 * s, 'base')); out.push(fE(cx + w * 0.9, top + 80 * s, w * 0.24, 76 * s, 'base')); out.push(fE(cx - w * 0.9, top + 86 * s, w * 0.12, 56 * s, 'blush', 0)); out.push(fE(cx + w * 0.9, top + 86 * s, w * 0.12, 56 * s, 'blush', 0)); }
+  if (type === 'round') { [-1, 1].forEach((d) => { out.push(fE(cx + d * w * 0.62, top + 4 * s, w * 0.22, w * 0.22, 'base')); out.push(fE(cx + d * w * 0.62, top + 6 * s, w * 0.11, w * 0.11, 'blush', 0)); }); }
+  if (type === 'jerboa') { [-1, 1].forEach((d) => { out.push(fE(cx + d * w * 0.58, top - 26 * s, w * 0.34, 50 * s, 'base')); out.push(fE(cx + d * w * 0.58, top - 22 * s, w * 0.18, 32 * s, 'blush', 0)); }); }
+  if (type === 'camel') { [-1, 1].forEach((d) => out.push(fE(cx + d * w * 0.8, top + 26 * s, w * 0.16, 12 * s, 'base'))); }
+  return out;
+};
+const formPrims = (id, stage) => {
+  const f = (FORMS[id] || [])[stage - 1];
+  if (!f) return null;
+  const G = 444;
+  const cx = 256;
+  const R = { tail: [], body: [], face: null, hat: null, neck: null, deco: null, em: null, pivot: [cx, G] };
+  const B = R.body;
+  const T = R.tail;
+  if (f.k === 'egg') {
+    const rx = 94; const ry = 116; const cy = G - ry;
+    const top = cy - ry;
+    if (f.ears) earShapes(f.ears, cx, top + 4, rx * 0.95, 0.8).forEach((s) => B.push(s));
+    if (f.horns) [-1, 1].forEach((d) => B.push(fP([[cx + d * 30, top + 26], [cx + d * 44, top - 18], [cx + d * 56, top + 34]], 'light')));
+    if (f.crest) B.push(fP([[cx - 26, top + 20], [cx - 14, top - 26], [cx, top + 8], [cx + 14, top - 30], [cx + 28, top + 20]], 'deep'));
+    if (f.tuft) B.push(fP([[cx - 12, top + 16], [cx + 4, top - 30], [cx + 18, top + 14]], 'base'));
+    const spawn = f.pat === 'spawn';
+    B.push(fP(eggPts(cx, cy, rx, ry), spawn ? 'water' : 'light'));
+    if (spawn) { B.push(fE(cx, cy + 20, 62, 66, 'base')); B.push(fE(cx - 40, cy - 60, 16, 22, 'white', 0)); }
+    if (f.pat === 'band') B.push(fP(eggBand(cx, cy, rx, ry, cy - 6, cy + 30), 'base', 0));
+    if (f.pat === 'stripes') { B.push(fP(eggBand(cx, cy, rx, ry, cy - 46, cy - 26), 'shade', 0)); B.push(fP(eggBand(cx, cy, rx, ry, cy + 4, cy + 24), 'shade', 0)); B.push(fP(eggBand(cx, cy, rx, ry, cy + 54, cy + 72), 'shade', 0)); }
+    if (f.pat === 'zigzag') B.push(fP(eggBand(cx, cy, rx, ry, cy - 10, cy + 22, 18), 'deep', 0));
+    if (f.pat === 'spots') [[-44, -50, 18], [36, -70, 13], [52, 10, 20], [-56, 40, 15], [6, 70, 17]].forEach(([dx, dy, r]) => B.push(fE(cx + dx, cy + dy, r, r * 0.85, 'base', 0)));
+    if (f.pat === 'speckle') [[-40, -60], [20, -82], [50, -30], [-60, 0], [40, 26], [-22, 56], [30, 80], [-50, 70], [64, 60], [0, -30]].forEach(([dx, dy]) => B.push(fE(cx + dx, cy + dy, 6, 5, 'deep', 0)));
+    if (f.pat === 'scales') [[-30, -50], [26, -50], [-58, 4], [0, 0], [58, 4], [-30, 56], [26, 56]].forEach(([dx, dy]) => { B.push(fE(cx + dx, cy + dy, 20, 16, 'base', 0)); B.push(fE(cx + dx, cy + dy - 4, 12, 8, 'shade', 0)); });
+    if (f.pat === 'flame') { B.push(fP([[cx - 84, cy + 40], [cx - 60, cy - 10], [cx - 40, cy + 26], [cx - 10, cy - 40], [cx + 18, cy + 20], [cx + 46, cy - 20], [cx + 62, cy + 30], [cx + 86, cy + 20], [cx + 70, cy + 100], [cx - 70, cy + 100]], 'red', 0)); B.push(fP([[cx - 56, cy + 70], [cx - 36, cy + 34], [cx - 14, cy + 60], [cx + 12, cy + 24], [cx + 34, cy + 62], [cx + 58, cy + 50], [cx + 50, cy + 100], [cx - 50, cy + 100]], 'gold', 0)); }
+    B.push(fE(cx - 44, cy - 50, 14, 22, 'white', 0));
+    const ey = spawn ? cy + 10 : cy + 12;
+    R.face = { eyes: [[cx - 32, ey], [cx + 32, ey]], er: 13, kind: 'oval', mouth: [cx, ey + 30], ma: 6, blush: [[cx - 58, ey + 24], [cx + 58, ey + 24]], br: 11 };
+    R.hat = [cx, top + 18, 50]; R.neck = [cx, G - 46, 76]; R.em = [cx + 100, top - 6];
+  } else if (f.k === 'baby') {
+    const rx = 112; const ry = 100; const cy = G - ry - 4;
+    const top = cy - ry;
+    if (f.tail === 'curl') { T.push(fE(cx + rx * 0.98, cy + 52, 38, 20, 'base')); T.push(fE(cx + rx * 1.24, cy + 30, 18, 16, 'base')); }
+    if (f.tail === 'thin') T.push(fP([[cx + rx * 0.8, cy + 70], [cx + rx * 1.3, cy + 20], [cx + rx * 1.4, cy - 40], [cx + rx * 1.5, cy - 36], [cx + rx * 1.42, cy + 30], [cx + rx * 0.86, cy + 86]], 'base'));
+    if (f.tail === 'stub') T.push(fE(cx + rx * 0.96, cy + 40, 24, 18, 'base'));
+    if (f.tail === 'puff') T.push(fE(cx + rx * 0.98, cy + 56, 26, 24, 'cream'));
+    if (f.tail === 'fluffy') { T.push(fE(cx + rx * 1.08, cy + 26, 46, 34, 'base')); T.push(fE(cx + rx * 1.32, cy + 10, 20, 16, 'cream')); }
+    if (f.tail === 'lizard') T.push(fP([[cx + rx * 0.7, cy + 50], [cx + rx * 1.6, cy + 80], [cx + rx * 1.9, cy + 60], [cx + rx * 1.62, cy + 96], [cx + rx * 0.72, cy + 92]], 'base'));
+    if (f.tail === 'fin') T.push(fP([[cx + rx * 0.7, cy + 40], [cx + rx * 1.5, cy + 20], [cx + rx * 1.7, cy + 50], [cx + rx * 1.5, cy + 86], [cx + rx * 0.7, cy + 88]], 'light'));
+    R.pivot = [cx + rx * 0.8, cy + 60];
+    if (f.hump) B.push(fE(cx + 10, top + 16, 56, 40, 'base'));
+    if (f.ears) earShapes(f.ears, cx, top + 26, rx, 1).forEach((s) => B.push(s));
+    if (f.dwings) [-1, 1].forEach((d) => B.push(fP([[cx + d * rx * 0.6, cy - 30], [cx + d * rx * 1.45, cy - 80], [cx + d * rx * 1.3, cy - 30], [cx + d * rx * 1.5, cy], [cx + d * rx * 0.7, cy + 20]], 'deep')));
+    if (f.gills) [-1, 1].forEach((d) => [-40, -6, 28].forEach((dy, i) => B.push(fP([[cx + d * rx * 0.78, cy + dy - 6], [cx + d * (rx * 1.28 + (i === 1 ? 10 : 0)), cy + dy - 18 + i * 8], [cx + d * rx * 0.82, cy + dy + 10]], 'deep'))));
+    if (f.horns) [-1, 1].forEach((d) => B.push(fP([[cx + d * 40, top + 24], [cx + d * 58, top - 30], [cx + d * 72, top + 34]], 'light')));
+    if (f.spikes) B.push(fP([[cx - 70, top + 30], [cx - 54, top - 18], [cx - 30, top + 12], [cx - 10, top - 26], [cx + 12, top + 10], [cx + 34, top - 22], [cx + 52, top + 14], [cx + 72, top - 6], [cx + 80, top + 40]], 'deep'));
+    if (f.crest) B.push(fP([[cx - 30, top + 22], [cx - 18, top - 34], [cx, top + 4], [cx + 16, top - 40], [cx + 32, top + 22]], 'deep'));
+    if (f.comb) [[-24, 0, 16], [0, -12, 20], [24, 0, 16]].forEach(([dx, dy, r]) => B.push(fE(cx + dx, top + dy + 8, r, r, 'red')));
+    if (f.tuft) B.push(fP([[cx - 14, top + 16], [cx + 6, top - 40], [cx + 22, top + 14]], 'base'));
+    if (f.flame) { B.push(fP([[cx - 40, top + 26], [cx - 34, top - 30], [cx - 10, top - 6], [cx + 4, top - 56], [cx + 22, top - 8], [cx + 44, top - 34], [cx + 44, top + 26]], 'red')); B.push(fP([[cx - 22, top + 24], [cx - 14, top - 6], [cx + 4, top - 26], [cx + 22, top - 2], [cx + 26, top + 24]], 'gold', 0)); }
+    if (f.feet) { B.push(fE(cx - 50, G - 6, 34, 14, 'base')); B.push(fE(cx + 50, G - 6, 34, 14, 'base')); }
+    if (f.feetB) { B.push(fE(cx - 34, G - 6, 22, 10, 'beak')); B.push(fE(cx + 34, G - 6, 22, 10, 'beak')); }
+    B.push(fE(cx, cy, rx, ry, 'base'));
+    if (f.belly) B.push(fE(cx, cy + 44, rx * 0.56, ry * 0.46, 'cream', 0));
+    if (f.cheeks) { B.push(fE(cx - 66, cy + 18, 36, 28, 'cream', 0)); B.push(fE(cx + 66, cy + 18, 36, 28, 'cream', 0)); }
+    if (f.spots) [[-60, -30, 14], [56, -46, 11], [70, 20, 13]].forEach(([dx, dy, r]) => B.push(fE(cx + dx, cy + dy, r, r * 0.8, 'deep', 0)));
+    if (f.mask) { B.push(fE(cx - 42, cy - 12, 28, 24, 'deep', 0)); B.push(fE(cx + 42, cy - 12, 28, 24, 'deep', 0)); }
+    if (f.wings) [-1, 1].forEach((d) => B.push(fE(cx + d * rx * 0.94, cy + 20, 26, 42, 'shade')));
+    B.push(fE(cx - 54, cy - 54, 16, 22, 'light', 0));
+    const ey = cy - 12;
+    const bird = !!f.beak;
+    if (bird) B.push(fP([[cx - 18, ey + 18], [cx + 18, ey + 18], [cx, ey + 40]], 'beak'));
+    R.face = { eyes: [[cx - 42, ey], [cx + 42, ey]], er: 16, kind: 'oval', mouth: bird ? null : [cx, ey + 36], ma: 7, blush: [[cx - 72, ey + 30], [cx + 72, ey + 30]], br: 14 };
+    R.hat = [cx, top + 14, 58]; R.neck = [cx, G - 40, 96]; R.em = [cx + 118, top - 10];
+  } else if (f.k === 'basket' || f.k === 'burrow') {
+    const basket = f.k === 'basket';
+    const ground = f.ground || 'brown';
+    const hy = basket ? G - 150 : G - 124;
+    const hr = basket ? 104 : 96;
+    if (basket) {
+      B.push(fE(cx, G - 84, 122, 20, 'brown'));
+      B.push(fE(cx, G - 88, 106, 14, 'cream', 0));
+    } else {
+      B.push(fE(cx, G - 30, 156, 52, ground));
+      B.push(fE(cx, G - 58, 84, 22, 'brownD', 0));
+    }
+    earShapes(f.ears, cx, hy - hr + 18, hr, 0.85).forEach((s) => B.push(s));
+    B.push(fE(cx, hy, hr, hr * 0.84, 'base'));
+    B.push(fE(cx - hr * 0.5, hy - hr * 0.45, 12, 16, 'light', 0));
+    if (basket) {
+      B.push(fE(cx - 46, G - 86, 22, 14, 'base')); B.push(fE(cx + 46, G - 86, 22, 14, 'base'));
+      B.push(fP([[cx - 118, G - 84], [cx + 118, G - 84], [cx + 98, G], [cx - 98, G]], 'tan'));
+      [G - 52, G - 24].forEach((y) => B.push(fL([[cx - 108 + (G - y) * -0.2, y], [cx + 108 - (G - y) * -0.2, y]], 'brown', 4)));
+      B.push(fP([[cx - 124, G - 92], [cx + 124, G - 92], [cx + 120, G - 76], [cx - 120, G - 76]], 'brown'));
+    } else {
+      B.push(fE(cx - 34, G - 64, 18, 12, 'base')); B.push(fE(cx + 34, G - 64, 18, 12, 'base'));
+      B.push(fP([[cx - 96, G - 62], [cx - 60, G - 54], [cx, G - 50], [cx + 60, G - 54], [cx + 96, G - 62], [cx + 120, G - 30], [cx - 120, G - 30]], ground, 0));
+      if (ground === 'brown') [[-120, -60], [110, -64], [60, -22]].forEach(([dx, dy]) => B.push(fP([[cx + dx - 12, G + dy + 14], [cx + dx - 4, G + dy - 14], [cx + dx + 2, G + dy + 6], [cx + dx + 10, G + dy - 18], [cx + dx + 14, G + dy + 14]], 'leaf', 0)));
+      else [[-110, -40], [96, -30]].forEach(([dx, dy]) => B.push(fE(cx + dx, G + dy, 14, 6, 'brownD', 0)));
+    }
+    const ey = hy + 2;
+    R.face = { eyes: [[cx - 38, ey], [cx + 38, ey]], er: 12, kind: 'oval', mouth: [cx, ey + 32], ma: 5, blush: [[cx - 66, ey + 24], [cx + 66, ey + 24]], br: 10 };
+    R.hat = [cx, hy - hr + 12, 46]; R.neck = [cx, hy + hr * 0.7, 56]; R.em = [cx + 110, hy - 110];
+  } else if (f.k === 'blanket') {
+    B.push(fE(cx, G - 16, 156, 28, 'red'));
+    B.push(fL([[cx - 140, G - 22], [cx + 140, G - 22]], 'gold', 6)); B.push(fL([[cx - 130, G - 8], [cx + 130, G - 8]], 'gold', 4));
+    B.push(fE(cx + 50, G - 108, 40, 26, 'base'));
+    B.push(fE(cx + 30, G - 62, 104, 46, 'base'));
+    B.push(fE(cx + 60, G - 30, 26, 10, 'shade')); B.push(fE(cx - 10, G - 30, 26, 10, 'shade'));
+    B.push(fP([[cx - 70, G - 72], [cx - 108, G - 128], [cx - 80, G - 140], [cx - 44, G - 88]], 'base'));
+    B.push(fE(cx - 98, G - 146, 46, 36, 'base'));
+    B.push(fE(cx - 126, G - 138, 20, 16, 'cream', 0));
+    B.push(fE(cx - 104, G - 186, 10, 7, 'base')); B.push(fE(cx - 70, G - 180, 10, 7, 'base'));
+    R.face = { eyes: [[cx - 112, G - 152], [cx - 80, G - 152]], er: 10, kind: 'oval', mouth: [cx - 100, G - 128], ma: 4, blush: [[cx - 132, G - 136], [cx - 64, G - 136]], br: 8 };
+    R.hat = [cx - 98, G - 182, 38]; R.neck = [cx - 92, G - 112, 34]; R.em = [cx + 40, G - 220];
+  } else if (f.k === 'cub') {
+    const bcy = G - 64; const brx = 74; const bry = 56;
+    const hcy = f.longLegs ? G - 196 : G - 162; const hr = 90;
+    const top = hcy - hr * 0.84;
+    if (f.tail === 'curl') { T.push(fE(cx + brx * 1.05, bcy + 10, 34, 16, 'base')); T.push(fE(cx + brx * 1.36, bcy - 12, 16, 16, 'base')); }
+    if (f.tail === 'thin') T.push(fP([[cx + brx * 0.8, bcy + 20], [cx + brx * 1.4, bcy - 30], [cx + brx * 1.5, bcy - 100], [cx + brx * 1.62, bcy - 96], [cx + brx * 1.54, bcy - 24], [cx + brx * 0.86, bcy + 36]], 'base'));
+    if (f.tail === 'stub') T.push(fE(cx + brx * 1.0, bcy - 10, 22, 16, 'base'));
+    if (f.tail === 'puff') T.push(fE(cx + brx * 1.0, bcy + 10, 24, 22, 'cream'));
+    if (f.tail === 'fluffy') { T.push(fE(cx + brx * 1.25, bcy - 16, 46, 32, 'base')); T.push(fE(cx + brx * 1.6, bcy - 30, 18, 15, 'cream')); }
+    R.pivot = [cx + brx * 0.8, bcy];
+    const legY = f.longLegs ? G - 34 : G - 10;
+    const legH = f.longLegs ? 40 : 14;
+    [[-56, 'shade'], [56, 'shade'], [-26, 'base'], [26, 'base']].forEach(([dx, c]) => B.push(f.longLegs ? fP([[cx + dx - 12, G - 90], [cx + dx + 12, G - 90], [cx + dx + 10, G], [cx + dx - 10, G]], c) : fE(cx + dx, legY, 18, legH, c)));
+    if (f.hump) B.push(fE(cx + 10, bcy - (f.longLegs ? 90 : 50), 44, 30, 'base'));
+    B.push(fE(cx, f.longLegs ? bcy - 50 : bcy, brx, bry, 'base'));
+    if (f.belly) B.push(fE(cx, (f.longLegs ? bcy - 50 : bcy) + 16, brx * 0.5, bry * 0.5, 'cream', 0));
+    earShapes(f.ears, cx, top + 18, hr, 0.95).forEach((s) => B.push(s));
+    B.push(fE(cx, hcy, hr, hr * 0.84, 'base'));
+    if (f.muzzle) B.push(fE(cx, hcy + 30, 42, 28, 'cream', 0));
+    if (f.cheeks) { B.push(fE(cx - 56, hcy + 20, 30, 24, 'cream', 0)); B.push(fE(cx + 56, hcy + 20, 30, 24, 'cream', 0)); }
+    if (f.mask) { B.push(fE(cx - 34, hcy - 8, 24, 21, 'deep', 0)); B.push(fE(cx + 34, hcy - 8, 24, 21, 'deep', 0)); }
+    if (f.spots) { B.push(fE(cx + 44, hcy - 44, 18, 14, 'deep', 0)); B.push(fE(cx - 40, bcy - 6, 14, 11, 'deep', 0)); }
+    B.push(fE(cx - 44, hcy - 40, 14, 18, 'light', 0));
+    const ey = hcy - 8;
+    R.face = { eyes: [[cx - 34, ey], [cx + 34, ey]], er: 15, kind: 'oval', mouth: [cx, ey + 34], ma: 6, blush: [[cx - 60, ey + 26], [cx + 60, ey + 26]], br: 12 };
+    R.hat = [cx, top + 12, 56]; R.neck = [cx, hcy + hr * 0.78, 58]; R.em = [cx + 116, top - 10];
+  } else if (f.k === 'turtle') {
+    const cy = G - 70;
+    B.push(fE(cx - 70, G - 8, 30, 14, 'skinD')); B.push(fE(cx + 70, G - 8, 30, 14, 'skinD'));
+    if (f.shell === 'angular') B.push(fP([[cx - 132, cy + 24], [cx - 100, cy - 70], [cx - 40, cy - 106], [cx + 40, cy - 106], [cx + 100, cy - 70], [cx + 132, cy + 24]], 'base'));
+    else { const pts = []; for (let i = 0; i <= 20; i++) { const t = Math.PI + (Math.PI * i) / 20; pts.push([cx + 132 * Math.cos(t), cy + 24 + 128 * Math.sin(t)]); } B.push(fP(pts, 'base')); }
+    [[-58, -40], [0, -70], [58, -40]].forEach(([dx, dy]) => B.push(fE(cx + dx, cy + dy, 24, 18, 'light', 0)));
+    B.push(fP([[cx - 136, cy + 10], [cx + 136, cy + 10], [cx + 130, cy + 30], [cx - 130, cy + 30]], 'deep'));
+    B.push(fE(cx, cy + 36, 58, 50, 'skin'));
+    R.face = { eyes: [[cx - 22, cy + 30], [cx + 22, cy + 30]], er: 11, kind: 'oval', mouth: [cx, cy + 54], ma: 5, blush: [[cx - 42, cy + 50], [cx + 42, cy + 50]], br: 9 };
+    R.hat = [cx, cy - 98, 54]; R.neck = [cx, cy + 74, 52]; R.em = [cx + 130, cy - 120];
+  } else if (f.k === 'tadpole') {
+    const hcx = cx - 30; const cy = G - 84;
+    T.push(fP([[hcx + 60, cy - 30], [hcx + 150, cy - 50], [hcx + 210, cy - 10], [hcx + 240, cy + 40], [hcx + 180, cy + 30], [hcx + 130, cy + 50], [hcx + 60, cy + 40]], 'light'));
+    R.pivot = [hcx + 70, cy];
+    B.push(fE(hcx, cy, 100, 84, 'base'));
+    B.push(fE(hcx, cy + 36, 60, 36, 'cream', 0));
+    B.push(fE(hcx - 40, cy - 40, 14, 18, 'light', 0));
+    R.face = { eyes: [[hcx - 38, cy - 14], [hcx + 34, cy - 14]], er: 15, kind: 'oval', mouth: [hcx, cy + 18], ma: 7, blush: [[hcx - 64, cy + 14], [hcx + 62, cy + 14]], br: 12 };
+    R.hat = [hcx, cy - 78, 56]; R.neck = [hcx, cy + 50, 80]; R.em = [hcx + 110, cy - 100];
+  } else if (f.k === 'orb') {
+    const cy = G - 96;
+    B.push(fE(cx, cy, 108, 108, 'light', 0));
+    B.push(fE(cx, cy, 82, 82, 'base'));
+    B.push(fE(cx - 30, cy - 34, 18, 14, 'white', 0));
+    if (f.star) B.push(fP([[cx, cy - 150], [cx + 10, cy - 128], [cx + 32, cy - 124], [cx + 14, cy - 110], [cx + 20, cy - 88], [cx, cy - 100], [cx - 20, cy - 88], [cx - 14, cy - 110], [cx - 32, cy - 124], [cx - 10, cy - 128]], 'gold'));
+    R.face = { eyes: [[cx - 28, cy + 2], [cx + 28, cy + 2]], er: 12, kind: 'oval', mouth: [cx, cy + 28], ma: 5, blush: [[cx - 50, cy + 22], [cx + 50, cy + 22]], br: 10 };
+    R.hat = [cx, cy - 72, 50]; R.neck = [cx, cy + 66, 64]; R.em = [cx + 100, cy - 110];
+  } else if (f.k === 'sprite') {
+    const cy = G - 92; const rx = 100; const ry = 90;
+    if (f.tip === 'flame') B.push(fP([[cx - 70, cy - 40], [cx - 54, cy - 120], [cx - 20, cy - 80], [cx, cy - 170], [cx + 24, cy - 84], [cx + 58, cy - 130], [cx + 72, cy - 40]], 'base'));
+    if (f.tip === 'drop') B.push(fP([[cx - 76, cy - 30], [cx, cy - 170], [cx + 76, cy - 30]], 'base'));
+    if (f.tip === 'leaf') { B.push(fL([[cx, cy - 80], [cx, cy - 130]], 'leafD', 8)); B.push(fP([[cx, cy - 120], [cx - 44, cy - 150], [cx - 56, cy - 126], [cx - 20, cy - 110]], 'leaf')); B.push(fP([[cx, cy - 126], [cx + 40, cy - 160], [cx + 56, cy - 136], [cx + 18, cy - 114]], 'leafL')); }
+    if (f.tip === 'swirl') { T.push(fL([[cx + 90, cy + 10], [cx + 140, cy - 10], [cx + 150, cy - 50], [cx + 124, cy - 64], [cx + 110, cy - 44], [cx + 124, cy - 30]], 'light', 10)); T.push(fL([[cx - 170, cy - 30], [cx - 120, cy - 30], [cx - 176, cy + 10], [cx - 126, cy + 10]], 'light', 8)); }
+    if (f.tip === 'halo') { B.push({ ring: [cx, cy - 20, 128], c: 'gold', w: 7 }); }
+    const flat = f.tip === 'leaf';
+    B.push(fE(cx, flat ? cy + 20 : cy, flat ? 120 : rx, flat ? 70 : ry, 'base'));
+    B.push(fE(cx - 40, (flat ? cy + 20 : cy) - 40, 16, 20, 'light', 0));
+    const ey = flat ? cy + 14 : cy - 4;
+    R.face = { eyes: [[cx - 34, ey], [cx + 34, ey]], er: 13, kind: 'oval', mouth: [cx, ey + 30], ma: 6, blush: [[cx - 62, ey + 24], [cx + 62, ey + 24]], br: 11 };
+    R.hat = [cx, flat ? cy - 44 : cy - 82, 54]; R.neck = [cx, G - 30, 84]; R.em = [cx + 116, cy - 130];
+  } else if (f.k === 'seed' || f.k === 'young') {
+    const bonsai = f.pot === 'bonsai';
+    if (bonsai) { B.push(fP([[cx - 124, 372], [cx + 124, 372], [cx + 104, 444], [cx - 104, 444]], 'base')); B.push(fP([[cx - 136, 356], [cx + 136, 356], [cx + 136, 380], [cx - 136, 380]], 'light')); }
+    else { B.push(fP([[cx - 80, 344], [cx + 80, 344], [cx + 64, 444], [cx - 64, 444]], 'base')); B.push(fP([[cx + 34, 344], [cx + 80, 344], [cx + 64, 444], [cx + 34, 444]], 'shade', 0)); B.push(fP([[cx - 92, 326], [cx + 92, 326], [cx + 92, 352], [cx - 92, 352]], 'light')); }
+    const rimY = bonsai ? 356 : 326;
+    const tops = [];
+    if (f.k === 'seed') {
+      tops.push(fE(cx, rimY + 2, 70, 12, 'soil', 0));
+      tops.push(fE(cx, rimY - 12, 26, 20, 'tan'));
+      tops.push(fP([[cx - 2, rimY - 28], [cx - 22, rimY - 56], [cx - 4, rimY - 48], [cx, rimY - 30]], 'leafL'));
+      tops.push(fP([[cx + 2, rimY - 30], [cx + 24, rimY - 62], [cx + 6, rimY - 52], [cx + 4, rimY - 30]], 'leaf'));
+      R.hat = [cx, rimY - 56, 40];
+    } else {
+      const t = f.top;
+      const stem = (y1) => tops.push(fP([[cx - 5, rimY], [cx + 5, rimY], [cx + 5, y1], [cx - 5, y1]], 'leafD', 0));
+      const leaves = (y) => { tops.push(fP([[cx, y], [cx - 70, y - 30], [cx - 80, y - 6], [cx - 20, y + 12]], 'leaf')); tops.push(fP([[cx, y - 10], [cx + 70, y - 44], [cx + 82, y - 20], [cx + 20, y + 4]], 'leafD')); };
+      if (t === 'seedling') { stem(272); tops.push(fE(cx - 34, 262, 34, 20, 'leafL')); tops.push(fE(cx + 34, 254, 34, 20, 'leaf')); R.hat = [cx, 238, 40]; }
+      if (t === 'sunbud') { stem(196); leaves(280); tops.push(fE(cx, 180, 30, 34, 'leafD')); tops.push(fP([[cx - 12, 152], [cx, 132], [cx + 12, 152]], 'yellow')); R.hat = [cx, 148, 40]; }
+      if (t === 'daisybud') { stem(206); leaves(286); tops.push(fE(cx, 196, 24, 28, 'leaf')); tops.push(fE(cx, 176, 16, 14, 'white')); R.hat = [cx, 164, 38]; }
+      if (t === 'tulipbud') { stem(220); tops.push(fP([[cx, 300], [cx - 50, 200], [cx - 30, 196], [cx + 4, 290]], 'leaf')); tops.push(fP([[cx, 296], [cx + 50, 206], [cx + 30, 200], [cx - 4, 288]], 'leafD')); tops.push(fP([[cx - 26, 226], [cx - 22, 176], [cx, 146], [cx + 22, 176], [cx + 26, 226], [cx, 238]], 'leaf')); tops.push(fP([[cx - 18, 186], [cx, 150], [cx + 18, 186], [cx, 178]], 'hot', 0)); R.hat = [cx, 144, 38]; }
+      if (t === 'tomato') { stem(250); tops.push(fE(cx - 40, 264, 46, 32, 'leaf')); tops.push(fE(cx + 42, 250, 46, 32, 'leafD')); tops.push(fE(cx, 224, 40, 28, 'leaf')); tops.push(fE(cx - 34, 298, 22, 20, 'leafL')); tops.push(fE(cx + 40, 214, 10, 10, 'yellow')); R.hat = [cx, 200, 42]; }
+      if (t === 'sapling' || t === 'bonsai') { const ty = t === 'bonsai' ? 250 : 236; tops.push(fP([[cx - 7, rimY], [cx + 7, rimY], [cx + 6, ty + 30], [cx - 6, ty + 30]], 'brown', 0)); tops.push(fE(cx, ty, t === 'bonsai' ? 84 : 76, t === 'bonsai' ? 46 : 58, 'leaf')); tops.push(fE(cx - 24, ty - 14, 34, 22, 'leafL', 0)); if (t === 'sapling') [[-40, -6], [20, -30], [44, 14], [-6, 22], [-20, -36]].forEach(([dx, dy], i) => tops.push(fE(cx + dx, ty + dy, 8, 8, i % 2 ? 'pink' : 'white', 0))); R.hat = [cx, ty - (t === 'bonsai' ? 40 : 54), 42]; }
+      if (t === 'cactusball') { tops.push(fE(cx, rimY - 54, 70, 62, 'leaf')); tops.push(fL([[cx - 30, rimY - 108], [cx - 34, rimY - 6]], 'leafD', 4)); tops.push(fL([[cx + 30, rimY - 108], [cx + 34, rimY - 6]], 'leafD', 4)); tops.push(fE(cx, rimY - 120, 16, 12, 'pink')); R.hat = [cx, rimY - 124, 44]; }
+    }
+    tops.forEach((s) => B.push(s));
+    const ballFace = f.top === 'cactusball';
+    if (ballFace) R.face = { eyes: [[cx - 26, rimY - 56], [cx + 26, rimY - 56]], er: 11, kind: 'oval', mouth: [cx, rimY - 32], ma: 5, blush: [[cx - 46, rimY - 36], [cx + 46, rimY - 36]], br: 9 };
+    else R.face = { eyes: [[cx - 30, 392], [cx + 30, 392]], er: 10, kind: 'oval', mouth: [cx, 416], ma: 5, blush: [[cx - 54, 410], [cx + 54, 410]], br: 9 };
+    R.neck = [cx, rimY + 10, bonsai ? 130 : 92]; R.deco = f.k === 'young' ? [cx, (R.hat[1] + rimY) / 2 + 20, 70] : [cx, rimY + 10, 92]; R.em = [cx + 100, R.hat[1] - 30];
+  } else if (f.k === 'seedBig' || f.k === 'vine') {
+    B.push(fE(cx, G - 18, 140, 30, 'soil'));
+    if (f.k === 'seedBig') {
+      B.push(fP([[cx, G - 196], [cx + 56, G - 120], [cx + 52, G - 60], [cx, G - 34], [cx - 52, G - 60], [cx - 56, G - 120]], 'cream'));
+      B.push(fP([[cx, G - 190], [cx + 50, G - 120], [cx + 46, G - 64], [cx, G - 40], [cx + 22, G - 110]], 'creamShade', 0));
+      R.face = { eyes: [[cx - 22, G - 112], [cx + 22, G - 112]], er: 11, kind: 'oval', mouth: [cx, G - 88], ma: 5, blush: [[cx - 40, G - 92], [cx + 40, G - 92]], br: 9 };
+      R.hat = [cx, G - 186, 44]; R.em = [cx + 90, G - 220];
+    } else {
+      B.push(fL([[cx - 120, G - 30], [cx - 80, G - 70], [cx - 30, G - 60]], 'leafD', 8));
+      B.push(fE(cx - 100, G - 86, 40, 28, 'leaf')); B.push(fE(cx + 110, G - 70, 36, 26, 'leafD'));
+      B.push(fE(cx + 96, G - 120, 14, 14, 'yellow'));
+      B.push(fE(cx, G - 74, 84, 62, 'leafL'));
+      B.push(fL([[cx - 30, G - 130], [cx - 36, G - 16]], 'leaf', 5)); B.push(fL([[cx + 30, G - 130], [cx + 36, G - 16]], 'leaf', 5));
+      B.push(fP([[cx - 6, G - 134], [cx - 8, G - 160], [cx + 10, G - 168], [cx + 8, G - 134]], 'brown'));
+      R.face = { eyes: [[cx - 28, G - 84], [cx + 28, G - 84]], er: 12, kind: 'oval', mouth: [cx, G - 58], ma: 6, blush: [[cx - 52, G - 62], [cx + 52, G - 62]], br: 10 };
+      R.hat = [cx, G - 136, 50]; R.em = [cx + 110, G - 190];
+    }
+    R.neck = [cx, G - 40, 90]; R.deco = [cx, G - 80, 110];
+  } else if (f.k === 'spore' || f.k === 'button') {
+    if (f.k === 'spore') {
+      B.push(fE(cx, G - 40, 120, 48, 'leaf'));
+      B.push(fE(cx, G - 58, 100, 22, 'leafL', 0));
+      [[-60, -50], [40, -70], [70, -40], [-20, -76]].forEach(([dx, dy]) => B.push(fE(cx + dx, G + dy, 6, 6, 'white', 0)));
+      B.push(fE(cx + 20, G - 96, 22, 18, 'base')); B.push(fP([[cx + 14, G - 82], [cx + 26, G - 82], [cx + 26, G - 64], [cx + 14, G - 64]], 'cream'));
+      R.face = { eyes: [[cx - 30, G - 40], [cx + 30, G - 40]], er: 11, kind: 'oval', mouth: [cx, G - 16], ma: 5, blush: [[cx - 56, G - 22], [cx + 56, G - 22]], br: 9 };
+      R.hat = [cx - 20, G - 96, 44]; R.em = [cx + 110, G - 150]; R.neck = [cx, G - 30, 100];
+    } else {
+      B.push(fP([[cx - 44, G], [cx - 40, G - 110], [cx + 40, G - 110], [cx + 44, G]], 'cream'));
+      const pts = []; for (let i = 0; i <= 18; i++) { const t = Math.PI + (Math.PI * i) / 18; pts.push([cx + 100 * Math.cos(t), G - 104 + 92 * Math.sin(t)]); }
+      B.push(fP(pts, 'base'));
+      B.push(fP([[cx - 100, G - 104], [cx + 100, G - 104], [cx + 90, G - 92], [cx - 90, G - 92]], 'creamShade'));
+      [[-50, -150, 14], [20, -170, 12], [56, -130, 10]].forEach(([dx, dy, r]) => B.push(fE(cx + dx, G + dy, r, r * 0.8, 'white', 0)));
+      R.face = { eyes: [[cx - 20, G - 62], [cx + 20, G - 62]], er: 10, kind: 'oval', mouth: [cx, G - 38], ma: 5, blush: [[cx - 34, G - 40], [cx + 34, G - 40]], br: 8 };
+      R.hat = [cx, G - 190, 50]; R.em = [cx + 110, G - 210]; R.neck = [cx, G - 98, 96];
+    }
+  }
+  return R;
+};
+
+const PIXKEY = { base: 'B', shade: 'S', deep: 'D', light: 'L', cream: 'C', creamShade: 'G', skin: 'V', skinD: 'U', beak: 'K', beakD: 'Q', red: 'R', redD: 'r', gold: 'J', yellow: 'A', leaf: 'F', leafL: 'E', leafD: 'H', pink: 'Y', hot: 'p', blush: 'P', brown: 'Z', brownD: 'z', white: 'W', water: 'X', waterD: 'x', glow: 'I', soil: 'z', tan: 'M', ink: 'O' };
+const FORM_CACHE = {};
+const pixelForm = (id, stage) => {
+  const key = id + stage;
+  if (FORM_CACHE[key]) return FORM_CACHE[key];
+  const R = formPrims(id, stage);
+  if (!R) return null;
+  const S = 16;
+  const g = Array.from({ length: 32 }, () => new Array(32).fill('.'));
+  const inPoly = (pts, x, y) => { let c = false; for (let i = 0, j = pts.length - 1; i < pts.length; j = i++) { const [xi, yi] = pts[i]; const [xj, yj] = pts[j]; if ((yi > y) !== (yj > y) && x < ((xj - xi) * (y - yi)) / (yj - yi) + xi) c = !c; } return c; };
+  const fill = (test, k) => { for (let y = 0; y < 28; y++) for (let x = 0; x < 32; x++) if (test(x + 0.5, y + 0.5)) g[y][x] = k; };
+  const draw = (s) => {
+    const k = PIXKEY[s.c] || 'B';
+    if (s.e) { const [cx, cy, rx, ry] = s.e.map((v) => v / S); fill((x, y) => ((x - cx) / Math.max(rx, 0.5)) ** 2 + ((y - cy) / Math.max(ry, 0.5)) ** 2 <= 1, k); }
+    else if (s.p) { const pts = s.p.map(([a, b]) => [a / S, b / S]); fill((x, y) => inPoly(pts, x, y), k); }
+    else if (s.l) { for (let i = 0; i + 1 < s.l.length; i++) { const [a, b] = s.l[i]; const [c, d] = s.l[i + 1]; for (let t = 0; t <= 1; t += 0.05) { const x = Math.floor((a + (c - a) * t) / S); const y = Math.floor((b + (d - b) * t) / S); if (y >= 0 && y < 28 && x >= 0 && x < 32) g[y][x] = k; } } }
+    else if (s.ring) { const [cx, cy, r] = s.ring.map((v) => v / S); fill((x, y) => Math.abs(Math.hypot(x - cx, y - cy) - r) < 0.55, k); }
+  };
+  R.tail.forEach(draw);
+  R.body.forEach(draw);
+  for (let y = 0; y < 32; y++) for (let x = 19; x < 32; x++) if (g[y][x] === 'B') g[y][x] = 'S';
+  const out = g.map((r) => r.slice());
+  for (let y = 0; y < 32; y++) for (let x = 0; x < 32; x++) {
+    if (g[y][x] !== '.') continue;
+    if ([[1, 0], [-1, 0], [0, 1], [0, -1]].some(([dx, dy]) => g[y + dy] && g[y + dy][x + dx] && g[y + dy][x + dx] !== '.')) out[y][x] = 'O';
+  }
+  const F = R.face;
+  const eyes = F.eyes.map(([x, y]) => [Math.round(x / S - 1), Math.round(y / S - 1)]);
+  const eyeBg = eyes.map(([x, y]) => { const k = out[y] && out[y][x]; return k && k !== '.' && k !== 'O' ? k : 'B'; });
+  eyes.forEach(([x, y]) => { out[y][x] = 'O'; out[y][x + 1] = 'W'; out[y + 1][x] = 'O'; out[y + 1][x + 1] = 'O'; });
+  F.blush.forEach(([x, y]) => { const bx = Math.round(x / S - 1); const by = Math.round(y / S); [bx, bx + 1].forEach((xx) => { if (out[by] && out[by][xx] && out[by][xx] !== '.' && out[by][xx] !== 'O') out[by][xx] = 'P'; }); });
+  let mouth = null;
+  let mBg = 'B';
+  if (F.mouth) {
+    mouth = [Math.round(F.mouth[0] / S) - 2, Math.max(Math.round(F.mouth[1] / S), eyes[0][1] + 2)];
+    const k = out[mouth[1]] && out[mouth[1]][mouth[0] + 1];
+    mBg = k && k !== '.' && k !== 'O' ? k : 'B';
+    out[mouth[1]][mouth[0] + 1] = 'O'; out[mouth[1]][mouth[0] + 2] = 'O';
+  }
+  const px = (v) => Math.round(v / S);
+  const nk = (n) => (n ? [px(n[0] - n[2]), px(n[0] + n[2]), px(n[1])] : n);
+  const res = { ...PETS[id], art: out.map((r) => r.join('')), eyes, eyeBg, mouth, mBg, head: [px(R.hat[0]), px(R.hat[1]), Math.max(3, Math.round((R.hat[2] / S) * 1.3)), eyes[0][1] + 1], neck: nk(R.neck), deco: nk(R.deco), em: [px(R.em[0]), px(R.em[1])], shellCape: null };
+  FORM_CACHE[key] = res;
+  return res;
+};
+const drawCape = (g, spec) => {
+  const [x0, x1, ny] = spec.neck;
+  let bottom = 31;
+  while (bottom > 0 && !/[^.]/.test(spec.art[bottom])) bottom--;
+  let bl = 31;
+  let br = 0;
+  for (let y = ny + Math.floor((bottom - ny) / 3); y <= bottom; y++) {
+    const row = spec.art[y];
+    const a = row.search(/[^.]/);
+    if (a < 0) continue;
+    bl = Math.min(bl, a);
+    br = Math.max(br, row.length - 1 - row.split('').reverse().join('').search(/[^.]/));
+  }
+  if (bl > br) { bl = x0 - 3; br = x1 + 3; }
+  bl = Math.min(bl, x0 - 2) - 2;
+  br = Math.max(br, x1 + 2) + 2;
+  const cells = new Set();
+  for (let y = ny; y <= bottom; y++) {
+    const t = Math.min(1, ((y - ny) / Math.max(1, bottom - ny)) * 1.4);
+    const e = 1 - (1 - t) * (1 - t);
+    const l = Math.max(0, Math.round(x0 - 1 + (bl - (x0 - 1)) * e));
+    const r = Math.min(31, Math.round(x1 + 1 + (br - (x1 + 1)) * e));
+    for (let x = l; x <= r; x++) {
+      put(g, x, y, y === bottom ? 'AJ' : ((x === l + 2 || x === r - 2) && y > ny + 2 ? 'AD' : 'AR'));
+      cells.add(y * 32 + x);
+    }
+  }
+  cells.forEach((i) => {
+    const x = i % 32;
+    const y = (i - x) / 32;
+    [[1, 0], [-1, 0], [0, 1]].forEach(([dx, dy]) => { if (!at(g, x + dx, y + dy)) put(g, x + dx, y + dy, 'O'); });
+  });
+};
+
+return { COATS, PETS, FORMS, pixelForm, makeGrid, stamp, applyMood, applyAcc, drawCape, HEAD_KEYS, ITEMS, GLYPHS, buildSky, buildGround, buildFx, TOP };
+})();
+
+const MP_PETS = [{"id": "mochi", "name": "Mochi", "species": "Cat", "design": "round", "group": "meadow", "island": "meadow", "words": ["unbothered", "cosy", "secretly clever"], "quirk": "Kneads its paws, then one slow blink at you.", "firstHome": "basket", "starter": true, "unlockDays": 0, "rare": false, "odds": null, "favouriteFood": "fish", "defaultColour": "butter", "batch": 1}, {"id": "pip", "name": "Pip", "species": "Cat", "design": "sharp", "group": "meadow", "island": "meadow", "words": ["dramatic", "fussy", "loyal"], "quirk": "Grooms one paw, then checks that you saw.", "firstHome": "basket", "starter": false, "unlockDays": 30, "rare": false, "odds": null, "favouriteFood": "fish", "defaultColour": "lavender", "batch": 2}, {"id": "bao", "name": "Bao", "species": "Dog", "design": "round", "group": "meadow", "island": "meadow", "words": ["stubborn", "snack-driven", "steady"], "quirk": "Sniffs the grass; its tail thumps once.", "firstHome": "basket", "starter": true, "unlockDays": 0, "rare": false, "odds": null, "favouriteFood": "bone", "defaultColour": "peach", "batch": 1}, {"id": "rook", "name": "Rook", "species": "Dog", "design": "sharp", "group": "meadow", "island": "meadow", "words": ["gentle", "shy", "watchful"], "quirk": "One ear lifts at every sound, then lowers.", "firstHome": "basket", "starter": false, "unlockDays": 60, "rare": false, "odds": null, "favouriteFood": "bone", "defaultColour": "charcoal", "batch": 2}, {"id": "pom", "name": "Pom", "species": "Bird", "design": "round", "group": "meadow", "island": "meadow", "words": ["bossy", "loud", "tidy"], "quirk": "Puffs up round, then preens one feather flat.", "firstHome": "egg", "starter": false, "unlockDays": 30, "rare": false, "odds": null, "favouriteFood": "berry", "defaultColour": "sky", "batch": 2}, {"id": "kite", "name": "Kite", "species": "Bird", "design": "sharp", "group": "meadow", "island": "meadow", "words": ["dreamy", "slow", "poetic"], "quirk": "Tilts its head and follows a passing cloud.", "firstHome": "egg", "starter": true, "unlockDays": 0, "rare": false, "odds": null, "favouriteFood": "berry", "defaultColour": "mint", "batch": 1}, {"id": "clover", "name": "Clover", "species": "Rabbit", "design": null, "group": "meadow", "island": "meadow", "words": ["brave", "nosy", "restless"], "quirk": "Nose wiggles; one ear flops and pops back.", "firstHome": "burrow", "starter": false, "unlockDays": 60, "rare": false, "odds": null, "favouriteFood": "carrot", "defaultColour": "cocoa", "batch": 2}, {"id": "nib", "name": "Nib", "species": "Hamster", "design": null, "group": "meadow", "island": "meadow", "words": ["organised", "thrifty", "cheerful"], "quirk": "Stuffs its cheeks, then pats them proudly.", "firstHome": "burrow", "starter": false, "unlockDays": 100, "rare": false, "odds": null, "favouriteFood": "seed", "defaultColour": "ginger", "batch": 2}, {"id": "peep", "name": "Peep", "species": "Chicken", "design": null, "group": "meadow", "island": "meadow", "words": ["punctual", "chatty", "nosy"], "quirk": "Pecks twice and bobs its head to a beat.", "firstHome": "egg", "starter": false, "unlockDays": 100, "rare": false, "odds": null, "favouriteFood": "seed", "defaultColour": "snow", "batch": 2}, {"id": "sunny", "name": "Sunny", "species": "Fennec", "design": "round", "group": "dunes", "island": "dunes", "words": ["mischievous", "funny", "warm"], "quirk": "Its big ears swivel one at a time.", "firstHome": "burrow", "starter": true, "unlockDays": 0, "rare": false, "odds": null, "favouriteFood": "berry", "defaultColour": "ginger", "batch": 1}, {"id": "zephyr", "name": "Zephyr", "species": "Fennec", "design": "sharp", "group": "dunes", "island": "dunes", "words": ["calm", "elegant", "night owl"], "quirk": "A slow tail sweep, eyes half closed.", "firstHome": "burrow", "starter": false, "unlockDays": 30, "rare": false, "odds": null, "favouriteFood": "berry", "defaultColour": "snow", "batch": 2}, {"id": "pebble", "name": "Pebble", "species": "Tortoise", "design": "round", "group": "dunes", "island": "dunes", "words": ["ambitious", "slow", "proud"], "quirk": "Stretches its neck out far, blinks, pulls back.", "firstHome": "egg", "starter": true, "unlockDays": 0, "rare": false, "odds": null, "favouriteFood": "leaf", "defaultColour": "olive", "batch": 1}, {"id": "mesa", "name": "Mesa", "species": "Tortoise", "design": "sharp", "group": "dunes", "island": "dunes", "words": ["wise", "grumpy", "soft inside"], "quirk": "Half-closed eyes and a tiny sigh.", "firstHome": "egg", "starter": false, "unlockDays": 60, "rare": false, "odds": null, "favouriteFood": "leaf", "defaultColour": "burgundy", "batch": 2}, {"id": "zig", "name": "Zig", "species": "Gecko", "design": "round", "group": "dunes", "island": "dunes", "words": ["curious", "giggly", "clingy"], "quirk": "Licks its own eyeball, like real geckos do.", "firstHome": "egg", "starter": false, "unlockDays": 30, "rare": false, "odds": null, "favouriteFood": "berry", "defaultColour": "teal", "batch": 2}, {"id": "dart", "name": "Dart", "species": "Gecko", "design": "sharp", "group": "dunes", "island": "dunes", "words": ["focused", "quiet", "precise"], "quirk": "Perfectly still, then one quick tail flick.", "firstHome": "egg", "starter": false, "unlockDays": 100, "rare": false, "odds": null, "favouriteFood": "berry", "defaultColour": "lavender", "batch": 2}, {"id": "dune", "name": "Dune", "species": "Camel", "design": null, "group": "dunes", "island": "dunes", "words": ["easygoing", "dramatic", "generous"], "quirk": "Chews slowly from side to side.", "firstHome": "blanket", "starter": true, "unlockDays": 0, "rare": false, "odds": null, "favouriteFood": "drop", "defaultColour": "caramel", "batch": 1}, {"id": "hop", "name": "Hop", "species": "Jerboa", "design": null, "group": "dunes", "island": "dunes", "words": ["bouncy", "scatterbrained", "night owl"], "quirk": "A tiny hop in place; the tail keeps balance.", "firstHome": "burrow", "starter": false, "unlockDays": 60, "rare": false, "odds": null, "favouriteFood": "seed", "defaultColour": "cocoa", "batch": 2}, {"id": "kit", "name": "Kit", "species": "Meerkat", "design": null, "group": "dunes", "island": "dunes", "words": ["watchful", "helpful", "team player"], "quirk": "Stands up tall to look around, then sits.", "firstHome": "burrow", "starter": false, "unlockDays": 100, "rare": false, "odds": null, "favouriteFood": "berry", "defaultColour": "charcoal", "batch": 2}, {"id": "lotl", "name": "Lotl", "species": "Axolotl", "design": null, "group": "special", "island": "lake", "words": ["unbothered", "smiley", "resilient"], "quirk": "Gills flutter while it floats up and down.", "firstHome": "egg", "starter": true, "unlockDays": 0, "rare": false, "odds": null, "favouriteFood": "fish", "defaultColour": "rose", "batch": 1}, {"id": "puddle", "name": "Puddle", "species": "Frog", "design": null, "group": "special", "island": "lake", "words": ["lazy", "philosophical", "rain-loving"], "quirk": "Throat pulses; a very slow blink.", "firstHome": "frogspawn", "starter": true, "unlockDays": 0, "rare": false, "odds": null, "favouriteFood": "berry", "defaultColour": "mint", "batch": 1}, {"id": "ripple", "name": "Ripple", "species": "Water spirit", "design": null, "group": "special", "island": "lake", "words": ["soothing", "shy", "adaptable"], "quirk": "Rings ripple outward from its base.", "firstHome": "orb", "starter": false, "unlockDays": null, "rare": true, "odds": 2, "favouriteFood": "drop", "defaultColour": "sky", "batch": 3}, {"id": "ember", "name": "Ember", "species": "Dragon", "design": null, "group": "special", "island": "cave", "words": ["tiny", "proud", "protective"], "quirk": "Puffs a smoke ring, then hiccups a spark.", "firstHome": "egg", "starter": true, "unlockDays": 0, "rare": false, "odds": null, "favouriteFood": "chili", "defaultColour": "teal", "batch": 1}, {"id": "cinder", "name": "Cinder", "species": "Phoenix", "design": null, "group": "special", "island": "cave", "words": ["theatrical", "hopeful", "comeback kid"], "quirk": "Its flame crest flickers and fluffs up.", "firstHome": "egg", "starter": false, "unlockDays": null, "rare": true, "odds": 1, "favouriteFood": "berry", "defaultColour": "butter", "batch": 3}, {"id": "flare", "name": "Flare", "species": "Fire spirit", "design": null, "group": "special", "island": "cave", "words": ["impatient", "excitable", "bright"], "quirk": "Crackles and sways like a candle in a draft.", "firstHome": "orb", "starter": false, "unlockDays": null, "rare": true, "odds": 2, "favouriteFood": "chili", "defaultColour": "ember", "batch": 3}, {"id": "cap", "name": "Cap", "species": "Mushroom", "design": null, "group": "special", "island": "grove", "words": ["shy", "mysterious", "patient"], "quirk": "Tilts its cap and lets out one spore puff.", "firstHome": "spore", "starter": false, "unlockDays": null, "rare": true, "odds": 1, "favouriteFood": "drop", "defaultColour": "burgundy", "batch": 3}, {"id": "gust", "name": "Gust", "species": "Wind spirit", "design": null, "group": "special", "island": "grove", "words": ["restless", "playful", "forgetful"], "quirk": "Drifts side to side; a leaf swirls past.", "firstHome": "orb", "starter": false, "unlockDays": null, "rare": true, "odds": 1, "favouriteFood": "berry", "defaultColour": "aqua", "batch": 3}, {"id": "moss", "name": "Moss", "species": "Earth spirit", "design": null, "group": "special", "island": "grove", "words": ["slow", "grounded", "nurturing"], "quirk": "The sprout on its head sways; eyes close.", "firstHome": "orb", "starter": false, "unlockDays": null, "rare": true, "odds": 1, "favouriteFood": "leaf", "defaultColour": "cocoa", "batch": 3}, {"id": "sprout", "name": "Gemma", "species": "Seedling", "design": null, "group": "garden", "island": "meadow", "words": ["eager", "tiny", "determined"], "quirk": "Both leaves stretch up, a little higher.", "firstHome": "seed", "starter": true, "unlockDays": 0, "rare": false, "odds": null, "favouriteFood": "drop", "defaultColour": "peach", "batch": 1}, {"id": "sol", "name": "Heli", "species": "Sunflower", "design": null, "group": "garden", "island": "meadow", "words": ["loyal", "sunny", "devoted"], "quirk": "Its face turns slowly toward the light.", "firstHome": "seed", "starter": true, "unlockDays": 0, "rare": false, "odds": null, "favouriteFood": "drop", "defaultColour": "lavender", "batch": 1}, {"id": "daisy", "name": "Beli", "species": "Daisy", "design": null, "group": "garden", "island": "meadow", "words": ["honest", "optimistic", "fresh"], "quirk": "Petals open and close a little.", "firstHome": "seed", "starter": false, "unlockDays": 30, "rare": false, "odds": null, "favouriteFood": "drop", "defaultColour": "rose", "batch": 2}, {"id": "tuli", "name": "Tuli", "species": "Tulip", "design": null, "group": "garden", "island": "meadow", "words": ["polite", "graceful", "romantic"], "quirk": "A small, gentle bow.", "firstHome": "seed", "starter": false, "unlockDays": 30, "rare": false, "odds": null, "favouriteFood": "drop", "defaultColour": "mint", "batch": 2}, {"id": "tomo", "name": "Sola", "species": "Tomato", "design": null, "group": "garden", "island": "meadow", "words": ["bubbly", "warm", "easily flustered"], "quirk": "Blushes a shade deeper and wobbles.", "firstHome": "seed", "starter": false, "unlockDays": 60, "rare": false, "odds": null, "favouriteFood": "drop", "defaultColour": "snow", "batch": 2}, {"id": "kabo", "name": "Pepo", "species": "Pumpkin", "design": null, "group": "garden", "island": "meadow", "words": ["hearty", "content", "homebody"], "quirk": "Rocks side to side; its vine curls.", "firstHome": "seed", "starter": false, "unlockDays": 100, "rare": false, "odds": null, "favouriteFood": "drop", "defaultColour": "ginger", "batch": 2}, {"id": "mac", "name": "Malu", "species": "Apple tree", "design": null, "group": "garden", "island": "meadow", "words": ["generous", "lucky", "sheltering"], "quirk": "One apple sways; the leaves rustle.", "firstHome": "seed", "starter": false, "unlockDays": 60, "rare": false, "odds": null, "favouriteFood": "drop", "defaultColour": "butter", "batch": 2}, {"id": "bo", "name": "Juni", "species": "Bonsai", "design": null, "group": "garden", "island": "meadow", "words": ["patient", "neat", "perfectionist"], "quirk": "One petal drifts down and it tidies up.", "firstHome": "seed", "starter": false, "unlockDays": 100, "rare": false, "odds": null, "favouriteFood": "drop", "defaultColour": "charcoal", "batch": 2}, {"id": "spike", "name": "Ceri", "species": "Cactus", "design": null, "group": "garden", "island": "dunes", "words": ["tough", "independent", "secretly soft"], "quirk": "A tiny flower blooms, then shyly closes.", "firstHome": "seed", "starter": true, "unlockDays": 0, "rare": false, "odds": null, "favouriteFood": "drop", "defaultColour": "sky", "batch": 1}, {"id": "mora", "name": "Mora", "species": "Time spirit", "design": null, "group": "mora", "island": "meadow", "words": ["timeless", "gentle", "encouraging"], "quirk": "Sand trickles down; the halo ticks once.", "firstHome": "orb", "starter": true, "unlockDays": 0, "rare": false, "odds": null, "favouriteFood": "drop", "defaultColour": "lavender", "batch": 1}];
+const MP_ITEMS = [{"id": "beanie", "name": "Beanie", "anchor": "head", "kind": "everyday", "event": null, "batch": 1}, {"id": "sunhat", "name": "Sun hat", "anchor": "head", "kind": "everyday", "event": null, "batch": 1}, {"id": "crown", "name": "Crown", "anchor": "head", "kind": "everyday", "event": null, "batch": 1}, {"id": "flowers", "name": "Flower crown", "anchor": "head", "kind": "everyday", "event": null, "batch": 1}, {"id": "headphones", "name": "Headphones", "anchor": "head", "kind": "everyday", "event": null, "batch": 1}, {"id": "glasses", "name": "Study glasses", "anchor": "face", "kind": "everyday", "event": null, "batch": 1}, {"id": "sunglasses", "name": "Shades, round", "anchor": "face", "kind": "everyday", "event": null, "batch": 1}, {"id": "starshades", "name": "Star shades, sharp", "anchor": "face", "kind": "everyday", "event": null, "batch": 1}, {"id": "scarf", "name": "Scarf", "anchor": "neck", "kind": "everyday", "event": null, "batch": 1}, {"id": "collar", "name": "Collar and tag", "anchor": "neck", "kind": "everyday", "event": null, "batch": 1}, {"id": "bowtie", "name": "Bow tie", "anchor": "neck", "kind": "everyday", "event": null, "batch": 1}, {"id": "cape", "name": "Cape", "anchor": "back", "kind": "everyday", "event": null, "batch": 1}, {"id": "lights", "name": "Fairy lights (plants)", "anchor": "neck", "kind": "everyday", "event": null, "batch": 1}, {"id": "book", "name": "Book", "anchor": "hand", "kind": "study", "event": null, "batch": 3}, {"id": "mug", "name": "Mug", "anchor": "hand", "kind": "study", "event": null, "batch": 3}, {"id": "lamp", "name": "Desk lamp", "anchor": "hand", "kind": "study", "event": null, "batch": 3}, {"id": "visor", "name": "Sun visor", "anchor": "head", "kind": "study", "event": null, "batch": 3}, {"id": "gradcap", "name": "Graduation cap", "anchor": "head", "kind": "study", "event": null, "batch": 3}, {"id": "party", "name": "Party hat", "anchor": "head", "kind": "event", "event": "new-year", "batch": 4}, {"id": "knot", "name": "Lucky knot", "anchor": "head", "kind": "event", "event": "lunar-new-year", "batch": 4}, {"id": "heartband", "name": "Heart band", "anchor": "head", "kind": "event", "event": "valentines-day", "batch": 4}, {"id": "shamrock", "name": "Shamrock band", "anchor": "head", "kind": "event", "event": "st-patricks-day", "batch": 4}, {"id": "bunnyears", "name": "Bunny ears", "anchor": "head", "kind": "event", "event": "easter", "batch": 4}, {"id": "rainbow", "name": "Rainbow band", "anchor": "head", "kind": "event", "event": "pride", "batch": 4}, {"id": "maple", "name": "Maple band", "anchor": "head", "kind": "event", "event": "canada-day", "batch": 4}, {"id": "leafcrown", "name": "Autumn leaves", "anchor": "head", "kind": "event", "event": "thanksgiving", "batch": 4}, {"id": "witch", "name": "Witch hat", "anchor": "head", "kind": "event", "event": "halloween", "batch": 4}, {"id": "santa", "name": "Santa hat", "anchor": "head", "kind": "event", "event": "christmas", "batch": 4}, {"id": "ball", "name": "Ball", "anchor": "hand", "kind": "toy", "event": null, "batch": 3}, {"id": "yarn", "name": "Yarn", "anchor": "hand", "kind": "toy", "event": null, "batch": 3}, {"id": "donut", "name": "Donut", "anchor": "hand", "kind": "treat", "event": null, "batch": 3}, {"id": "meat", "name": "Meat", "anchor": "hand", "kind": "treat", "event": null, "batch": 3}, {"id": "juice", "name": "Juice box", "anchor": "hand", "kind": "treat", "event": null, "batch": 3}, {"id": "cake", "name": "Cake", "anchor": "hand", "kind": "treat", "event": null, "batch": 3}];
 const MP_ITEM_IDS = MP_ITEMS.map((x) => x.id);
 const MP_TOY_ART = {"ball": "<circle cx=\"0\" cy=\"-14\" r=\"14\" fill=\"#E5484D\" stroke=\"#2E3B55\" stroke-width=\"2.6\" stroke-linejoin=\"round\"></circle><path d=\"M-13 -11 Q0 -3 13 -11\" fill=\"none\" stroke=\"#FFFFFF\" stroke-width=\"4\"></path><path d=\"M2 -27 Q-2 -14 2 -1\" fill=\"none\" stroke=\"#FFD25E\" stroke-width=\"3.5\"></path><circle cx=\"-6\" cy=\"-20\" r=\"3\" fill=\"#FFFFFF\" opacity=\".8\"></circle>", "yarn": "<path d=\"M10 -4 C22 -2 26 2 34 0\" fill=\"none\" stroke=\"#C9577A\" stroke-width=\"2.5\" stroke-linecap=\"round\"></path><circle cx=\"0\" cy=\"-13\" r=\"13\" fill=\"#F27A8E\" stroke=\"#2E3B55\" stroke-width=\"2.6\" stroke-linejoin=\"round\"></circle><path d=\"M-11 -18 Q0 -10 11 -20 M-12 -10 Q0 -2 12 -12 M-6 -24 Q4 -12 -2 -1\" fill=\"none\" stroke=\"#C9577A\" stroke-width=\"2.2\" stroke-linecap=\"round\"></path>", "donut": "<ellipse cx=\"0\" cy=\"-8\" rx=\"17\" ry=\"9\" fill=\"#B07A45\" stroke=\"#2E3B55\" stroke-width=\"2.6\" stroke-linejoin=\"round\"></ellipse><ellipse cx=\"0\" cy=\"-11\" rx=\"14\" ry=\"6.5\" fill=\"#F27A8E\"></ellipse><ellipse cx=\"0\" cy=\"-11\" rx=\"4.5\" ry=\"2.2\" fill=\"#7A4A2A\"></ellipse><path d=\"M-9 -13 l3 -1 M6 -15 l3 1 M-3 -7 l3 0 M8 -9 l2 2 M-10 -9 l2 1\" stroke=\"#FFFFFF\" stroke-width=\"2\" stroke-linecap=\"round\"></path><path d=\"M-4 -16 l2 1 M10 -12 l1 2\" stroke=\"#FFD25E\" stroke-width=\"2\" stroke-linecap=\"round\"></path>", "meat": "<path d=\"M4 -16 L18 -26\" stroke=\"#F2F0EC\" stroke-width=\"6\" stroke-linecap=\"round\"></path><circle cx=\"18\" cy=\"-29\" r=\"4\" fill=\"#F2F0EC\" stroke=\"#2E3B55\" stroke-width=\"2.6\" stroke-linejoin=\"round\"></circle><circle cx=\"22\" cy=\"-25\" r=\"4\" fill=\"#F2F0EC\" stroke=\"#2E3B55\" stroke-width=\"2.6\" stroke-linejoin=\"round\"></circle><path d=\"M-14 -2 C-22 -14 -10 -28 4 -22 C12 -18 12 -8 4 -2 C-2 2 -10 2 -14 -2 Z\" fill=\"#B5533C\" stroke=\"#2E3B55\" stroke-width=\"2.6\" stroke-linejoin=\"round\"></path><path d=\"M-10 -14 C-6 -20 0 -20 2 -18\" fill=\"none\" stroke=\"#D97A5E\" stroke-width=\"3\" stroke-linecap=\"round\"></path>", "juice": "<rect x=\"-10\" y=\"-30\" width=\"20\" height=\"30\" rx=\"2\" fill=\"#F28C38\" stroke=\"#2E3B55\" stroke-width=\"2.6\" stroke-linejoin=\"round\"></rect><rect x=\"-10\" y=\"-22\" width=\"20\" height=\"13\" fill=\"#FFD25E\"></rect><circle cx=\"0\" cy=\"-15.5\" r=\"4\" fill=\"#F28C38\"></circle><path d=\"M0 -19 q2 -3 5 -3\" stroke=\"#7DBB4C\" stroke-width=\"2\" fill=\"none\" stroke-linecap=\"round\"></path><path d=\"M4 -30 L4 -40 L10 -44\" fill=\"none\" stroke=\"#FFFFFF\" stroke-width=\"2.5\" stroke-linecap=\"round\" stroke-linejoin=\"round\"></path>", "cake": "<path d=\"M-16 0 L-16 -16 L16 -22 L16 -6 Z\" fill=\"#F6E3BD\" stroke=\"#2E3B55\" stroke-width=\"2.6\" stroke-linejoin=\"round\"></path><path d=\"M-16 -10 L16 -16 L16 -12 L-16 -6 Z\" fill=\"#F27A8E\"></path><path d=\"M-16 -16 L16 -22 L20 -24 L-12 -18 Z\" fill=\"#FFFFFF\" stroke=\"#2E3B55\" stroke-width=\"2.6\" stroke-linejoin=\"round\"></path><circle cx=\"4\" cy=\"-27\" r=\"4.5\" fill=\"#E5484D\" stroke=\"#2E3B55\" stroke-width=\"2.6\" stroke-linejoin=\"round\"></circle><path d=\"M4 -31 l1 -3\" stroke=\"#5E9A3C\" stroke-width=\"2\" stroke-linecap=\"round\"></path>"};
 const MP_EMOTE_TPL = "<g display=\"{{em.happy}}\" fill=\"#F27A8E\">\n<path d=\"M0 6 C-12 -6 -22 6 -10 16 L0 24 L10 16 C22 6 12 -6 0 6 Z\"></path>\n<path transform=\"translate(22 -14) scale(0.6)\" d=\"M0 6 C-12 -6 -22 6 -10 16 L0 24 L10 16 C22 6 12 -6 0 6 Z\"></path>\n</g>\n<g display=\"{{em.sad}}\">\n<path d=\"M-20 6 C-24 -4 -14 -12 -6 -8 C-4 -18 12 -20 16 -8 C24 -10 30 0 24 6 Z\" fill=\"#9AA7B8\"></path>\n<path d=\"M-12 12 l-3 7 M0 12 l-3 7 M12 12 l-3 7\" stroke=\"#5FA8E8\" stroke-width=\"3\" stroke-linecap=\"round\" fill=\"none\"></path>\n</g>\n<g display=\"{{em.mad}}\">\n<path d=\"M-12 -4 Q-4 -4 -4 -12 M4 -12 Q4 -4 12 -4 M12 4 Q4 4 4 12 M-4 12 Q-4 4 -12 4\" stroke=\"#E5484D\" stroke-width=\"4\" fill=\"none\" stroke-linecap=\"round\"></path>\n</g>\n<g display=\"{{em.sick}}\">\n<path d=\"M2 0 a2 2 0 1 1 -4 0 a5 5 0 1 1 10 0 a8 8 0 1 1 -16 0 a11 11 0 1 1 22 0\" stroke=\"#7CB86A\" stroke-width=\"3.5\" fill=\"none\" stroke-linecap=\"round\"></path>\n<path d=\"M24 -14 C28 -8 30 -5 30 -3 a6 6 0 0 1 -12 0 C18 -5 20 -8 24 -14 Z\" fill=\"#8EC5F0\"></path>\n</g>\n<g display=\"{{em.sleepy}}\" fill=\"none\" stroke=\"#6B7A99\" stroke-linejoin=\"round\" stroke-linecap=\"round\">\n<path d=\"M-12 -2 h12 l-12 14 h12\" stroke-width=\"4\"></path>\n<path d=\"M8 -20 h8 l-8 9 h8\" stroke-width=\"3\"></path>\n</g>\n<g display=\"{{em.focus}}\"><path d=\"M-16 -6 L0 -2 L16 -6 L16 10 L0 14 L-16 10 Z\" fill=\"#FFFFFF\" stroke=\"#5B7FB5\" stroke-width=\"2.5\" stroke-linejoin=\"round\"></path><path d=\"M0 -2 L0 14\" stroke=\"#5B7FB5\" stroke-width=\"2\"></path><path d=\"M-12 1 L-4 3 M-12 5 L-4 7 M4 3 L12 1 M4 7 L12 5\" stroke=\"#9AA7B8\" stroke-width=\"1.6\" stroke-linecap=\"round\"></path></g>\n<g display=\"{{em.cold}}\" stroke=\"#7FB6E0\" stroke-width=\"3\" stroke-linecap=\"round\" fill=\"none\"><path d=\"M0 -14 L0 14 M-12 -7 L12 7 M-12 7 L12 -7 M-4 -11 L0 -7 L4 -11 M-4 11 L0 7 L4 11\"></path></g>\n<g display=\"{{em.celebrate}}\"><path d=\"M0 -14 L4 -4 L14 -4 L6 2 L9 12 L0 6 L-9 12 L-6 2 L-14 -4 L-4 -4 Z\" fill=\"#FFD25E\" stroke=\"#E0A93A\" stroke-width=\"2\" stroke-linejoin=\"round\"></path><rect x=\"16\" y=\"-18\" width=\"6\" height=\"6\" fill=\"#F27A8E\" transform=\"rotate(20 19 -15)\"></rect><rect x=\"-24\" y=\"-12\" width=\"6\" height=\"6\" fill=\"#5BB8F0\" transform=\"rotate(-25 -21 -9)\"></rect><circle cx=\"19\" cy=\"10\" r=\"3.5\" fill=\"#7DDB5C\"></circle><circle cx=\"-18\" cy=\"12\" r=\"2.5\" fill=\"#F2C14E\"></circle></g>\n<g display=\"{{em.hungry}}\">\n<circle cx=\"-18\" cy=\"24\" r=\"5\" fill=\"#FFFFFF\" stroke=\"#C9D3E6\" stroke-width=\"2\"></circle>\n<circle cx=\"-27\" cy=\"34\" r=\"3\" fill=\"#FFFFFF\" stroke=\"#C9D3E6\" stroke-width=\"2\"></circle>\n<circle cx=\"0\" cy=\"0\" r=\"21\" fill=\"#FFFFFF\" stroke=\"#C9D3E6\" stroke-width=\"2\"></circle>\n<g display=\"{{em.fish}}\"><path d=\"M-11 0 Q-2 -9 7 0 Q-2 9 -11 0 Z M7 0 L13 -6 L13 6 Z\" fill=\"#7FB6D6\"></path><circle cx=\"-5\" cy=\"-1\" r=\"1.6\" fill=\"#2E3B55\"></circle></g>\n<g display=\"{{em.bone}}\" fill=\"#D9C9A3\"><rect x=\"-8\" y=\"-2.5\" width=\"16\" height=\"5\" rx=\"2\"></rect><circle cx=\"-9\" cy=\"-3\" r=\"3.5\"></circle><circle cx=\"-9\" cy=\"3\" r=\"3.5\"></circle><circle cx=\"9\" cy=\"-3\" r=\"3.5\"></circle><circle cx=\"9\" cy=\"3\" r=\"3.5\"></circle></g>\n<g display=\"{{em.berry}}\"><circle cx=\"-4\" cy=\"3\" r=\"6\" fill=\"#E5484D\"></circle><circle cx=\"5\" cy=\"2\" r=\"5\" fill=\"#C93A40\"></circle><path d=\"M0 -4 q2 -6 8 -6\" stroke=\"#5E9A3C\" stroke-width=\"2\" fill=\"none\"></path></g>\n<g display=\"{{em.drop}}\"><path d=\"M0 -11 C5 -4 8 0 8 3 a8 8 0 0 1 -16 0 C-8 0 -5 -4 0 -11 Z\" fill=\"#5FA8E8\"></path></g>\n<g display=\"{{em.carrot}}\"><path d=\"M-10 10 L5 -5 L10 0 Z\" fill=\"#F28C38\"></path><path d=\"M6 -6 l1 -8 M8 -4 l8 -2\" stroke=\"#5E9A3C\" stroke-width=\"3\" stroke-linecap=\"round\" fill=\"none\"></path></g>\n<g display=\"{{em.seed}}\"><path d=\"M0 -10 C8 -5 8 5 0 10 C-8 5 -8 -5 0 -10 Z\" fill=\"#E8C77A\"></path><path d=\"M0 -8 L0 8\" stroke=\"#B98A4E\" stroke-width=\"2.5\" fill=\"none\"></path></g>\n<g display=\"{{em.chili}}\"><path d=\"M-10 8 C-4 8 6 2 8 -6 C11 -2 4 10 -10 10 Z\" fill=\"#E5484D\"></path><path d=\"M8 -6 q2 -4 6 -5\" stroke=\"#5E9A3C\" stroke-width=\"2.5\" fill=\"none\" stroke-linecap=\"round\"></path></g>\n<g display=\"{{em.leaf}}\"><path d=\"M-10 8 C-10 -6 2 -12 12 -10 C12 2 4 10 -10 8 Z\" fill=\"#7DBB4C\"></path><path d=\"M-10 8 L8 -6\" stroke=\"#5E9A3C\" stroke-width=\"2\" fill=\"none\"></path></g>\n</g>";
-const MP_SCENE_BACK = "\n<g display=\"{{showSun}}\">\n<circle cx=\"110\" cy=\"110\" r=\"58\" fill=\"#FFE7A3\" opacity=\"0.55\" class=\"mp-pulse\"></circle>\n<circle cx=\"110\" cy=\"110\" r=\"40\" fill=\"#FFD66B\"></circle>\n</g>\n<g display=\"{{showNight}}\" fill=\"#F6EFD2\">\n<circle cx=\"490\" cy=\"100\" r=\"32\"></circle>\n<circle cx=\"504\" cy=\"90\" r=\"28\" fill=\"#1B2440\"></circle>\n<path transform=\"translate(120 90)\" d=\"M0 -7 L1.8 -1.8 L7 0 L1.8 1.8 L0 7 L-1.8 1.8 L-7 0 L-1.8 -1.8 Z\" class=\"mp-twinkle\" style=\"--mp-d:3s\"></path>\n<path transform=\"translate(260 60)\" d=\"M0 -5 L1.4 -1.4 L5 0 L1.4 1.4 L0 5 L-1.4 1.4 L-5 0 L-1.4 -1.4 Z\"></path>\n<path transform=\"translate(360 150)\" d=\"M0 -6 L1.6 -1.6 L6 0 L1.6 1.6 L0 6 L-1.6 1.6 L-6 0 L-1.6 -1.6 Z\" class=\"mp-twinkle\" style=\"--mp-d:2.6s\"></path>\n<circle cx=\"60\" cy=\"180\" r=\"2.5\"></circle><circle cx=\"200\" cy=\"140\" r=\"2\"></circle><circle cx=\"320\" cy=\"40\" r=\"2.5\"></circle><circle cx=\"420\" cy=\"60\" r=\"2\"></circle><circle cx=\"560\" cy=\"190\" r=\"2.5\"></circle><circle cx=\"180\" cy=\"220\" r=\"2\"></circle><circle cx=\"40\" cy=\"60\" r=\"2\"></circle>\n</g>\n<g display=\"{{groveOn}}\" fill=\"#F6EFD2\">\n<circle cx=\"80\" cy=\"70\" r=\"2.5\"></circle><circle cx=\"160\" cy=\"40\" r=\"2\"></circle><circle cx=\"260\" cy=\"90\" r=\"2.5\"></circle><circle cx=\"360\" cy=\"50\" r=\"2\"></circle><circle cx=\"470\" cy=\"80\" r=\"3\" class=\"mp-twinkle\" style=\"--mp-d:2.4s\"></circle><circle cx=\"540\" cy=\"40\" r=\"2\"></circle><circle cx=\"200\" cy=\"150\" r=\"2\"></circle>\n<path d=\"M520 120 a26 26 0 1 0 22 40 a20 20 0 1 1 -22 -40 Z\" fill=\"#F6EFD2\" opacity=\"0.85\"></path>\n</g>\n<g display=\"{{showCloudA}}\">\n<g transform=\"translate({{cloudA}})\" class=\"mp-drift\" style=\"--mp-dx:{{cloudDx}}px;--mp-d:24s\">\n<circle cx=\"-38\" cy=\"4\" r=\"24\" fill=\"{{cloudLit}}\"></circle><circle cx=\"0\" cy=\"-10\" r=\"32\" fill=\"{{cloudLit}}\"></circle><circle cx=\"36\" cy=\"4\" r=\"22\" fill=\"{{cloudLit}}\"></circle>\n<rect x=\"-62\" y=\"4\" width=\"124\" height=\"24\" rx=\"12\" fill=\"{{cloudLit}}\"></rect>\n<rect x=\"-56\" y=\"18\" width=\"112\" height=\"10\" rx=\"5\" fill=\"{{cloudShade}}\"></rect>\n</g>\n</g>\n<g display=\"{{showCloudB}}\">\n<g transform=\"translate(460 100)\" class=\"mp-drift\" style=\"--mp-dx:-30.0px;--mp-d:30s\">\n<circle cx=\"-44\" cy=\"4\" r=\"26\" fill=\"{{cloudLit}}\"></circle><circle cx=\"0\" cy=\"-12\" r=\"36\" fill=\"{{cloudLit}}\"></circle><circle cx=\"42\" cy=\"4\" r=\"24\" fill=\"{{cloudLit}}\"></circle>\n<rect x=\"-70\" y=\"4\" width=\"140\" height=\"26\" rx=\"13\" fill=\"{{cloudLit}}\"></rect>\n<rect x=\"-64\" y=\"20\" width=\"128\" height=\"10\" rx=\"5\" fill=\"{{cloudShade}}\"></rect>\n</g>\n</g>\n<g display=\"{{showCloudC}}\">\n<g transform=\"translate(300 60)\" class=\"mp-drift\" style=\"--mp-dx:22.0px;--mp-d:20s\">\n<circle cx=\"-30\" cy=\"4\" r=\"18\" fill=\"{{cloudLit}}\"></circle><circle cx=\"0\" cy=\"-8\" r=\"26\" fill=\"{{cloudLit}}\"></circle><circle cx=\"28\" cy=\"4\" r=\"18\" fill=\"{{cloudLit}}\"></circle>\n<rect x=\"-50\" y=\"4\" width=\"100\" height=\"20\" rx=\"10\" fill=\"{{cloudLit}}\"></rect>\n<rect x=\"-44\" y=\"16\" width=\"88\" height=\"8\" rx=\"4\" fill=\"{{cloudShade}}\"></rect>\n</g>\n</g>\n<g display=\"{{caveOn}}\">\n<circle cx=\"490\" cy=\"330\" r=\"96\" fill=\"#9D7FD6\" opacity=\"0.18\"></circle>\n<path d=\"M0 0 L600 0 L600 40 L580 40 L572 74 L564 40 L520 40 L510 92 L500 40 L420 40 L412 64 L404 40 L300 40 L290 84 L280 40 L200 40 L192 60 L184 40 L100 40 L90 76 L80 40 L0 40 Z\" fill=\"#2F2A40\"></path>\n<path d=\"M0 40 L80 40 L90 76 L100 40 L184 40 L192 60 L200 40 L280 40 L290 84 L300 40 L404 40 L412 64 L420 40 L500 40 L510 92 L520 40 L564 40 L572 74 L580 40 L600 40\" fill=\"none\" stroke=\"#46425A\" stroke-width=\"4\" stroke-linejoin=\"round\"></path>\n</g>\n<path d=\"M66 398 C150 388 450 388 534 398 C530 450 470 500 400 532 C350 556 320 580 300 584 C280 580 250 556 200 532 C130 500 70 450 66 398 Z\" fill=\"{{g.earth}}\"></path>\n<path d=\"M420 398 L534 398 C530 450 470 500 400 532 C350 556 320 580 300 584 C340 540 400 470 420 398 Z\" fill=\"{{g.earthR}}\"></path>\n<path d=\"M110 452 C220 466 380 466 490 452\" fill=\"none\" stroke=\"{{g.st1}}\" stroke-width=\"6\" stroke-linecap=\"round\"></path>\n<path d=\"M190 512 C260 522 340 522 410 512\" fill=\"none\" stroke=\"{{g.st2}}\" stroke-width=\"6\" stroke-linecap=\"round\"></path>\n<path d=\"M150 486 C240 496 360 496 456 486\" fill=\"none\" stroke=\"{{g.st1}}\" stroke-width=\"5\" stroke-linecap=\"round\" display=\"{{desertOn}}\"></path>\n<circle cx=\"170\" cy=\"480\" r=\"6\" fill=\"{{g.peb}}\"></circle><circle cx=\"330\" cy=\"540\" r=\"5\" fill=\"{{g.peb}}\"></circle><circle cx=\"450\" cy=\"470\" r=\"6\" fill=\"{{g.peb}}\"></circle><circle cx=\"250\" cy=\"430\" r=\"4\" fill=\"{{g.peb}}\"></circle>\n<path d=\"M84 410 a14 14 0 0 0 28 0 a14 14 0 0 0 28 0 a14 14 0 0 0 28 0 a14 14 0 0 0 28 0 a14 14 0 0 0 28 0 a14 14 0 0 0 28 0 a14 14 0 0 0 28 0 a14 14 0 0 0 28 0 a14 14 0 0 0 28 0 a14 14 0 0 0 28 0 a14 14 0 0 0 28 0 a14 14 0 0 0 28 0 a14 14 0 0 0 28 0 a14 14 0 0 0 28 0 a14 14 0 0 0 28 0 a14 14 0 0 0 28 0 L84 410 Z\" fill=\"{{g.drip}}\"></path>\n<path d=\"M56 400 C56 384 76 380 100 380 L500 380 C524 380 544 384 544 400 C544 412 530 416 516 416 L84 416 C70 416 56 412 56 400 Z\" fill=\"{{g.top}}\"></path>\n<path d=\"M100 380 L500 380 C520 380 536 383 541 390 L59 390 C64 383 80 380 100 380 Z\" fill=\"{{g.topL}}\"></path>\n<path d=\"M300 382 C330 372 370 372 400 382 Z M120 382 C140 375 166 375 186 382 Z\" fill=\"{{g.topL}}\" display=\"{{desertOn}}\"></path>\n<g display=\"{{pondOn}}\">\n<ellipse cx=\"112\" cy=\"388\" rx=\"56\" ry=\"11\" fill=\"#6FA9C9\"></ellipse>\n<ellipse cx=\"114\" cy=\"389\" rx=\"48\" ry=\"8\" fill=\"{{water}}\"></ellipse>\n<ellipse cx=\"98\" cy=\"386\" rx=\"14\" ry=\"2.5\" fill=\"#FFFFFF\" opacity=\"0.6\"></ellipse>\n<g display=\"{{showRain}}\" fill=\"none\" stroke=\"#FFFFFF\" stroke-width=\"2\">\n<ellipse cx=\"100\" cy=\"389\" rx=\"16\" ry=\"4\" class=\"mp-ripple\"></ellipse>\n<ellipse cx=\"130\" cy=\"390\" rx=\"14\" ry=\"3.5\" class=\"mp-ripple\" style=\"animation-delay:0.6s\"></ellipse>\n</g>\n</g>\n<path d=\"M70 380 L76 366 L82 380 Z M88 380 L92 370 L96 380 Z M360 380 L365 368 L370 380 Z M520 380 L525 368 L530 380 Z\" fill=\"#6AA63F\" display=\"{{showGrass}}\"></path>\n<g transform=\"{{lampXf}}\">\n<rect x=\"193\" y=\"300\" width=\"6\" height=\"84\" rx=\"3\" fill=\"#3E4A5C\"></rect>\n<rect x=\"186\" y=\"380\" width=\"20\" height=\"6\" rx=\"3\" fill=\"#3E4A5C\"></rect>\n<rect x=\"180\" y=\"272\" width=\"32\" height=\"30\" rx=\"8\" fill=\"#4B5870\"></rect>\n<rect x=\"186\" y=\"278\" width=\"20\" height=\"18\" rx=\"4\" fill=\"{{lamp}}\"></rect>\n<path d=\"M176 274 L196 256 L216 274 Z\" fill=\"#3E4A5C\" stroke=\"#3E4A5C\" stroke-width=\"4\" stroke-linejoin=\"round\"></path>\n</g>\n<g display=\"{{meadowOn}}\">\n<rect x=\"480\" y=\"270\" width=\"18\" height=\"114\" rx=\"8\" fill=\"#8A5631\"></rect>\n<rect x=\"489\" y=\"270\" width=\"9\" height=\"114\" fill=\"#6E4426\"></rect>\n<circle cx=\"488\" cy=\"232\" r=\"56\" fill=\"#6FB04A\"></circle>\n<circle cx=\"452\" cy=\"262\" r=\"34\" fill=\"#6FB04A\"></circle>\n<circle cx=\"526\" cy=\"258\" r=\"36\" fill=\"#5A9A3C\"></circle>\n<circle cx=\"486\" cy=\"190\" r=\"40\" fill=\"#7DBB4C\"></circle>\n<circle cx=\"468\" cy=\"208\" r=\"20\" fill=\"#8CCB5E\"></circle>\n<circle cx=\"456\" cy=\"252\" r=\"14\" fill=\"#8CCB5E\"></circle>\n<g fill=\"none\" stroke=\"#5E9A3C\" stroke-width=\"3\" stroke-linecap=\"round\">\n<path d=\"M440 382 L440 366\"></path><path d=\"M540 384 L540 370\"></path>\n</g>\n<circle cx=\"440\" cy=\"364\" r=\"7\" fill=\"{{flower}}\"></circle><circle cx=\"440\" cy=\"364\" r=\"2.5\" fill=\"#E59A3C\"></circle>\n<circle cx=\"540\" cy=\"368\" r=\"6\" fill=\"{{flower}}\"></circle><circle cx=\"540\" cy=\"368\" r=\"2.2\" fill=\"#E59A3C\"></circle>\n</g>\n<g display=\"{{desertOn}}\">\n<path d=\"M478 384 C474 330 482 290 500 252\" fill=\"none\" stroke=\"#B07A45\" stroke-width=\"18\" stroke-linecap=\"round\"></path>\n<path d=\"M478 384 C474 330 482 290 500 252\" fill=\"none\" stroke=\"#8E5F36\" stroke-width=\"18\" stroke-dasharray=\"4 12\"></path>\n<path d=\"M500 248 C474 228 440 230 414 258 C444 246 472 246 500 248 Z\" fill=\"#6FB04A\" stroke=\"#4F8A36\" stroke-width=\"3\" stroke-linejoin=\"round\"></path>\n<path d=\"M500 248 C484 214 454 198 426 202 C454 214 480 230 500 248 Z\" fill=\"#8CCB5E\" stroke=\"#4F8A36\" stroke-width=\"3\" stroke-linejoin=\"round\"></path>\n<path d=\"M500 248 C512 212 540 196 570 200 C542 212 518 228 500 248 Z\" fill=\"#7DBB4C\" stroke=\"#4F8A36\" stroke-width=\"3\" stroke-linejoin=\"round\"></path>\n<path d=\"M500 248 C530 230 564 238 586 266 C556 252 528 248 500 248 Z\" fill=\"#5A9A3C\" stroke=\"#4F8A36\" stroke-width=\"3\" stroke-linejoin=\"round\"></path>\n<path d=\"M500 248 C478 252 456 270 446 292 C466 274 484 262 500 248 Z\" fill=\"#6FB04A\" stroke=\"#4F8A36\" stroke-width=\"3\" stroke-linejoin=\"round\"></path>\n<circle cx=\"494\" cy=\"258\" r=\"8\" fill=\"#6E4426\"></circle><circle cx=\"508\" cy=\"258\" r=\"7\" fill=\"#6E4426\"></circle>\n<path d=\"M60 384 L60 334 Q60 322 72 322 Q84 322 84 334 L84 384 Z\" fill=\"#7DBF6A\" stroke=\"#3F6E2C\" stroke-width=\"4\"></path>\n<path d=\"M60 352 L48 352 Q40 352 40 344 L40 332 Q40 326 46 326 Q52 326 52 332 L52 342 L60 342\" fill=\"#7DBF6A\" stroke=\"#3F6E2C\" stroke-width=\"4\" stroke-linejoin=\"round\"></path>\n<path d=\"M84 346 L94 346 Q100 346 100 340 L100 330 Q100 324 94 324 Q88 324 88 330 L88 338 L84 338\" fill=\"#5A9A4C\" stroke=\"#3F6E2C\" stroke-width=\"4\" stroke-linejoin=\"round\"></path>\n<path d=\"M72 328 L72 380\" stroke=\"#5A9A4C\" stroke-width=\"3\"></path>\n<circle cx=\"72\" cy=\"320\" r=\"6\" fill=\"#F2A0B4\"></circle>\n<path d=\"M420 384 C420 372 440 372 440 384 Z M520 384 C520 376 534 376 534 384 Z\" fill=\"#B3AB9E\"></path>\n</g>\n<g display=\"{{groveOn}}\">\n<rect x=\"480\" y=\"270\" width=\"18\" height=\"114\" rx=\"8\" fill=\"#3E2E5C\"></rect>\n<rect x=\"489\" y=\"270\" width=\"9\" height=\"114\" fill=\"#2E2248\"></rect>\n<circle cx=\"488\" cy=\"232\" r=\"70\" fill=\"#7FF0E0\" opacity=\"0.12\"></circle>\n<circle cx=\"488\" cy=\"232\" r=\"56\" fill=\"#6A58C0\"></circle>\n<circle cx=\"452\" cy=\"262\" r=\"34\" fill=\"#6A58C0\"></circle>\n<circle cx=\"526\" cy=\"258\" r=\"36\" fill=\"#4E3F9C\"></circle>\n<circle cx=\"486\" cy=\"190\" r=\"40\" fill=\"#8E7CE0\"></circle>\n<circle cx=\"468\" cy=\"208\" r=\"20\" fill=\"#B5A8F0\"></circle>\n<circle cx=\"456\" cy=\"252\" r=\"14\" fill=\"#B5A8F0\"></circle>\n<circle cx=\"470\" cy=\"236\" r=\"5\" fill=\"#7FF0E0\"></circle><circle cx=\"510\" cy=\"214\" r=\"4\" fill=\"#7FF0E0\"></circle><circle cx=\"500\" cy=\"270\" r=\"4\" fill=\"#7FF0E0\"></circle>\n<path d=\"M60 384 L58 316 Q70 300 84 316 L86 384 Z\" fill=\"#6E6A8A\" stroke=\"#2E3B55\" stroke-width=\"4\" stroke-linejoin=\"round\"></path>\n<path d=\"M96 384 L96 340 Q106 328 118 340 L120 384 Z\" fill=\"#6E6A8A\" stroke=\"#2E3B55\" stroke-width=\"4\" stroke-linejoin=\"round\"></path>\n<path d=\"M66 340 L72 326 L78 340 L72 354 Z M104 356 L108 348 L112 356 L108 364 Z\" fill=\"#7FF0E0\" class=\"mp-twinkle\" style=\"--mp-d:3s\"></path>\n<circle cx=\"150\" cy=\"370\" r=\"24\" fill=\"#7FF0E0\" opacity=\"0.18\"></circle>\n<path d=\"M146 384 L146 368 L154 368 L154 384 Z M418 384 L418 372 L424 372 L424 384 Z\" fill=\"#E8F4F2\" stroke=\"#2E3B55\" stroke-width=\"3.5\" stroke-linejoin=\"round\"></path>\n<path d=\"M132 370 C132 348 168 348 168 370 Z M408 374 C408 360 434 360 434 374 Z\" fill=\"#5FE0D0\" stroke=\"#2E3B55\" stroke-width=\"3.5\" stroke-linejoin=\"round\"></path>\n<circle cx=\"142\" cy=\"362\" r=\"2.5\" fill=\"#FFFFFF\"></circle><circle cx=\"156\" cy=\"358\" r=\"2\" fill=\"#FFFFFF\"></circle>\n<g fill=\"#FFF1A8\">\n<circle cx=\"150\" cy=\"250\" r=\"5\" class=\"mp-twinkle\" style=\"--mp-d:2.2s\"></circle>\n<circle cx=\"410\" cy=\"300\" r=\"4\" class=\"mp-twinkle\" style=\"--mp-d:1.8s\"></circle>\n<circle cx=\"560\" cy=\"330\" r=\"5\" class=\"mp-twinkle\" style=\"--mp-d:2.6s\"></circle>\n<circle cx=\"250\" cy=\"160\" r=\"4\" class=\"mp-twinkle\" style=\"--mp-d:2s\"></circle>\n<circle cx=\"440\" cy=\"150\" r=\"4\" class=\"mp-twinkle\" style=\"--mp-d:2.4s\"></circle>\n<circle cx=\"90\" cy=\"230\" r=\"3.5\" class=\"mp-twinkle\" style=\"--mp-d:2.8s\"></circle>\n</g>\n</g>\n<g display=\"{{lakeOn}}\">\n<ellipse cx=\"300\" cy=\"398\" rx=\"126\" ry=\"15\" fill=\"#3F7A2C\"></ellipse>\n<path d=\"M176 396 C176 384 236 380 300 380 C364 380 424 384 424 396 C424 404 364 408 300 408 L300 396 L280 408 C224 406 176 402 176 396 Z\" fill=\"#7DBB4C\"></path>\n<g display=\"{{lilyOn}}\">\n<path d=\"M66 398 a16 5 0 1 0 2 -4 L70 398 Z M524 404 a13 4 0 1 0 2 -3 L528 404 Z\" fill=\"#5E9A3C\"></path>\n<circle cx=\"68\" cy=\"394\" r=\"4\" fill=\"#F2A0B4\"></circle>\n</g>\n<ellipse cx=\"480\" cy=\"392\" rx=\"30\" ry=\"9\" fill=\"none\" stroke=\"#2E3B55\" stroke-width=\"16\"></ellipse>\n<ellipse cx=\"480\" cy=\"392\" rx=\"30\" ry=\"9\" fill=\"none\" stroke=\"#FFFFFF\" stroke-width=\"10\"></ellipse>\n<ellipse cx=\"480\" cy=\"392\" rx=\"30\" ry=\"9\" fill=\"none\" stroke=\"#E5484D\" stroke-width=\"10\" stroke-dasharray=\"15 15\"></ellipse>\n<path d=\"M90 392 L86 330 M100 394 L102 320 M110 394 L114 336 M540 394 L536 344 M552 396 L556 336\" stroke=\"#5E9A3C\" stroke-width=\"4\" stroke-linecap=\"round\" fill=\"none\"></path>\n<path d=\"M86 330 L85 316 M102 320 L102 304 M114 336 L115 322 M556 336 L557 322\" stroke=\"#8A5631\" stroke-width=\"8\" stroke-linecap=\"round\" fill=\"none\"></path>\n<path d=\"M140 400 q10 -3 20 0 M380 412 q10 -3 20 0 M200 386 q8 -2 16 0\" fill=\"none\" stroke=\"#FFFFFF\" stroke-width=\"2\" opacity=\"0.7\"></path>\n</g>\n\n<g display=\"{{caveOn}}\">\n<path d=\"M440 384 L446 340 L458 330 L466 344 L464 384 Z\" fill=\"#6FD3D8\" stroke=\"#2F6E78\" stroke-width=\"4\" stroke-linejoin=\"round\"></path>\n<path d=\"M446 340 L458 330 L458 384 L444 384 Z\" fill=\"#B5EEF0\"></path>\n<path d=\"M470 384 L478 300 L494 282 L508 300 L512 384 Z\" fill=\"#9D7FD6\" stroke=\"#4A3A70\" stroke-width=\"4\" stroke-linejoin=\"round\"></path>\n<path d=\"M478 300 L494 282 L494 384 L472 384 Z\" fill=\"#C2AEF0\"></path>\n<path d=\"M516 384 L522 350 L534 340 L544 354 L540 384 Z\" fill=\"#9D7FD6\" stroke=\"#4A3A70\" stroke-width=\"4\" stroke-linejoin=\"round\"></path>\n<path d=\"M60 384 L74 326 L88 384 Z\" fill=\"#646080\" stroke=\"#38344A\" stroke-width=\"4\" stroke-linejoin=\"round\"></path>\n<path d=\"M86 384 L94 354 L102 384 Z\" fill=\"#77738F\" stroke=\"#38344A\" stroke-width=\"4\" stroke-linejoin=\"round\"></path>\n</g>\n<g display=\"{{showSnow}}\" fill=\"#E6EEF8\">\n<path d=\"M56 400 C56 384 76 380 100 380 L500 380 C524 380 544 384 544 400 C520 394 480 398 440 394 C400 398 360 394 320 398 C280 394 240 398 200 394 C160 398 120 394 80 398 C68 398 60 400 56 400 Z\"></path>\n<path d=\"M452 168 C456 150 516 150 520 168 C506 160 466 160 452 168 Z\" display=\"{{meadowOn}}\"></path>\n<path transform=\"{{lampXf}}\" d=\"M176 274 L196 256 L216 274 L196 268 Z\" stroke=\"#F4F7FB\" stroke-width=\"4\" stroke-linejoin=\"round\"></path>\n<path d=\"M500 222 C508 212 536 212 540 224 C530 220 510 220 500 222 Z\" display=\"{{meadowOn}}\"></path>\n<path d=\"M430 204 C452 208 476 222 492 238 C474 226 452 214 430 204 Z M568 202 C546 206 524 222 508 238 C526 224 548 212 568 202 Z\" display=\"{{desertOn}}\"></path>\n<path d=\"M60 334 Q60 322 72 322 Q84 322 84 334 Z\" display=\"{{desertOn}}\"></path>\n</g>\n";
+const MP_SCENE_BACK = "\n<g display=\"{{showSun}}\">\n<circle cx=\"110\" cy=\"110\" r=\"58\" fill=\"#FFE7A3\" opacity=\"0.55\" class=\"mp-pulse\"></circle>\n<circle cx=\"110\" cy=\"110\" r=\"40\" fill=\"#FFD66B\"></circle>\n</g>\n<g display=\"{{showNight}}\" fill=\"#F6EFD2\">\n<path d=\"M518.9 113.7L516.6 117.8L513.6 121.6L510.2 124.8L506.3 127.5L502.1 129.6L497.5 131.1L492.8 131.9L488.1 131.9L483.4 131.3L478.8 130.0L474.5 128.0L470.5 125.4L467.0 122.2L464.0 118.6L461.5 114.5L459.7 110.2L458.5 105.6L458.0 100.8L458.2 96.1L459.2 91.4L460.8 87.0L463.0 82.8L465.9 79.0L469.2 75.6L473.1 72.8L477.3 70.6L481.8 69.1L486.4 68.2L484.2 70.2L482.2 72.5L480.4 74.9L478.9 77.6L477.7 80.3L476.8 83.2L476.3 86.2L476.0 89.2L476.1 92.2L476.5 95.2L477.2 98.2L478.3 101.0L479.6 103.7L481.2 106.3L483.1 108.6L485.2 110.8L487.6 112.7L490.1 114.3L492.8 115.7L495.7 116.7L498.6 117.5L501.6 117.9L504.6 118.0L507.6 117.8L510.6 117.2L513.5 116.3L516.3 115.2Z\"></path>\n<path transform=\"translate(120 90)\" d=\"M0 -7 L1.8 -1.8 L7 0 L1.8 1.8 L0 7 L-1.8 1.8 L-7 0 L-1.8 -1.8 Z\" class=\"mp-twinkle\" style=\"--mp-d:3s\"></path>\n<path transform=\"translate(260 60)\" d=\"M0 -5 L1.4 -1.4 L5 0 L1.4 1.4 L0 5 L-1.4 1.4 L-5 0 L-1.4 -1.4 Z\"></path>\n<path transform=\"translate(360 150)\" d=\"M0 -6 L1.6 -1.6 L6 0 L1.6 1.6 L0 6 L-1.6 1.6 L-6 0 L-1.6 -1.6 Z\" class=\"mp-twinkle\" style=\"--mp-d:2.6s\"></path>\n<circle cx=\"60\" cy=\"180\" r=\"2.5\"></circle><circle cx=\"200\" cy=\"140\" r=\"2\"></circle><circle cx=\"320\" cy=\"40\" r=\"2.5\"></circle><circle cx=\"420\" cy=\"60\" r=\"2\"></circle><circle cx=\"560\" cy=\"190\" r=\"2.5\"></circle><circle cx=\"180\" cy=\"220\" r=\"2\"></circle><circle cx=\"40\" cy=\"60\" r=\"2\"></circle>\n</g>\n<g display=\"{{groveOn}}\" fill=\"#F6EFD2\">\n<circle cx=\"80\" cy=\"70\" r=\"2.5\"></circle><circle cx=\"160\" cy=\"40\" r=\"2\"></circle><circle cx=\"260\" cy=\"90\" r=\"2.5\"></circle><circle cx=\"360\" cy=\"50\" r=\"2\"></circle><circle cx=\"470\" cy=\"80\" r=\"3\" class=\"mp-twinkle\" style=\"--mp-d:2.4s\"></circle><circle cx=\"540\" cy=\"40\" r=\"2\"></circle><circle cx=\"200\" cy=\"150\" r=\"2\"></circle>\n<path d=\"M520 120 a26 26 0 1 0 22 40 a20 20 0 1 1 -22 -40 Z\" fill=\"#F6EFD2\" opacity=\"0.85\"></path>\n</g>\n<g display=\"{{showCloudA}}\">\n<g transform=\"translate({{cloudA}})\" class=\"mp-drift\" style=\"--mp-dx:{{cloudDx}}px;--mp-d:24s\">\n<circle cx=\"-38\" cy=\"4\" r=\"24\" fill=\"{{cloudLit}}\"></circle><circle cx=\"0\" cy=\"-10\" r=\"32\" fill=\"{{cloudLit}}\"></circle><circle cx=\"36\" cy=\"4\" r=\"22\" fill=\"{{cloudLit}}\"></circle>\n<rect x=\"-62\" y=\"4\" width=\"124\" height=\"24\" rx=\"12\" fill=\"{{cloudLit}}\"></rect>\n<rect x=\"-56\" y=\"18\" width=\"112\" height=\"10\" rx=\"5\" fill=\"{{cloudShade}}\"></rect>\n</g>\n</g>\n<g display=\"{{showCloudB}}\">\n<g transform=\"translate(460 100)\" class=\"mp-drift\" style=\"--mp-dx:-30.0px;--mp-d:30s\">\n<circle cx=\"-44\" cy=\"4\" r=\"26\" fill=\"{{cloudLit}}\"></circle><circle cx=\"0\" cy=\"-12\" r=\"36\" fill=\"{{cloudLit}}\"></circle><circle cx=\"42\" cy=\"4\" r=\"24\" fill=\"{{cloudLit}}\"></circle>\n<rect x=\"-70\" y=\"4\" width=\"140\" height=\"26\" rx=\"13\" fill=\"{{cloudLit}}\"></rect>\n<rect x=\"-64\" y=\"20\" width=\"128\" height=\"10\" rx=\"5\" fill=\"{{cloudShade}}\"></rect>\n</g>\n</g>\n<g display=\"{{showCloudC}}\">\n<g transform=\"translate(300 60)\" class=\"mp-drift\" style=\"--mp-dx:22.0px;--mp-d:20s\">\n<circle cx=\"-30\" cy=\"4\" r=\"18\" fill=\"{{cloudLit}}\"></circle><circle cx=\"0\" cy=\"-8\" r=\"26\" fill=\"{{cloudLit}}\"></circle><circle cx=\"28\" cy=\"4\" r=\"18\" fill=\"{{cloudLit}}\"></circle>\n<rect x=\"-50\" y=\"4\" width=\"100\" height=\"20\" rx=\"10\" fill=\"{{cloudLit}}\"></rect>\n<rect x=\"-44\" y=\"16\" width=\"88\" height=\"8\" rx=\"4\" fill=\"{{cloudShade}}\"></rect>\n</g>\n</g>\n<g display=\"{{caveOn}}\">\n<circle cx=\"490\" cy=\"330\" r=\"96\" fill=\"#9D7FD6\" opacity=\"0.18\"></circle>\n</g>\n<path d=\"M66 398 C150 388 450 388 534 398 C530 450 470 500 400 532 C350 556 320 580 300 584 C280 580 250 556 200 532 C130 500 70 450 66 398 Z\" fill=\"{{g.earth}}\"></path>\n<path d=\"M420 398 L534 398 C530 450 470 500 400 532 C350 556 320 580 300 584 C340 540 400 470 420 398 Z\" fill=\"{{g.earthR}}\"></path>\n<path d=\"M110 452 C220 466 380 466 490 452\" fill=\"none\" stroke=\"{{g.st1}}\" stroke-width=\"6\" stroke-linecap=\"round\"></path>\n<path d=\"M190 512 C260 522 340 522 410 512\" fill=\"none\" stroke=\"{{g.st2}}\" stroke-width=\"6\" stroke-linecap=\"round\"></path>\n<path d=\"M150 486 C240 496 360 496 456 486\" fill=\"none\" stroke=\"{{g.st1}}\" stroke-width=\"5\" stroke-linecap=\"round\" display=\"{{desertOn}}\"></path>\n<circle cx=\"170\" cy=\"480\" r=\"6\" fill=\"{{g.peb}}\"></circle><circle cx=\"330\" cy=\"540\" r=\"5\" fill=\"{{g.peb}}\"></circle><circle cx=\"450\" cy=\"470\" r=\"6\" fill=\"{{g.peb}}\"></circle><circle cx=\"250\" cy=\"430\" r=\"4\" fill=\"{{g.peb}}\"></circle>\n<path d=\"M84 410 a14 14 0 0 0 28 0 a14 14 0 0 0 28 0 a14 14 0 0 0 28 0 a14 14 0 0 0 28 0 a14 14 0 0 0 28 0 a14 14 0 0 0 28 0 a14 14 0 0 0 28 0 a14 14 0 0 0 28 0 a14 14 0 0 0 28 0 a14 14 0 0 0 28 0 a14 14 0 0 0 28 0 a14 14 0 0 0 28 0 a14 14 0 0 0 28 0 a14 14 0 0 0 28 0 a14 14 0 0 0 28 0 a14 14 0 0 0 28 0 L84 410 Z\" fill=\"{{g.drip}}\"></path>\n<path d=\"M56 400 C56 384 76 380 100 380 L500 380 C524 380 544 384 544 400 C544 412 530 416 516 416 L84 416 C70 416 56 412 56 400 Z\" fill=\"{{g.top}}\"></path>\n<path d=\"M100 380 L500 380 C520 380 536 383 541 390 L59 390 C64 383 80 380 100 380 Z\" fill=\"{{g.topL}}\"></path>\n<path d=\"M300 382 C330 372 370 372 400 382 Z M120 382 C140 375 166 375 186 382 Z\" fill=\"{{g.topL}}\" display=\"{{desertOn}}\"></path>\n<g display=\"{{pondOn}}\">\n<ellipse cx=\"112\" cy=\"388\" rx=\"56\" ry=\"11\" fill=\"#6FA9C9\"></ellipse>\n<ellipse cx=\"114\" cy=\"389\" rx=\"48\" ry=\"8\" fill=\"{{water}}\"></ellipse>\n<ellipse cx=\"98\" cy=\"386\" rx=\"14\" ry=\"2.5\" fill=\"#FFFFFF\" opacity=\"0.6\"></ellipse>\n<g display=\"{{showRain}}\" fill=\"none\" stroke=\"#FFFFFF\" stroke-width=\"2\">\n<ellipse cx=\"100\" cy=\"389\" rx=\"16\" ry=\"4\" class=\"mp-ripple\"></ellipse>\n<ellipse cx=\"130\" cy=\"390\" rx=\"14\" ry=\"3.5\" class=\"mp-ripple\" style=\"animation-delay:0.6s\"></ellipse>\n</g>\n</g>\n<path d=\"M70 380 L76 366 L82 380 Z M88 380 L92 370 L96 380 Z M360 380 L365 368 L370 380 Z M520 380 L525 368 L530 380 Z\" fill=\"#6AA63F\" display=\"{{showGrass}}\"></path>\n<g transform=\"{{lampXf}}\">\n<rect x=\"193\" y=\"300\" width=\"6\" height=\"84\" rx=\"3\" fill=\"#3E4A5C\"></rect>\n<rect x=\"186\" y=\"380\" width=\"20\" height=\"6\" rx=\"3\" fill=\"#3E4A5C\"></rect>\n<rect x=\"180\" y=\"272\" width=\"32\" height=\"30\" rx=\"8\" fill=\"#4B5870\"></rect>\n<rect x=\"186\" y=\"278\" width=\"20\" height=\"18\" rx=\"4\" fill=\"{{lamp}}\"></rect>\n<path d=\"M176 274 L196 256 L216 274 Z\" fill=\"#3E4A5C\" stroke=\"#3E4A5C\" stroke-width=\"4\" stroke-linejoin=\"round\"></path>\n</g>\n<g display=\"{{meadowOn}}\">\n<rect x=\"480\" y=\"270\" width=\"18\" height=\"114\" rx=\"8\" fill=\"#8A5631\"></rect>\n<rect x=\"489\" y=\"270\" width=\"9\" height=\"114\" fill=\"#6E4426\"></rect>\n<circle cx=\"488\" cy=\"232\" r=\"56\" fill=\"#6FB04A\"></circle>\n<circle cx=\"452\" cy=\"262\" r=\"34\" fill=\"#6FB04A\"></circle>\n<circle cx=\"526\" cy=\"258\" r=\"36\" fill=\"#5A9A3C\"></circle>\n<circle cx=\"486\" cy=\"190\" r=\"40\" fill=\"#7DBB4C\"></circle>\n<circle cx=\"468\" cy=\"208\" r=\"20\" fill=\"#8CCB5E\"></circle>\n<circle cx=\"456\" cy=\"252\" r=\"14\" fill=\"#8CCB5E\"></circle>\n<g fill=\"none\" stroke=\"#5E9A3C\" stroke-width=\"3\" stroke-linecap=\"round\">\n<path d=\"M440 382 L440 366\"></path><path d=\"M540 384 L540 370\"></path>\n</g>\n<circle cx=\"440\" cy=\"364\" r=\"7\" fill=\"{{flower}}\"></circle><circle cx=\"440\" cy=\"364\" r=\"2.5\" fill=\"#E59A3C\"></circle>\n<circle cx=\"540\" cy=\"368\" r=\"6\" fill=\"{{flower}}\"></circle><circle cx=\"540\" cy=\"368\" r=\"2.2\" fill=\"#E59A3C\"></circle>\n</g>\n<g display=\"{{desertOn}}\">\n<path d=\"M478 384 C474 330 482 290 500 252\" fill=\"none\" stroke=\"#B07A45\" stroke-width=\"18\" stroke-linecap=\"round\"></path>\n<path d=\"M478 384 C474 330 482 290 500 252\" fill=\"none\" stroke=\"#8E5F36\" stroke-width=\"18\" stroke-dasharray=\"4 12\"></path>\n<path d=\"M500 248 C474 228 440 230 414 258 C444 246 472 246 500 248 Z\" fill=\"#6FB04A\" stroke=\"#4F8A36\" stroke-width=\"3\" stroke-linejoin=\"round\"></path>\n<path d=\"M500 248 C484 214 454 198 426 202 C454 214 480 230 500 248 Z\" fill=\"#8CCB5E\" stroke=\"#4F8A36\" stroke-width=\"3\" stroke-linejoin=\"round\"></path>\n<path d=\"M500 248 C512 212 540 196 570 200 C542 212 518 228 500 248 Z\" fill=\"#7DBB4C\" stroke=\"#4F8A36\" stroke-width=\"3\" stroke-linejoin=\"round\"></path>\n<path d=\"M500 248 C530 230 564 238 586 266 C556 252 528 248 500 248 Z\" fill=\"#5A9A3C\" stroke=\"#4F8A36\" stroke-width=\"3\" stroke-linejoin=\"round\"></path>\n<path d=\"M500 248 C478 252 456 270 446 292 C466 274 484 262 500 248 Z\" fill=\"#6FB04A\" stroke=\"#4F8A36\" stroke-width=\"3\" stroke-linejoin=\"round\"></path>\n<circle cx=\"494\" cy=\"258\" r=\"8\" fill=\"#6E4426\"></circle><circle cx=\"508\" cy=\"258\" r=\"7\" fill=\"#6E4426\"></circle>\n<path d=\"M60 384 L60 334 Q60 322 72 322 Q84 322 84 334 L84 384 Z\" fill=\"#7DBF6A\" stroke=\"#3F6E2C\" stroke-width=\"4\"></path>\n<path d=\"M60 352 L48 352 Q40 352 40 344 L40 332 Q40 326 46 326 Q52 326 52 332 L52 342 L60 342\" fill=\"#7DBF6A\" stroke=\"#3F6E2C\" stroke-width=\"4\" stroke-linejoin=\"round\"></path>\n<path d=\"M84 346 L94 346 Q100 346 100 340 L100 330 Q100 324 94 324 Q88 324 88 330 L88 338 L84 338\" fill=\"#5A9A4C\" stroke=\"#3F6E2C\" stroke-width=\"4\" stroke-linejoin=\"round\"></path>\n<path d=\"M72 328 L72 380\" stroke=\"#5A9A4C\" stroke-width=\"3\"></path>\n<circle cx=\"72\" cy=\"320\" r=\"6\" fill=\"#F2A0B4\"></circle>\n<path d=\"M420 384 C420 372 440 372 440 384 Z M520 384 C520 376 534 376 534 384 Z\" fill=\"#B3AB9E\"></path>\n</g>\n<g display=\"{{groveOn}}\">\n<rect x=\"480\" y=\"270\" width=\"18\" height=\"114\" rx=\"8\" fill=\"#3E2E5C\"></rect>\n<rect x=\"489\" y=\"270\" width=\"9\" height=\"114\" fill=\"#2E2248\"></rect>\n<circle cx=\"488\" cy=\"232\" r=\"70\" fill=\"#7FF0E0\" opacity=\"0.12\"></circle>\n<circle cx=\"488\" cy=\"232\" r=\"56\" fill=\"#6A58C0\"></circle>\n<circle cx=\"452\" cy=\"262\" r=\"34\" fill=\"#6A58C0\"></circle>\n<circle cx=\"526\" cy=\"258\" r=\"36\" fill=\"#4E3F9C\"></circle>\n<circle cx=\"486\" cy=\"190\" r=\"40\" fill=\"#8E7CE0\"></circle>\n<circle cx=\"468\" cy=\"208\" r=\"20\" fill=\"#B5A8F0\"></circle>\n<circle cx=\"456\" cy=\"252\" r=\"14\" fill=\"#B5A8F0\"></circle>\n<circle cx=\"470\" cy=\"236\" r=\"5\" fill=\"#7FF0E0\"></circle><circle cx=\"510\" cy=\"214\" r=\"4\" fill=\"#7FF0E0\"></circle><circle cx=\"500\" cy=\"270\" r=\"4\" fill=\"#7FF0E0\"></circle>\n<path d=\"M60 384 L58 316 Q70 300 84 316 L86 384 Z\" fill=\"#6E6A8A\" stroke=\"#2E3B55\" stroke-width=\"4\" stroke-linejoin=\"round\"></path>\n<path d=\"M96 384 L96 340 Q106 328 118 340 L120 384 Z\" fill=\"#6E6A8A\" stroke=\"#2E3B55\" stroke-width=\"4\" stroke-linejoin=\"round\"></path>\n<path d=\"M66 340 L72 326 L78 340 L72 354 Z M104 356 L108 348 L112 356 L108 364 Z\" fill=\"#7FF0E0\" class=\"mp-twinkle\" style=\"--mp-d:3s\"></path>\n<circle cx=\"150\" cy=\"370\" r=\"24\" fill=\"#7FF0E0\" opacity=\"0.18\"></circle>\n<path d=\"M146 384 L146 368 L154 368 L154 384 Z M418 384 L418 372 L424 372 L424 384 Z\" fill=\"#E8F4F2\" stroke=\"#2E3B55\" stroke-width=\"3.5\" stroke-linejoin=\"round\"></path>\n<path d=\"M132 370 C132 348 168 348 168 370 Z M408 374 C408 360 434 360 434 374 Z\" fill=\"#5FE0D0\" stroke=\"#2E3B55\" stroke-width=\"3.5\" stroke-linejoin=\"round\"></path>\n<circle cx=\"142\" cy=\"362\" r=\"2.5\" fill=\"#FFFFFF\"></circle><circle cx=\"156\" cy=\"358\" r=\"2\" fill=\"#FFFFFF\"></circle>\n<g fill=\"#FFF1A8\">\n<circle cx=\"150\" cy=\"250\" r=\"5\" class=\"mp-twinkle\" style=\"--mp-d:2.2s\"></circle>\n<circle cx=\"410\" cy=\"300\" r=\"4\" class=\"mp-twinkle\" style=\"--mp-d:1.8s\"></circle>\n<circle cx=\"560\" cy=\"330\" r=\"5\" class=\"mp-twinkle\" style=\"--mp-d:2.6s\"></circle>\n<circle cx=\"250\" cy=\"160\" r=\"4\" class=\"mp-twinkle\" style=\"--mp-d:2s\"></circle>\n<circle cx=\"440\" cy=\"150\" r=\"4\" class=\"mp-twinkle\" style=\"--mp-d:2.4s\"></circle>\n<circle cx=\"90\" cy=\"230\" r=\"3.5\" class=\"mp-twinkle\" style=\"--mp-d:2.8s\"></circle>\n</g>\n</g>\n<g display=\"{{lakeOn}}\">\n<ellipse cx=\"300\" cy=\"398\" rx=\"126\" ry=\"15\" fill=\"#3F7A2C\"></ellipse>\n<path d=\"M176 396 C176 384 236 380 300 380 C364 380 424 384 424 396 C424 404 364 408 300 408 L300 396 L280 408 C224 406 176 402 176 396 Z\" fill=\"#7DBB4C\"></path>\n<g display=\"{{lilyOn}}\">\n<path d=\"M66 398 a16 5 0 1 0 2 -4 L70 398 Z M524 404 a13 4 0 1 0 2 -3 L528 404 Z\" fill=\"#5E9A3C\"></path>\n<circle cx=\"68\" cy=\"394\" r=\"4\" fill=\"#F2A0B4\"></circle>\n</g>\n<ellipse cx=\"480\" cy=\"392\" rx=\"30\" ry=\"9\" fill=\"none\" stroke=\"#2E3B55\" stroke-width=\"16\"></ellipse>\n<ellipse cx=\"480\" cy=\"392\" rx=\"30\" ry=\"9\" fill=\"none\" stroke=\"#FFFFFF\" stroke-width=\"10\"></ellipse>\n<ellipse cx=\"480\" cy=\"392\" rx=\"30\" ry=\"9\" fill=\"none\" stroke=\"#E5484D\" stroke-width=\"10\" stroke-dasharray=\"15 15\"></ellipse>\n<path d=\"M90 392 L86 330 M100 394 L102 320 M110 394 L114 336 M540 394 L536 344 M552 396 L556 336\" stroke=\"#5E9A3C\" stroke-width=\"4\" stroke-linecap=\"round\" fill=\"none\"></path>\n<path d=\"M86 330 L85 316 M102 320 L102 304 M114 336 L115 322 M556 336 L557 322\" stroke=\"#8A5631\" stroke-width=\"8\" stroke-linecap=\"round\" fill=\"none\"></path>\n<path d=\"M140 400 q10 -3 20 0 M380 412 q10 -3 20 0 M200 386 q8 -2 16 0\" fill=\"none\" stroke=\"#FFFFFF\" stroke-width=\"2\" opacity=\"0.7\"></path>\n</g>\n\n<g display=\"{{caveOn}}\">\n<path d=\"M440 384 L446 340 L458 330 L466 344 L464 384 Z\" fill=\"#6FD3D8\" stroke=\"#2F6E78\" stroke-width=\"4\" stroke-linejoin=\"round\"></path>\n<path d=\"M446 340 L458 330 L458 384 L444 384 Z\" fill=\"#B5EEF0\"></path>\n<path d=\"M470 384 L478 300 L494 282 L508 300 L512 384 Z\" fill=\"#9D7FD6\" stroke=\"#4A3A70\" stroke-width=\"4\" stroke-linejoin=\"round\"></path>\n<path d=\"M478 300 L494 282 L494 384 L472 384 Z\" fill=\"#C2AEF0\"></path>\n<path d=\"M516 384 L522 350 L534 340 L544 354 L540 384 Z\" fill=\"#9D7FD6\" stroke=\"#4A3A70\" stroke-width=\"4\" stroke-linejoin=\"round\"></path>\n<path d=\"M60 384 L74 326 L88 384 Z\" fill=\"#646080\" stroke=\"#38344A\" stroke-width=\"4\" stroke-linejoin=\"round\"></path>\n<path d=\"M86 384 L94 354 L102 384 Z\" fill=\"#77738F\" stroke=\"#38344A\" stroke-width=\"4\" stroke-linejoin=\"round\"></path>\n</g>\n<g display=\"{{showSnow}}\" fill=\"#E6EEF8\">\n<path d=\"M56 400 C56 384 76 380 100 380 L500 380 C524 380 544 384 544 400 C520 394 480 398 440 394 C400 398 360 394 320 398 C280 394 240 398 200 394 C160 398 120 394 80 398 C68 398 60 400 56 400 Z\"></path>\n<path d=\"M452 168 C456 150 516 150 520 168 C506 160 466 160 452 168 Z\" display=\"{{meadowOn}}\"></path>\n<path transform=\"{{lampXf}}\" d=\"M176 274 L196 256 L216 274 L196 268 Z\" stroke=\"#F4F7FB\" stroke-width=\"4\" stroke-linejoin=\"round\"></path>\n<path d=\"M500 222 C508 212 536 212 540 224 C530 220 510 220 500 222 Z\" display=\"{{meadowOn}}\"></path>\n<path d=\"M430 204 C452 208 476 222 492 238 C474 226 452 214 430 204 Z M568 202 C546 206 524 222 508 238 C526 224 548 212 568 202 Z\" display=\"{{desertOn}}\"></path>\n<path d=\"M60 334 Q60 322 72 322 Q84 322 84 334 Z\" display=\"{{desertOn}}\"></path>\n</g>\n";
 const MP_SCENE_FRONT = "\n\n<g display=\"{{lampGlow}}\" transform=\"{{lampXf}}\">\n<circle cx=\"196\" cy=\"287\" r=\"54\" fill=\"#FFE08A\" opacity=\"0.14\"></circle>\n<circle cx=\"196\" cy=\"287\" r=\"28\" fill=\"#FFE08A\" opacity=\"0.28\"></circle>\n<rect x=\"186\" y=\"278\" width=\"20\" height=\"18\" rx=\"4\" fill=\"#FFE08A\"></rect>\n</g>\n<g display=\"{{showRain}}\" stroke=\"#5F7896\" stroke-width=\"3\" stroke-linecap=\"round\" opacity=\"0.75\">\n<g class=\"mp-rain\">\n<g>\n<line x1=\"351\" y1=\"154\" x2=\"345\" y2=\"176\"></line><line x1=\"424\" y1=\"49\" x2=\"418\" y2=\"71\"></line><line x1=\"94\" y1=\"548\" x2=\"88\" y2=\"570\"></line><line x1=\"116\" y1=\"374\" x2=\"110\" y2=\"396\"></line><line x1=\"239\" y1=\"38\" x2=\"233\" y2=\"60\"></line><line x1=\"108\" y1=\"444\" x2=\"102\" y2=\"466\"></line><line x1=\"448\" y1=\"71\" x2=\"442\" y2=\"93\"></line><line x1=\"266\" y1=\"92\" x2=\"260\" y2=\"114\"></line><line x1=\"584\" y1=\"434\" x2=\"578\" y2=\"456\"></line><line x1=\"146\" y1=\"228\" x2=\"140\" y2=\"250\"></line><line x1=\"590\" y1=\"136\" x2=\"584\" y2=\"158\"></line><line x1=\"316\" y1=\"429\" x2=\"310\" y2=\"451\"></line><line x1=\"167\" y1=\"553\" x2=\"161\" y2=\"575\"></line><line x1=\"335\" y1=\"573\" x2=\"329\" y2=\"595\"></line><line x1=\"205\" y1=\"105\" x2=\"199\" y2=\"127\"></line><line x1=\"212\" y1=\"381\" x2=\"206\" y2=\"403\"></line><line x1=\"81\" y1=\"210\" x2=\"75\" y2=\"232\"></line><line x1=\"528\" y1=\"544\" x2=\"522\" y2=\"566\"></line><line x1=\"457\" y1=\"321\" x2=\"451\" y2=\"343\"></line><line x1=\"484\" y1=\"370\" x2=\"478\" y2=\"392\"></line><line x1=\"326\" y1=\"254\" x2=\"320\" y2=\"276\"></line><line x1=\"40\" y1=\"320\" x2=\"34\" y2=\"342\"></line><line x1=\"530\" y1=\"230\" x2=\"524\" y2=\"252\"></line><line x1=\"380\" y1=\"500\" x2=\"374\" y2=\"522\"></line><line x1=\"250\" y1=\"480\" x2=\"244\" y2=\"502\"></line><line x1=\"20\" y1=\"90\" x2=\"14\" y2=\"112\"></line><line x1=\"620\" y1=\"300\" x2=\"614\" y2=\"322\"></line><line x1=\"610\" y1=\"60\" x2=\"604\" y2=\"82\"></line>\n</g>\n<g transform=\"translate(30 -600)\">\n<line x1=\"351\" y1=\"154\" x2=\"345\" y2=\"176\"></line><line x1=\"424\" y1=\"49\" x2=\"418\" y2=\"71\"></line><line x1=\"94\" y1=\"548\" x2=\"88\" y2=\"570\"></line><line x1=\"116\" y1=\"374\" x2=\"110\" y2=\"396\"></line><line x1=\"239\" y1=\"38\" x2=\"233\" y2=\"60\"></line><line x1=\"108\" y1=\"444\" x2=\"102\" y2=\"466\"></line><line x1=\"448\" y1=\"71\" x2=\"442\" y2=\"93\"></line><line x1=\"266\" y1=\"92\" x2=\"260\" y2=\"114\"></line><line x1=\"584\" y1=\"434\" x2=\"578\" y2=\"456\"></line><line x1=\"146\" y1=\"228\" x2=\"140\" y2=\"250\"></line><line x1=\"590\" y1=\"136\" x2=\"584\" y2=\"158\"></line><line x1=\"316\" y1=\"429\" x2=\"310\" y2=\"451\"></line><line x1=\"167\" y1=\"553\" x2=\"161\" y2=\"575\"></line><line x1=\"335\" y1=\"573\" x2=\"329\" y2=\"595\"></line><line x1=\"205\" y1=\"105\" x2=\"199\" y2=\"127\"></line><line x1=\"212\" y1=\"381\" x2=\"206\" y2=\"403\"></line><line x1=\"81\" y1=\"210\" x2=\"75\" y2=\"232\"></line><line x1=\"528\" y1=\"544\" x2=\"522\" y2=\"566\"></line><line x1=\"457\" y1=\"321\" x2=\"451\" y2=\"343\"></line><line x1=\"484\" y1=\"370\" x2=\"478\" y2=\"392\"></line><line x1=\"326\" y1=\"254\" x2=\"320\" y2=\"276\"></line><line x1=\"40\" y1=\"320\" x2=\"34\" y2=\"342\"></line><line x1=\"530\" y1=\"230\" x2=\"524\" y2=\"252\"></line><line x1=\"380\" y1=\"500\" x2=\"374\" y2=\"522\"></line><line x1=\"250\" y1=\"480\" x2=\"244\" y2=\"502\"></line><line x1=\"20\" y1=\"90\" x2=\"14\" y2=\"112\"></line><line x1=\"620\" y1=\"300\" x2=\"614\" y2=\"322\"></line><line x1=\"610\" y1=\"60\" x2=\"604\" y2=\"82\"></line>\n</g>\n</g>\n</g>\n<g display=\"{{showSnow}}\" fill=\"#FFFFFF\">\n<g class=\"mp-snow\">\n<g>\n<circle cx=\"473\" cy=\"573\" r=\"5\"></circle><circle cx=\"472\" cy=\"520\" r=\"4\"></circle><circle cx=\"199\" cy=\"524\" r=\"5\"></circle><circle cx=\"200\" cy=\"96\" r=\"5\"></circle><circle cx=\"320\" cy=\"145\" r=\"3.5\"></circle><circle cx=\"561\" cy=\"42\" r=\"5\"></circle><circle cx=\"473\" cy=\"161\" r=\"3.5\"></circle><circle cx=\"551\" cy=\"64\" r=\"3.5\"></circle><circle cx=\"46\" cy=\"194\" r=\"4\"></circle><circle cx=\"40\" cy=\"475\" r=\"4.5\"></circle><circle cx=\"461\" cy=\"200\" r=\"4\"></circle><circle cx=\"311\" cy=\"511\" r=\"3.5\"></circle><circle cx=\"97\" cy=\"468\" r=\"4.5\"></circle><circle cx=\"426\" cy=\"564\" r=\"3.5\"></circle><circle cx=\"270\" cy=\"322\" r=\"4\"></circle><circle cx=\"535\" cy=\"295\" r=\"3.5\"></circle><circle cx=\"81\" cy=\"576\" r=\"3.5\"></circle><circle cx=\"420\" cy=\"110\" r=\"4.5\"></circle><circle cx=\"405\" cy=\"68\" r=\"3.5\"></circle><circle cx=\"10\" cy=\"218\" r=\"4\"></circle><circle cx=\"63\" cy=\"481\" r=\"5\"></circle><circle cx=\"416\" cy=\"429\" r=\"3.5\"></circle><circle cx=\"589\" cy=\"203\" r=\"4.5\"></circle><circle cx=\"354\" cy=\"89\" r=\"4.5\"></circle><circle cx=\"350\" cy=\"15\" r=\"5\"></circle><circle cx=\"130\" cy=\"137\" r=\"4\"></circle><circle cx=\"113\" cy=\"11\" r=\"3.5\"></circle><circle cx=\"486\" cy=\"498\" r=\"4\"></circle><circle cx=\"140\" cy=\"300\" r=\"4\"></circle><circle cx=\"250\" cy=\"420\" r=\"4.5\"></circle><circle cx=\"380\" cy=\"250\" r=\"4\"></circle><circle cx=\"560\" cy=\"380\" r=\"4\"></circle><circle cx=\"20\" cy=\"380\" r=\"4.5\"></circle><circle cx=\"300\" cy=\"40\" r=\"4\"></circle>\n</g>\n<g transform=\"translate(0 -600)\">\n<circle cx=\"473\" cy=\"573\" r=\"5\"></circle><circle cx=\"472\" cy=\"520\" r=\"4\"></circle><circle cx=\"199\" cy=\"524\" r=\"5\"></circle><circle cx=\"200\" cy=\"96\" r=\"5\"></circle><circle cx=\"320\" cy=\"145\" r=\"3.5\"></circle><circle cx=\"561\" cy=\"42\" r=\"5\"></circle><circle cx=\"473\" cy=\"161\" r=\"3.5\"></circle><circle cx=\"551\" cy=\"64\" r=\"3.5\"></circle><circle cx=\"46\" cy=\"194\" r=\"4\"></circle><circle cx=\"40\" cy=\"475\" r=\"4.5\"></circle><circle cx=\"461\" cy=\"200\" r=\"4\"></circle><circle cx=\"311\" cy=\"511\" r=\"3.5\"></circle><circle cx=\"97\" cy=\"468\" r=\"4.5\"></circle><circle cx=\"426\" cy=\"564\" r=\"3.5\"></circle><circle cx=\"270\" cy=\"322\" r=\"4\"></circle><circle cx=\"535\" cy=\"295\" r=\"3.5\"></circle><circle cx=\"81\" cy=\"576\" r=\"3.5\"></circle><circle cx=\"420\" cy=\"110\" r=\"4.5\"></circle><circle cx=\"405\" cy=\"68\" r=\"3.5\"></circle><circle cx=\"10\" cy=\"218\" r=\"4\"></circle><circle cx=\"63\" cy=\"481\" r=\"5\"></circle><circle cx=\"416\" cy=\"429\" r=\"3.5\"></circle><circle cx=\"589\" cy=\"203\" r=\"4.5\"></circle><circle cx=\"354\" cy=\"89\" r=\"4.5\"></circle><circle cx=\"350\" cy=\"15\" r=\"5\"></circle><circle cx=\"130\" cy=\"137\" r=\"4\"></circle><circle cx=\"113\" cy=\"11\" r=\"3.5\"></circle><circle cx=\"486\" cy=\"498\" r=\"4\"></circle><circle cx=\"140\" cy=\"300\" r=\"4\"></circle><circle cx=\"250\" cy=\"420\" r=\"4.5\"></circle><circle cx=\"380\" cy=\"250\" r=\"4\"></circle><circle cx=\"560\" cy=\"380\" r=\"4\"></circle><circle cx=\"20\" cy=\"380\" r=\"4.5\"></circle><circle cx=\"300\" cy=\"40\" r=\"4\"></circle>\n</g>\n</g>\n</g>\n";
+const MP_ISO_TOYS = {"ball": "<circle cx=\"0\" cy=\"-14\" r=\"14\" fill=\"#E5484D\" stroke=\"none\"/><path d=\"M-13 -11 Q0 -3 13 -11\" fill=\"none\" stroke=\"#FFFFFF\" stroke-width=\"4\"/><path d=\"M2 -27 Q-2 -14 2 -1\" fill=\"none\" stroke=\"#FFD25E\" stroke-width=\"3.5\"/><circle cx=\"-6\" cy=\"-20\" r=\"3\" fill=\"#FFFFFF\" opacity=\".8\"/>", "yarn": "<path d=\"M10 -4 C22 -2 26 2 34 0\" fill=\"none\" stroke=\"#C9577A\" stroke-width=\"2.5\" stroke-linecap=\"round\"/><circle cx=\"0\" cy=\"-13\" r=\"13\" fill=\"#F27A8E\" stroke=\"none\"/><path d=\"M-11 -18 Q0 -10 11 -20 M-12 -10 Q0 -2 12 -12 M-6 -24 Q4 -12 -2 -1\" fill=\"none\" stroke=\"#C9577A\" stroke-width=\"2.2\" stroke-linecap=\"round\"/>", "donut": "<ellipse cx=\"0\" cy=\"-8\" rx=\"17\" ry=\"9\" fill=\"#B07A45\" stroke=\"none\"/><ellipse cx=\"0\" cy=\"-11\" rx=\"14\" ry=\"6.5\" fill=\"#F27A8E\"/><ellipse cx=\"0\" cy=\"-11\" rx=\"4.5\" ry=\"2.2\" fill=\"#7A4A2A\"/><path d=\"M-9 -13 l3 -1 M6 -15 l3 1 M-3 -7 l3 0 M8 -9 l2 2 M-10 -9 l2 1\" stroke=\"#FFFFFF\" stroke-width=\"2\" stroke-linecap=\"round\"/><path d=\"M-4 -16 l2 1 M10 -12 l1 2\" stroke=\"#FFD25E\" stroke-width=\"2\" stroke-linecap=\"round\"/>", "meat": "<path d=\"M4 -16 L18 -26\" stroke=\"#F2F0EC\" stroke-width=\"6\" stroke-linecap=\"round\"/><circle cx=\"18\" cy=\"-29\" r=\"4\" fill=\"#F2F0EC\" stroke=\"none\"/><circle cx=\"22\" cy=\"-25\" r=\"4\" fill=\"#F2F0EC\" stroke=\"none\"/><path d=\"M-14 -2 C-22 -14 -10 -28 4 -22 C12 -18 12 -8 4 -2 C-2 2 -10 2 -14 -2 Z\" fill=\"#B5533C\" stroke=\"none\"/><path d=\"M-10 -14 C-6 -20 0 -20 2 -18\" fill=\"none\" stroke=\"#D97A5E\" stroke-width=\"3\" stroke-linecap=\"round\"/>", "juice": "<rect x=\"-10\" y=\"-30\" width=\"20\" height=\"30\" rx=\"2\" fill=\"#F28C38\" stroke=\"none\"/><rect x=\"-10\" y=\"-22\" width=\"20\" height=\"13\" fill=\"#FFD25E\"/><circle cx=\"0\" cy=\"-15.5\" r=\"4\" fill=\"#F28C38\"/><path d=\"M0 -19 q2 -3 5 -3\" stroke=\"#7DBB4C\" stroke-width=\"2\" fill=\"none\" stroke-linecap=\"round\"/><path d=\"M4 -30 L4 -40 L10 -44\" fill=\"none\" stroke=\"#FFFFFF\" stroke-width=\"2.5\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/>", "cake": "<path d=\"M-16 0 L-16 -16 L16 -22 L16 -6 Z\" fill=\"#F6E3BD\" stroke=\"none\"/><path d=\"M-16 -10 L16 -16 L16 -12 L-16 -6 Z\" fill=\"#F27A8E\"/><path d=\"M-16 -16 L16 -22 L20 -24 L-12 -18 Z\" fill=\"#FFFFFF\" stroke=\"none\"/><circle cx=\"4\" cy=\"-27\" r=\"4.5\" fill=\"#E5484D\" stroke=\"none\"/><path d=\"M4 -31 l1 -3\" stroke=\"#5E9A3C\" stroke-width=\"2\" stroke-linecap=\"round\"/>"};
+const MP_ISO_EMOTE = "<g display=\"{{em.happy}}\" fill=\"#F27A8E\"><path d=\"M0 6 C-12 -6 -22 6 -10 16 L0 24 L10 16 C22 6 12 -6 0 6 Z\"/><path transform=\"translate(22 -14) scale(0.6)\" d=\"M0 6 C-12 -6 -22 6 -10 16 L0 24 L10 16 C22 6 12 -6 0 6 Z\"/></g><g display=\"{{em.sad}}\"><path d=\"M-20 6 C-24 -4 -14 -12 -6 -8 C-4 -18 12 -20 16 -8 C24 -10 30 0 24 6 Z\" fill=\"#9AA7B8\"/><path d=\"M-12 12 l-3 7 M0 12 l-3 7 M12 12 l-3 7\" stroke=\"#5FA8E8\" stroke-width=\"3\" stroke-linecap=\"round\" fill=\"none\"/></g><g display=\"{{em.mad}}\"><path d=\"M-12 -4 Q-4 -4 -4 -12 M4 -12 Q4 -4 12 -4 M12 4 Q4 4 4 12 M-4 12 Q-4 4 -12 4\" stroke=\"#E5484D\" stroke-width=\"4\" fill=\"none\" stroke-linecap=\"round\"/></g><g display=\"{{em.sick}}\"><path d=\"M2 0 a2 2 0 1 1 -4 0 a5 5 0 1 1 10 0 a8 8 0 1 1 -16 0 a11 11 0 1 1 22 0\" stroke=\"#7CB86A\" stroke-width=\"3.5\" fill=\"none\" stroke-linecap=\"round\"/><path d=\"M24 -14 C28 -8 30 -5 30 -3 a6 6 0 0 1 -12 0 C18 -5 20 -8 24 -14 Z\" fill=\"#8EC5F0\"/></g><g display=\"{{em.sleepy}}\" fill=\"none\" stroke=\"#6B7A99\" stroke-linejoin=\"round\" stroke-linecap=\"round\"><path d=\"M-12 -2 h12 l-12 14 h12\" stroke-width=\"4\"/><path d=\"M8 -20 h8 l-8 9 h8\" stroke-width=\"3\"/></g><g display=\"{{em.focus}}\"><path d=\"M-16 -6 L0 -2 L16 -6 L16 10 L0 14 L-16 10 Z\" fill=\"#FFFFFF\" stroke=\"#5B7FB5\" stroke-width=\"2.5\" stroke-linejoin=\"round\"/><path d=\"M0 -2 L0 14\" stroke=\"#5B7FB5\" stroke-width=\"2\"/><path d=\"M-12 1 L-4 3 M-12 5 L-4 7 M4 3 L12 1 M4 7 L12 5\" stroke=\"#9AA7B8\" stroke-width=\"1.6\" stroke-linecap=\"round\"/></g><g display=\"{{em.cold}}\" stroke=\"#7FB6E0\" stroke-width=\"3\" stroke-linecap=\"round\" fill=\"none\"><path d=\"M0 -14 L0 14 M-12 -7 L12 7 M-12 7 L12 -7 M-4 -11 L0 -7 L4 -11 M-4 11 L0 7 L4 11\"/></g><g display=\"{{em.celebrate}}\"><path d=\"M0 -14 L4 -4 L14 -4 L6 2 L9 12 L0 6 L-9 12 L-6 2 L-14 -4 L-4 -4 Z\" fill=\"#FFD25E\" stroke=\"#E0A93A\" stroke-width=\"2\" stroke-linejoin=\"round\"/><rect x=\"16\" y=\"-18\" width=\"6\" height=\"6\" fill=\"#F27A8E\" transform=\"rotate(20 19 -15)\"/><rect x=\"-24\" y=\"-12\" width=\"6\" height=\"6\" fill=\"#5BB8F0\" transform=\"rotate(-25 -21 -9)\"/><circle cx=\"19\" cy=\"10\" r=\"3.5\" fill=\"#7DDB5C\"/><circle cx=\"-18\" cy=\"12\" r=\"2.5\" fill=\"#F2C14E\"/></g><g display=\"{{em.hungry}}\"><circle cx=\"-18\" cy=\"24\" r=\"5\" fill=\"#FFFFFF\" stroke=\"#C9D3E6\" stroke-width=\"2\"/><circle cx=\"-27\" cy=\"34\" r=\"3\" fill=\"#FFFFFF\" stroke=\"#C9D3E6\" stroke-width=\"2\"/><circle cx=\"0\" cy=\"0\" r=\"21\" fill=\"#FFFFFF\" stroke=\"#C9D3E6\" stroke-width=\"2\"/><g display=\"{{em.fish}}\"><path d=\"M-11 0 Q-2 -9 7 0 Q-2 9 -11 0 Z M7 0 L13 -6 L13 6 Z\" fill=\"#7FB6D6\"/><circle cx=\"-5\" cy=\"-1\" r=\"1.6\" fill=\"#2E3B55\"/></g><g display=\"{{em.bone}}\" fill=\"#D9C9A3\"><rect x=\"-8\" y=\"-2.5\" width=\"16\" height=\"5\" rx=\"2\"/><circle cx=\"-9\" cy=\"-3\" r=\"3.5\"/><circle cx=\"-9\" cy=\"3\" r=\"3.5\"/><circle cx=\"9\" cy=\"-3\" r=\"3.5\"/><circle cx=\"9\" cy=\"3\" r=\"3.5\"/></g><g display=\"{{em.berry}}\"><circle cx=\"-4\" cy=\"3\" r=\"6\" fill=\"#E5484D\"/><circle cx=\"5\" cy=\"2\" r=\"5\" fill=\"#C93A40\"/><path d=\"M0 -4 q2 -6 8 -6\" stroke=\"#5E9A3C\" stroke-width=\"2\" fill=\"none\"/></g><g display=\"{{em.drop}}\"><path d=\"M0 -11 C5 -4 8 0 8 3 a8 8 0 0 1 -16 0 C-8 0 -5 -4 0 -11 Z\" fill=\"#5FA8E8\"/></g><g display=\"{{em.carrot}}\"><path d=\"M-10 10 L5 -5 L10 0 Z\" fill=\"#F28C38\"/><path d=\"M6 -6 l1 -8 M8 -4 l8 -2\" stroke=\"#5E9A3C\" stroke-width=\"3\" stroke-linecap=\"round\" fill=\"none\"/></g><g display=\"{{em.seed}}\"><path d=\"M0 -10 C8 -5 8 5 0 10 C-8 5 -8 -5 0 -10 Z\" fill=\"#E8C77A\"/><path d=\"M0 -8 L0 8\" stroke=\"#B98A4E\" stroke-width=\"2.5\" fill=\"none\"/></g><g display=\"{{em.chili}}\"><path d=\"M-10 8 C-4 8 6 2 8 -6 C11 -2 4 10 -10 10 Z\" fill=\"#E5484D\"/><path d=\"M8 -6 q2 -4 6 -5\" stroke=\"#5E9A3C\" stroke-width=\"2.5\" fill=\"none\" stroke-linecap=\"round\"/></g><g display=\"{{em.leaf}}\"><path d=\"M-10 8 C-10 -6 2 -12 12 -10 C12 2 4 10 -10 8 Z\" fill=\"#7DBB4C\"/><path d=\"M-10 8 L8 -6\" stroke=\"#5E9A3C\" stroke-width=\"2\" fill=\"none\"/></g></g>";
+const MP_ISO_BACK = "<g display=\"{{showSun}}\"><g transform=\"translate(96 96)\"><g class=\"mp-a mp-spin\"><g transform=\"translate(-96 -96)\"><polygon points=\"96,34 104,52 88,52\" fill=\"#FFE29A\"/><polygon points=\"96,158 88,140 104,140\" fill=\"#FFE29A\"/><polygon points=\"34,96 52,88 52,104\" fill=\"#FFE29A\"/><polygon points=\"158,96 140,104 140,88\" fill=\"#FFE29A\"/><polygon points=\"52,52 68,58 58,68\" fill=\"#FFE29A\"/><polygon points=\"140,140 124,134 134,124\" fill=\"#FFE29A\"/><polygon points=\"140,52 134,68 124,58\" fill=\"#FFE29A\"/><polygon points=\"52,140 58,124 68,134\" fill=\"#FFE29A\"/></g></g></g><circle cx=\"96\" cy=\"96\" r=\"34\" fill=\"#FFD66B\"/><polygon points=\"74,84 96,64 118,80 96,92\" fill=\"#FFE59A\"/></g><g display=\"{{groveOn}}\" fill=\"#F6EFD2\"><circle cx=\"90\" cy=\"80\" r=\"2\"/><circle cx=\"170\" cy=\"50\" r=\"1.6\"/><circle cx=\"250\" cy=\"96\" r=\"2\"/><circle cx=\"350\" cy=\"56\" r=\"1.6\"/><circle cx=\"460\" cy=\"90\" r=\"2.4\" class=\"mp-twinkle\" style=\"--mp-d:2.4s\"/><circle cx=\"540\" cy=\"50\" r=\"1.6\"/><path d=\"M500 110 a22 22 0 1 0 18 34 a17 17 0 1 1 -18 -34 Z\" opacity=\"0.85\"/></g><g display=\"{{showNight}}\"><g fill=\"#F6EFD2\"><circle cx=\"263\" cy=\"167\" r=\"2.5\" class=\"mp-twinkle\" style=\"--mp-d:3s\"/><circle cx=\"153\" cy=\"110\" r=\"2.5\"/><circle cx=\"505\" cy=\"176\" r=\"2.5\"/><circle cx=\"87\" cy=\"171\" r=\"1.5\"/><circle cx=\"440\" cy=\"40\" r=\"2.5\" class=\"mp-twinkle\" style=\"--mp-d:2.4s\"/><circle cx=\"259\" cy=\"65\" r=\"2.5\"/><circle cx=\"560\" cy=\"150\" r=\"2.5\"/><circle cx=\"174\" cy=\"75\" r=\"2.5\" class=\"mp-twinkle\" style=\"--mp-d:4s\"/><circle cx=\"175\" cy=\"149\" r=\"2\"/><circle cx=\"35\" cy=\"187\" r=\"1.5\"/><circle cx=\"328\" cy=\"23\" r=\"2\"/><circle cx=\"416\" cy=\"125\" r=\"2\"/><circle cx=\"60\" cy=\"50\" r=\"2\"/><circle cx=\"340\" cy=\"110\" r=\"1.5\"/></g><path d=\"M527.4 104.3L525.2 108.3L522.5 111.8L519.3 115.0L515.6 117.6L511.6 119.6L507.4 121.1L503.0 121.9L498.5 122.0L494.0 121.4L489.7 120.2L485.6 118.3L481.8 115.9L478.5 112.9L475.6 109.4L473.3 105.6L471.5 101.4L470.4 97.1L470.0 92.6L470.3 88.1L471.2 83.7L472.7 79.5L474.9 75.6L477.6 72.0L480.9 68.9L484.5 66.3L488.5 64.3L492.8 62.9L497.2 62.1L495.2 64.0L493.4 66.1L491.8 68.4L490.5 70.8L489.5 73.4L488.7 76.0L488.2 78.8L488.0 81.5L488.1 84.3L488.5 87.0L489.2 89.7L490.1 92.3L491.4 94.8L492.8 97.1L494.6 99.3L496.5 101.2L498.7 103.0L501.0 104.5L503.4 105.8L506.0 106.7L508.7 107.5L511.4 107.9L514.2 108.0L517.0 107.8L519.7 107.4L522.3 106.6L524.9 105.6Z\" fill=\"#F6EFD2\"/></g><g display=\"{{showCloudA}}\"><g transform=\"translate(150 112)\" class=\"mp-drift\" style=\"--mp-dx:28.0px;--mp-d:24s\"><polygon points=\"-70,14 70,14 56,-6 -56,-4\" fill=\"{{cloudMid}}\"/><polygon points=\"-46,-4 -24,-36 4,-32 16,-4\" fill=\"{{cloudLit}}\"/><polygon points=\"4,-6 26,-28 50,-14 56,-6\" fill=\"{{cloudShade}}\"/><polygon points=\"-24,-36 -6,-48 14,-40 4,-32\" fill=\"{{cloudLit}}\"/><polygon points=\"-70,14 70,14 58,24 -58,24\" fill=\"{{cloudShade}}\"/></g></g><g display=\"{{showCloudB}}\"><g transform=\"translate(450 96)\" class=\"mp-drift\" style=\"--mp-dx:-30.0px;--mp-d:30s\"><polygon points=\"-80,16 80,16 64,-8 -64,-6\" fill=\"{{cloudMid}}\"/><polygon points=\"-50,-6 -30,-40 2,-38 18,-6\" fill=\"{{cloudLit}}\"/><polygon points=\"2,-8 30,-34 58,-18 64,-8\" fill=\"{{cloudShade}}\"/><polygon points=\"-80,16 80,16 66,28 -66,28\" fill=\"{{cloudShade}}\"/></g></g><g display=\"{{showCloudC}}\"><g transform=\"translate(300 58)\" class=\"mp-drift\" style=\"--mp-dx:18.0px;--mp-d:20s\"><polygon points=\"-60,12 60,12 48,-6 -48,-4\" fill=\"{{cloudMid}}\"/><polygon points=\"-36,-4 -18,-30 6,-26 14,-4\" fill=\"{{cloudLit}}\"/><polygon points=\"6,-6 24,-22 42,-12 48,-6\" fill=\"{{cloudShade}}\"/><polygon points=\"-60,12 60,12 50,20 -50,20\" fill=\"{{cloudShade}}\"/></g></g><g display=\"{{caveOn}}\"><circle cx=\"398\" cy=\"210\" r=\"80\" fill=\"#9D7FD6\" opacity=\"0.18\"/></g><g stroke-linejoin=\"round\" stroke-width=\"1.2\"><polygon points=\"80,280 300,390 300,462 80,352\" fill=\"{{g.sideL}}\" stroke=\"{{g.sideL}}\"/><polygon points=\"300,390 520,280 520,352 300,462\" fill=\"{{g.sideR}}\" stroke=\"{{g.sideR}}\"/><polyline points=\"80,322 300,432\" fill=\"none\" stroke=\"{{g.st1}}\" stroke-width=\"3\"/><polyline points=\"300,432 520,322\" fill=\"none\" stroke=\"{{g.st2}}\" stroke-width=\"3\"/><g display=\"{{desertOn}}\"><polyline points=\"80,304 300,414\" fill=\"none\" stroke=\"{{g.st1}}\" stroke-width=\"2\"/><polyline points=\"80,338 300,448\" fill=\"none\" stroke=\"{{g.st1}}\" stroke-width=\"2\"/><polyline points=\"300,414 520,304\" fill=\"none\" stroke=\"{{g.st2}}\" stroke-width=\"2\"/><polyline points=\"300,448 520,338\" fill=\"none\" stroke=\"{{g.st2}}\" stroke-width=\"2\"/></g><ellipse cx=\"130\" cy=\"340\" rx=\"7\" ry=\"4\" fill=\"{{g.peb}}\" stroke=\"none\"/><ellipse cx=\"236\" cy=\"420\" rx=\"6\" ry=\"3.5\" fill=\"{{g.peb}}\" stroke=\"none\"/><ellipse cx=\"180\" cy=\"392\" rx=\"4\" ry=\"2.5\" fill=\"{{g.peb}}\" stroke=\"none\"/><ellipse cx=\"360\" cy=\"420\" rx=\"7\" ry=\"4\" fill=\"{{g.pebR}}\" stroke=\"none\"/><ellipse cx=\"460\" cy=\"352\" rx=\"5\" ry=\"3\" fill=\"{{g.pebR}}\" stroke=\"none\"/><ellipse cx=\"410\" cy=\"396\" rx=\"4\" ry=\"2.5\" fill=\"{{g.pebR}}\" stroke=\"none\"/><polygon points=\"300,170 520,280 300,390 80,280\" fill=\"{{g.top}}\" stroke=\"{{g.top}}\"/><polygon points=\"300,170 410,225 300,280 190,225\" fill=\"{{g.inner}}\" stroke=\"{{g.inner}}\"/><polygon points=\"190,225 300,280 245,307 135,252\" fill=\"{{g.qL}}\" stroke=\"{{g.qL}}\"/><polygon points=\"410,225 520,280 465,307 355,252\" fill=\"{{g.qR}}\" stroke=\"{{g.qR}}\"/><polygon points=\"80,280 300,390 300,412 280,390 260,392 240,370 220,372 200,350 180,352 160,330 140,332 120,310 100,312 80,290\" fill=\"{{g.bandL}}\" stroke=\"{{g.bandL}}\"/><polygon points=\"300,390 520,280 520,290 500,312 480,310 460,332 440,330 420,352 400,350 380,372 360,370 340,392 320,390 300,412\" fill=\"{{g.bandR}}\" stroke=\"{{g.bandR}}\"/><g display=\"{{desertOn}}\" stroke=\"none\"><polygon points=\"196,300 256,290 316,300 256,308\" fill=\"#F5E2B6\"/><polygon points=\"330,240 372,234 410,242 370,248\" fill=\"#F5E2B6\"/><polygon points=\"240,214 270,210 296,216 268,220\" fill=\"#DCBD84\"/></g><g display=\"{{showSnow}}\"><polygon points=\"300,174 514,281 300,386 86,281\" fill=\"#E4EDF8\" stroke=\"#E4EDF8\"/><polygon points=\"300,174 410,229 300,284 190,229\" fill=\"#EEF4FB\" stroke=\"#EEF4FB\"/><polygon points=\"80,280 300,390 300,400 284,394 268,398 250,388 232,390 214,380 196,382 178,370 160,372 142,360 124,362 106,350 80,290\" fill=\"#D2DEEC\" stroke=\"#D2DEEC\"/><polygon points=\"300,390 520,280 520,290 494,304 476,302 458,314 440,312 422,324 404,322 386,334 368,332 350,346 332,344 316,354 300,400\" fill=\"#C2D1E3\" stroke=\"#C2D1E3\"/></g><g display=\"{{showGrass}}\" fill=\"#86C257\" stroke=\"#86C257\"><polygon points=\"172,312 178,296 184,312\"/><polygon points=\"250,190 256,176 262,190\"/><polygon points=\"460,288 466,272 472,288\"/></g><ellipse display=\"{{pondOn}}\" cx=\"180\" cy=\"278\" rx=\"60\" ry=\"29\" fill=\"#6FA9C9\" stroke=\"none\"/><ellipse display=\"{{pondOn}}\" cx=\"182\" cy=\"280\" rx=\"52\" ry=\"24\" fill=\"{{water}}\" stroke=\"none\"/><polygon display=\"{{pondOn}}\" points=\"152,272 192,264 176,274\" fill=\"#FFFFFF\" opacity=\".55\" stroke=\"none\"/><polygon display=\"{{pondOn}}\" points=\"196,290 216,286 208,292\" fill=\"#FFFFFF\" opacity=\".35\" stroke=\"none\"/><g display=\"{{showRain}}\" fill=\"none\" stroke=\"#FFFFFF\" stroke-width=\"1.6\"><ellipse cx=\"166\" cy=\"276\" rx=\"18\" ry=\"8\" class=\"mp-ripple\"/><ellipse cx=\"200\" cy=\"286\" rx=\"16\" ry=\"7\" class=\"mp-ripple\" style=\"animation-delay:0.55s\"/><ellipse cx=\"184\" cy=\"268\" rx=\"14\" ry=\"6\" class=\"mp-ripple\" style=\"animation-delay:1.1s\"/></g><g display=\"{{meadowOn}}\"><g stroke=\"none\"><polygon points=\"135,302 137,302 137,276 135,276\" fill=\"#5E9A3C\"/><polygon points=\"136,270 140,276 136,282 132,276\" fill=\"#9D7FD6\"/><polygon points=\"136,264 139,269 136,274 133,269\" fill=\"#B79CE6\"/><polygon points=\"149,308 151,308 151,280 149,280\" fill=\"#5E9A3C\"/><polygon points=\"150,274 154,280 150,286 146,280\" fill=\"#9D7FD6\"/><polygon points=\"150,268 153,273 150,278 147,273\" fill=\"#B79CE6\"/></g><polygon points=\"390,244 402,244 400,204 392,204\" fill=\"#8A5631\" stroke=\"#8A5631\"/><polygon points=\"396,244 402,244 400,204 396,204\" fill=\"#6E4426\" stroke=\"#6E4426\"/><polygon points=\"352,214 396,226 440,212 430,170 362,170\" fill=\"{{tc.c0}}\" stroke=\"{{tc.c0}}\"/><polygon points=\"352,214 362,170 396,150 392,196\" fill=\"{{tc.c1}}\" stroke=\"{{tc.c1}}\"/><polygon points=\"396,226 440,212 430,170 400,190\" fill=\"{{tc.c2}}\" stroke=\"{{tc.c2}}\"/><polygon points=\"362,170 372,128 396,108 420,126 430,170 396,150\" fill=\"{{tc.c3}}\" stroke=\"{{tc.c3}}\"/><polygon points=\"372,128 396,108 398,140 380,150\" fill=\"{{tc.c4}}\" stroke=\"{{tc.c4}}\"/><polygon points=\"396,108 420,126 430,170 398,140\" fill=\"{{tc.c5}}\" stroke=\"{{tc.c5}}\"/><polygon points=\"362,170 380,150 396,150 392,196\" fill=\"{{tc.c6}}\" stroke=\"{{tc.c6}}\"/><g display=\"{{showSnow}}\"><polygon points=\"372,128 396,108 420,126 398,124\" fill=\"#FFFFFF\" stroke=\"#FFFFFF\"/><polygon points=\"362,170 380,150 396,150 378,160\" fill=\"#F1F5FA\" stroke=\"#F1F5FA\"/><polygon points=\"400,190 430,170 440,212 426,196\" fill=\"#E6ECF3\" stroke=\"#E6ECF3\"/></g><g stroke=\"none\"><polygon points=\"438,272 440,272 440,258 438,258\" fill=\"#5E9A3C\"/><circle cx=\"439\" cy=\"256\" r=\"5\" fill=\"{{flower}}\"/><circle cx=\"439\" cy=\"256\" r=\"1.8\" fill=\"#E59A3C\"/><polygon points=\"452,280 454,280 454,264 452,264\" fill=\"#5E9A3C\"/><circle cx=\"453\" cy=\"262\" r=\"5\" fill=\"{{flower}}\"/><circle cx=\"453\" cy=\"262\" r=\"1.8\" fill=\"#E59A3C\"/></g></g><g display=\"{{groveOn}}\" stroke=\"none\"><polygon points=\"174,240 174,204 184,194 196,202 196,246\" fill=\"#6E6A8A\"/><polygon points=\"196,202 204,206 204,242 196,246\" fill=\"#55516E\"/><polygon points=\"184,214 188,208 192,214 188,222\" fill=\"#7FF0E0\" class=\"mp-twinkle\" style=\"--mp-d:3s\"/><polygon points=\"212,226 212,198 220,190 230,196 230,230\" fill=\"#6E6A8A\"/><polygon points=\"230,196 236,200 236,228 230,230\" fill=\"#55516E\"/><polygon points=\"218,206 221,201 224,206 221,212\" fill=\"#7FF0E0\" class=\"mp-twinkle\" style=\"--mp-d:2.6s\"/><circle cx=\"134\" cy=\"286\" r=\"20\" fill=\"#7FF0E0\" opacity=\"0.16\"/><polygon points=\"130,300 138,300 138,282 130,282\" fill=\"#E8F4F2\"/><polygon points=\"116,284 134,268 152,284 134,290\" fill=\"#5FE0D0\"/><polygon points=\"134,268 152,284 134,290\" fill=\"#3FBFB0\"/><circle cx=\"128\" cy=\"279\" r=\"2.2\" fill=\"#FFFFFF\"/><circle cx=\"140\" cy=\"276\" r=\"1.8\" fill=\"#FFFFFF\"/><polygon points=\"152,308 157,308 157,296 152,296\" fill=\"#E8F4F2\"/><polygon points=\"144,298 154,288 164,298 154,302\" fill=\"#5FE0D0\"/><polygon points=\"154,288 164,298 154,302\" fill=\"#3FBFB0\"/><polygon points=\"456,300 461,300 461,290 456,290\" fill=\"#E8F4F2\"/><polygon points=\"450,292 458,284 466,292 458,295\" fill=\"#9D7FD6\"/><circle cx=\"396\" cy=\"160\" r=\"6\" fill=\"#7FF0E0\" opacity=\"0.55\"/><circle cx=\"420\" cy=\"196\" r=\"4\" fill=\"#7FF0E0\" opacity=\"0.55\"/><circle cx=\"372\" cy=\"200\" r=\"4\" fill=\"#7FF0E0\" opacity=\"0.55\"/><g fill=\"#FFF1A8\"><circle cx=\"230\" cy=\"170\" r=\"3\" class=\"mp-twinkle\" style=\"--mp-d:2.2s\"/><circle cx=\"350\" cy=\"250\" r=\"2.5\" class=\"mp-twinkle\" style=\"--mp-d:1.8s\"/><circle cx=\"460\" cy=\"230\" r=\"3\" class=\"mp-twinkle\" style=\"--mp-d:2.6s\"/><circle cx=\"150\" cy=\"230\" r=\"2.5\" class=\"mp-twinkle\" style=\"--mp-d:2s\"/><circle cx=\"420\" cy=\"130\" r=\"2.5\" class=\"mp-twinkle\" style=\"--mp-d:2.4s\"/><circle cx=\"110\" cy=\"190\" r=\"2.5\" class=\"mp-twinkle\" style=\"--mp-d:2.8s\"/></g></g><g display=\"{{lakeOn}}\"><ellipse cx=\"280\" cy=\"352\" rx=\"76\" ry=\"27\" fill=\"#3F7A2C\" stroke=\"none\"/><ellipse cx=\"280\" cy=\"348\" rx=\"72\" ry=\"24\" fill=\"#7DBB4C\" stroke=\"none\"/><polygon points=\"280,348 304,326 318,330\" fill=\"{{g.top}}\" stroke=\"none\"/><ellipse cx=\"262\" cy=\"340\" rx=\"30\" ry=\"8\" fill=\"#8CCB5E\" stroke=\"none\"/><g display=\"{{lilyOn}}\"><path d=\"M170 258 a13 6 0 1 0 2 -5 L174 258 Z M388 318 a11 5 0 1 0 2 -4 L392 318 Z M214 300 a9 4 0 1 0 2 -3 L218 300 Z\" fill=\"#5E9A3C\" stroke=\"none\"/><circle cx=\"172\" cy=\"254\" r=\"4\" fill=\"#F2A0B4\" stroke=\"none\"/></g><ellipse cx=\"430\" cy=\"284\" rx=\"24\" ry=\"10\" fill=\"none\" stroke=\"#FFFFFF\" stroke-width=\"9\"/><ellipse cx=\"430\" cy=\"284\" rx=\"24\" ry=\"10\" fill=\"none\" stroke=\"#E5484D\" stroke-width=\"9\" stroke-dasharray=\"12 13\"/><ellipse cx=\"430\" cy=\"282\" rx=\"16\" ry=\"5\" fill=\"#5FA3CC\" opacity=\"0.5\" stroke=\"none\"/><path d=\"M112 284 L110 236 M120 288 L122 230 M128 290 L132 242 M480 270 L478 226 M488 266 L492 220\" stroke=\"#5E9A3C\" stroke-width=\"3\" stroke-linecap=\"round\" fill=\"none\"/><path d=\"M110 238 L109 226 M122 232 L122 220 M132 244 L133 232 M492 222 L493 210\" stroke=\"#8A5631\" stroke-width=\"6\" stroke-linecap=\"round\" fill=\"none\"/><path d=\"M240 220 q10 -3 20 0 M350 250 q10 -3 20 0 M160 300 q8 -2 16 0 M380 350 q8 -2 16 0\" fill=\"none\" stroke=\"#FFFFFF\" stroke-width=\"1.6\" opacity=\"0.75\"/></g><g display=\"{{caveOn}}\"><polygon points=\"362,250 366,214 376,206 384,216 382,252\" fill=\"#6FD3D8\" stroke=\"#6FD3D8\"/><polygon points=\"366,214 376,206 376,252 364,250\" fill=\"#B5EEF0\" stroke=\"#B5EEF0\"/><polygon points=\"384,246 390,180 402,168 412,180 414,248\" fill=\"#9D7FD6\" stroke=\"#9D7FD6\"/><polygon points=\"390,180 402,168 402,248 386,246\" fill=\"#C2AEF0\" stroke=\"#C2AEF0\"/><polygon points=\"418,250 422,222 432,214 440,224 436,252\" fill=\"#8466C4\" stroke=\"#8466C4\"/><polygon points=\"120,300 128,262 136,302\" fill=\"#646080\" stroke=\"#646080\"/><polygon points=\"134,304 140,282 146,306\" fill=\"#77738F\" stroke=\"#77738F\"/><polygon points=\"456,284 462,262 468,286\" fill=\"#646080\" stroke=\"#646080\"/></g><g display=\"{{desertOn}}\"><polygon points=\"144,304 156,304 156,252 150,244 144,252\" fill=\"#7DBF6A\" stroke=\"#7DBF6A\"/><polygon points=\"150,304 156,304 156,252 150,244\" fill=\"#5A9A4C\" stroke=\"#5A9A4C\"/><polygon points=\"144,286 132,286 132,264 136,259 140,264 140,280 144,280\" fill=\"#7DBF6A\" stroke=\"#7DBF6A\"/><polygon points=\"156,276 168,276 168,256 164,251 160,256 160,270 156,270\" fill=\"#5A9A4C\" stroke=\"#5A9A4C\"/><polygon points=\"147,245 150,238 153,245\" fill=\"#F2A0B4\" stroke=\"#F2A0B4\"/><polygon points=\"390,246 402,246 404,216 394,216\" fill=\"#B07A45\" stroke=\"#B07A45\"/><polygon points=\"394,216 404,216 408,188 398,188\" fill=\"#8E5F36\" stroke=\"#8E5F36\"/><polygon points=\"398,188 408,188 414,162 404,162\" fill=\"#B07A45\" stroke=\"#B07A45\"/><polygon points=\"404,162 414,162 420,140 410,140\" fill=\"#8E5F36\" stroke=\"#8E5F36\"/><path d=\"{{palm.light}}\" fill=\"#8CCB5E\" stroke=\"#8CCB5E\"/><path d=\"{{palm.dark}}\" fill=\"#5A9A3C\" stroke=\"#5A9A3C\"/><circle cx=\"412\" cy=\"146\" r=\"5\" fill=\"#6E4426\"/><circle cx=\"422\" cy=\"147\" r=\"4.5\" fill=\"#6E4426\"/><path d=\"{{palm.snow}}\" fill=\"#F4F7FB\" display=\"{{showSnow}}\"/><polygon points=\"440,276 452,262 466,266 470,280 452,284\" fill=\"#C9875A\" stroke=\"#C9875A\"/><polygon points=\"440,276 452,262 466,266 452,272\" fill=\"#DDA06E\" stroke=\"#DDA06E\"/><polygon points=\"118,262 126,254 136,258 132,268 122,268\" fill=\"#C9875A\" stroke=\"#C9875A\"/></g><polygon points=\"430,320 446,328 430,336 414,328\" fill=\"#DAD5CB\" stroke=\"#DAD5CB\"/><polygon points=\"414,328 430,336 446,328 446,331 430,339 414,331\" fill=\"#B3AB9E\" stroke=\"#B3AB9E\"/><polygon points=\"398,338 414,346 398,354 382,346\" fill=\"#DAD5CB\" stroke=\"#DAD5CB\"/><polygon points=\"382,346 398,354 414,346 414,349 398,357 382,349\" fill=\"#B3AB9E\" stroke=\"#B3AB9E\"/><g transform=\"{{lampXf}}\"><polygon points=\"188,326 204,326 202,320 190,320\" fill=\"#3E4A5C\" stroke=\"#3E4A5C\"/><polygon points=\"194,322 198,322 198,274 194,274\" fill=\"#3E4A5C\" stroke=\"#3E4A5C\"/><polygon points=\"188,262 204,262 203,276 189,276\" fill=\"#4B5870\" stroke=\"#4B5870\"/><polygon points=\"191,264 201,264 200,274 192,274\" fill=\"{{lamp}}\" stroke=\"{{lamp}}\"/><polygon points=\"185,262 207,262 196,253\" fill=\"#3E4A5C\" stroke=\"#3E4A5C\"/></g></g>";
+const MP_ISO_FRONT = "<g display=\"{{lampGlow}}\" transform=\"{{lampXf}}\"><circle cx=\"196\" cy=\"269\" r=\"52\" fill=\"#FFE08A\" opacity=\".14\"/><circle cx=\"196\" cy=\"269\" r=\"26\" fill=\"#FFE08A\" opacity=\".28\"/><polygon points=\"191,264 201,264 200,274 192,274\" fill=\"#FFE08A\"/></g><g display=\"{{showRain}}\" stroke=\"#5F7896\" stroke-width=\"2.4\" stroke-linecap=\"round\" opacity=\".75\"><g class=\"mp-rain\"><g><line x1=\"351\" y1=\"154\" x2=\"345\" y2=\"176\"/><line x1=\"424\" y1=\"49\" x2=\"418\" y2=\"71\"/><line x1=\"94\" y1=\"548\" x2=\"88\" y2=\"570\"/><line x1=\"116\" y1=\"374\" x2=\"110\" y2=\"396\"/><line x1=\"239\" y1=\"38\" x2=\"233\" y2=\"60\"/><line x1=\"108\" y1=\"444\" x2=\"102\" y2=\"466\"/><line x1=\"448\" y1=\"71\" x2=\"442\" y2=\"93\"/><line x1=\"266\" y1=\"92\" x2=\"260\" y2=\"114\"/><line x1=\"584\" y1=\"434\" x2=\"578\" y2=\"456\"/><line x1=\"146\" y1=\"228\" x2=\"140\" y2=\"250\"/><line x1=\"590\" y1=\"136\" x2=\"584\" y2=\"158\"/><line x1=\"316\" y1=\"429\" x2=\"310\" y2=\"451\"/><line x1=\"167\" y1=\"553\" x2=\"161\" y2=\"575\"/><line x1=\"335\" y1=\"573\" x2=\"329\" y2=\"595\"/><line x1=\"205\" y1=\"105\" x2=\"199\" y2=\"127\"/><line x1=\"212\" y1=\"381\" x2=\"206\" y2=\"403\"/><line x1=\"81\" y1=\"210\" x2=\"75\" y2=\"232\"/><line x1=\"528\" y1=\"544\" x2=\"522\" y2=\"566\"/><line x1=\"457\" y1=\"321\" x2=\"451\" y2=\"343\"/><line x1=\"484\" y1=\"370\" x2=\"478\" y2=\"392\"/><line x1=\"326\" y1=\"254\" x2=\"320\" y2=\"276\"/><line x1=\"40\" y1=\"320\" x2=\"34\" y2=\"342\"/><line x1=\"530\" y1=\"230\" x2=\"524\" y2=\"252\"/><line x1=\"380\" y1=\"500\" x2=\"374\" y2=\"522\"/><line x1=\"250\" y1=\"480\" x2=\"244\" y2=\"502\"/><line x1=\"20\" y1=\"90\" x2=\"14\" y2=\"112\"/><line x1=\"620\" y1=\"300\" x2=\"614\" y2=\"322\"/><line x1=\"610\" y1=\"60\" x2=\"604\" y2=\"82\"/></g><g transform=\"translate(30 -600)\"><line x1=\"351\" y1=\"154\" x2=\"345\" y2=\"176\"/><line x1=\"424\" y1=\"49\" x2=\"418\" y2=\"71\"/><line x1=\"94\" y1=\"548\" x2=\"88\" y2=\"570\"/><line x1=\"116\" y1=\"374\" x2=\"110\" y2=\"396\"/><line x1=\"239\" y1=\"38\" x2=\"233\" y2=\"60\"/><line x1=\"108\" y1=\"444\" x2=\"102\" y2=\"466\"/><line x1=\"448\" y1=\"71\" x2=\"442\" y2=\"93\"/><line x1=\"266\" y1=\"92\" x2=\"260\" y2=\"114\"/><line x1=\"584\" y1=\"434\" x2=\"578\" y2=\"456\"/><line x1=\"146\" y1=\"228\" x2=\"140\" y2=\"250\"/><line x1=\"590\" y1=\"136\" x2=\"584\" y2=\"158\"/><line x1=\"316\" y1=\"429\" x2=\"310\" y2=\"451\"/><line x1=\"167\" y1=\"553\" x2=\"161\" y2=\"575\"/><line x1=\"335\" y1=\"573\" x2=\"329\" y2=\"595\"/><line x1=\"205\" y1=\"105\" x2=\"199\" y2=\"127\"/><line x1=\"212\" y1=\"381\" x2=\"206\" y2=\"403\"/><line x1=\"81\" y1=\"210\" x2=\"75\" y2=\"232\"/><line x1=\"528\" y1=\"544\" x2=\"522\" y2=\"566\"/><line x1=\"457\" y1=\"321\" x2=\"451\" y2=\"343\"/><line x1=\"484\" y1=\"370\" x2=\"478\" y2=\"392\"/><line x1=\"326\" y1=\"254\" x2=\"320\" y2=\"276\"/><line x1=\"40\" y1=\"320\" x2=\"34\" y2=\"342\"/><line x1=\"530\" y1=\"230\" x2=\"524\" y2=\"252\"/><line x1=\"380\" y1=\"500\" x2=\"374\" y2=\"522\"/><line x1=\"250\" y1=\"480\" x2=\"244\" y2=\"502\"/><line x1=\"20\" y1=\"90\" x2=\"14\" y2=\"112\"/><line x1=\"620\" y1=\"300\" x2=\"614\" y2=\"322\"/><line x1=\"610\" y1=\"60\" x2=\"604\" y2=\"82\"/></g></g></g><g display=\"{{showSnow}}\" fill=\"#FFFFFF\"><g class=\"mp-snow\"><g><circle cx=\"473\" cy=\"573\" r=\"4\"/><circle cx=\"472\" cy=\"520\" r=\"3\"/><circle cx=\"199\" cy=\"524\" r=\"4\"/><circle cx=\"200\" cy=\"96\" r=\"4\"/><circle cx=\"320\" cy=\"145\" r=\"2.5\"/><circle cx=\"561\" cy=\"42\" r=\"4\"/><circle cx=\"473\" cy=\"161\" r=\"2.5\"/><circle cx=\"551\" cy=\"64\" r=\"2.5\"/><circle cx=\"46\" cy=\"194\" r=\"3\"/><circle cx=\"40\" cy=\"475\" r=\"3.5\"/><circle cx=\"461\" cy=\"200\" r=\"3\"/><circle cx=\"311\" cy=\"511\" r=\"2.5\"/><circle cx=\"97\" cy=\"468\" r=\"3.5\"/><circle cx=\"426\" cy=\"564\" r=\"2.5\"/><circle cx=\"270\" cy=\"322\" r=\"3\"/><circle cx=\"535\" cy=\"295\" r=\"2.5\"/><circle cx=\"81\" cy=\"576\" r=\"2.5\"/><circle cx=\"420\" cy=\"110\" r=\"3.5\"/><circle cx=\"405\" cy=\"68\" r=\"2.5\"/><circle cx=\"10\" cy=\"218\" r=\"3\"/><circle cx=\"63\" cy=\"481\" r=\"4\"/><circle cx=\"416\" cy=\"429\" r=\"2.5\"/><circle cx=\"589\" cy=\"203\" r=\"3.5\"/><circle cx=\"354\" cy=\"89\" r=\"3.5\"/><circle cx=\"350\" cy=\"15\" r=\"4\"/><circle cx=\"130\" cy=\"137\" r=\"3\"/><circle cx=\"113\" cy=\"11\" r=\"2.5\"/><circle cx=\"486\" cy=\"498\" r=\"3\"/><circle cx=\"140\" cy=\"300\" r=\"3\"/><circle cx=\"250\" cy=\"420\" r=\"3.5\"/><circle cx=\"380\" cy=\"250\" r=\"3\"/><circle cx=\"560\" cy=\"380\" r=\"3\"/><circle cx=\"20\" cy=\"380\" r=\"3.5\"/><circle cx=\"300\" cy=\"40\" r=\"3\"/></g><g transform=\"translate(0 -600)\"><circle cx=\"473\" cy=\"573\" r=\"4\"/><circle cx=\"472\" cy=\"520\" r=\"3\"/><circle cx=\"199\" cy=\"524\" r=\"4\"/><circle cx=\"200\" cy=\"96\" r=\"4\"/><circle cx=\"320\" cy=\"145\" r=\"2.5\"/><circle cx=\"561\" cy=\"42\" r=\"4\"/><circle cx=\"473\" cy=\"161\" r=\"2.5\"/><circle cx=\"551\" cy=\"64\" r=\"2.5\"/><circle cx=\"46\" cy=\"194\" r=\"3\"/><circle cx=\"40\" cy=\"475\" r=\"3.5\"/><circle cx=\"461\" cy=\"200\" r=\"3\"/><circle cx=\"311\" cy=\"511\" r=\"2.5\"/><circle cx=\"97\" cy=\"468\" r=\"3.5\"/><circle cx=\"426\" cy=\"564\" r=\"2.5\"/><circle cx=\"270\" cy=\"322\" r=\"3\"/><circle cx=\"535\" cy=\"295\" r=\"2.5\"/><circle cx=\"81\" cy=\"576\" r=\"2.5\"/><circle cx=\"420\" cy=\"110\" r=\"3.5\"/><circle cx=\"405\" cy=\"68\" r=\"2.5\"/><circle cx=\"10\" cy=\"218\" r=\"3\"/><circle cx=\"63\" cy=\"481\" r=\"4\"/><circle cx=\"416\" cy=\"429\" r=\"2.5\"/><circle cx=\"589\" cy=\"203\" r=\"3.5\"/><circle cx=\"354\" cy=\"89\" r=\"3.5\"/><circle cx=\"350\" cy=\"15\" r=\"4\"/><circle cx=\"130\" cy=\"137\" r=\"3\"/><circle cx=\"113\" cy=\"11\" r=\"2.5\"/><circle cx=\"486\" cy=\"498\" r=\"3\"/><circle cx=\"140\" cy=\"300\" r=\"3\"/><circle cx=\"250\" cy=\"420\" r=\"3.5\"/><circle cx=\"380\" cy=\"250\" r=\"3\"/><circle cx=\"560\" cy=\"380\" r=\"3\"/><circle cx=\"20\" cy=\"380\" r=\"3.5\"/><circle cx=\"300\" cy=\"40\" r=\"3\"/></g></g></g>";
+const MP_PX_KEYS = {"O": "#2E3B55", "B": "coat.base", "S": "coat.shade", "D": "coat.deep", "L": "coat.light", "C": "coat.cream", "G": "coat.creamShade", "P": "#F2B8C0", "N": "#E08A97", "W": "#FFFFFF", "K": "#F2A65A", "Q": "#D98840", "E": "leaf.E", "F": "leaf.F", "H": "leaf.H", "Y": "#F2A0B4", "r": "#C93A40", "p": "#F27A8E", "X": "#D8F2FF", "x": "#A6DAF2", "I": "#FFF1A8", "R": "#E5484D", "J": "#F2C14E", "T": "#E8848F", "V": "#C9C08A", "U": "#A89F6B", "TR": "#8EC5F0", "SK": "#A8D08D", "TG": "#E8848F", "AR": "#E5484D", "AD": "#C93A40", "HL": "#F27A8E", "AW": "#F2F0EC", "AS": "#E8C77A", "AJ": "#F2C14E", "AP": "#F27A8E", "AY": "#FFD66B", "AL": "#7DBB4C", "AK": "#3E4A5C", "AC": "#5B7FB5", "Lr": "#FF5A5F", "Ly": "#FFD25E", "Lb": "#5BC8F5", "Lp": "#FF8FD0", "Lw": "#FFF6C8", "AG": "#B07A2A", "A": "#FFD25E", "a": "#F2B33D", "M": "#D9A066", "m": "#B87A48", "Z": "#8A5631", "z": "#6E4426", "AV": "#7A5BB5", "Av": "#5E4592", "AO": "#F28C38", "AN": "#263040", "AE": "#B5533C"};
+const MP_PX_EMOTE_KEYS = {"eh": "#F27A8E", "ec": "#9AA7B8", "ed": "#5FA8E8", "ea": "#E5484D", "es": "#7CB86A", "ez": "#6B7A99", "ey": "#8F9CB8", "ew": "#FFFFFF", "ef": "#7FB6D6", "ee": "#2E3B55", "eb": "#E8DCC0", "eg": "#5E9A3C", "er": "#E5484D", "eo": "#F28C38", "en": "#E8C77A", "em": "#B98A4E"};
+const MP_PX_TOY_KEYS = {"o": "#2E3B55", "r": "#E5484D", "w": "#FFFFFF", "p": "#F27A8E", "q": "#C9577A", "b": "#B07A45", "c": "#E8C08A", "y": "#FFD25E", "g": "#7DBB4C", "k": "#F28C38", "a": "#8EC5F0"};
+const MP_PX_BACK = "\n<path fill=\"#FFD66B\" d=\"{{sk.Y1}}\"></path>\n<path fill=\"#FFF0B3\" d=\"{{sk.Y2}}\"></path>\n<path fill=\"#F6EFD2\" d=\"{{sk.M}}\"></path>\n<path fill=\"#F6EFD2\" d=\"{{sk.X1}}\"></path>\n<path fill=\"#F6EFD2\" class=\"mp-px-twinkle\" d=\"{{sk.X2}}\"></path>\n<g class=\"mp-a mp-px-cloud\">\n<path fill=\"{{cloudLit}}\" d=\"{{cl.CL}}\"></path>\n<path fill=\"{{cloudShade}}\" d=\"{{cl.CS}}\"></path>\n</g>\n<path fill=\"{{gc.G1}}\" d=\"{{gr.G1}}\"></path>\n<path fill=\"{{gc.G2}}\" d=\"{{gr.G2}}\"></path>\n<path fill=\"{{gc.G3}}\" d=\"{{gr.G3}}\"></path>\n<path fill=\"{{gc.T1}}\" d=\"{{gr.T1}}\"></path>\n<path fill=\"{{gc.T2}}\" d=\"{{gr.T2}}\"></path>\n<path fill=\"{{gc.T3}}\" d=\"{{gr.T3}}\"></path>\n<path fill=\"#EBC88E\" d=\"{{gr.D1}}\"></path>\n<path fill=\"#DDB070\" d=\"{{gr.D2}}\"></path>\n<path fill=\"#C99858\" d=\"{{gr.D3}}\"></path>\n<path fill=\"#D98B5A\" d=\"{{gr.R1}}\"></path>\n<path fill=\"#BF6F44\" d=\"{{gr.R2}}\"></path>\n<path fill=\"#9A5232\" d=\"{{gr.R3}}\"></path>\n<path fill=\"#B3AB9E\" d=\"{{gr.ST}}\"></path>\n<path fill=\"#8A86A2\" d=\"{{gr.C1}}\"></path>\n<path fill=\"#77738F\" d=\"{{gr.C2}}\"></path>\n<path fill=\"#646080\" d=\"{{gr.C3}}\"></path>\n<path fill=\"#58546A\" d=\"{{gr.C4}}\"></path>\n<path fill=\"#46425A\" d=\"{{gr.C5}}\"></path>\n<path fill=\"#2F2A40\" d=\"{{gr.C6}}\"></path>\n<path fill=\"#9D7FD6\" d=\"{{gr.Q1}}\"></path>\n<path fill=\"#D2C2F5\" d=\"{{gr.Q2}}\"></path>\n<path fill=\"#4A3A70\" d=\"{{gr.Q0}}\"></path>\n<path fill=\"#6FD3D8\" d=\"{{gr.Q3}}\"></path>\n<path fill=\"#B5EEF0\" d=\"{{gr.Q4}}\"></path>\n<path fill=\"#4F8A36\" d=\"{{gr.LP}}\"></path>\n<path fill=\"#8A5631\" d=\"{{gr.RT}}\"></path>\n<path fill=\"#A6D6EE\" d=\"{{gr.W1}}\"></path>\n<path fill=\"#7FB6D6\" d=\"{{gr.W2}}\"></path>\n<path fill=\"#E8F6FD\" d=\"{{gr.W3}}\"></path>\n<path fill=\"#DCEAF4\" d=\"{{gr.IC}}\"></path>\n<path fill=\"{{gc.F0}}\" d=\"{{gr.F0}}\"></path>\n<path fill=\"{{gc.F1}}\" d=\"{{gr.F1}}\"></path>\n<path fill=\"{{gc.F2}}\" d=\"{{gr.F2}}\"></path>\n<path fill=\"{{gc.F3}}\" d=\"{{gr.F3}}\"></path>\n<path fill=\"#7DBF6A\" d=\"{{gr.CG}}\"></path>\n<path fill=\"#5A9A4C\" d=\"{{gr.CH}}\"></path>\n<path fill=\"#8A5631\" d=\"{{gr.K1}}\"></path>\n<path fill=\"#6E4426\" d=\"{{gr.K2}}\"></path>\n<path fill=\"#B07A45\" d=\"{{gr.P1}}\"></path>\n<path fill=\"#8E5F36\" d=\"{{gr.P2}}\"></path>\n<path fill=\"#6E4426\" d=\"{{gr.CO}}\"></path>\n<path fill=\"#3E4A5C\" d=\"{{gr.LO}}\"></path>\n<path fill=\"{{lamp}}\" d=\"{{gr.LY}}\"></path>\n<path fill=\"{{flower}}\" d=\"{{gr.FL}}\"></path>\n<path fill=\"{{gc.FC}}\" d=\"{{gr.FC}}\"></path>\n<path fill=\"{{gc.LV}}\" d=\"{{gr.LV}}\"></path>\n<path fill=\"#F2A0B4\" d=\"{{gr.PK}}\"></path>\n<path fill=\"{{gc.MR}}\" d=\"{{gr.MR}}\"></path>\n<path fill=\"#3F7A2C\" d=\"{{gr.LQ}}\"></path>\n<path fill=\"#E5484D\" d=\"{{gr.RR}}\"></path>\n<path fill=\"#FFFFFF\" d=\"{{gr.RW}}\"></path>\n<path fill=\"#6E6A8A\" d=\"{{gr.RS}}\"></path>\n<path fill=\"#55516E\" d=\"{{gr.RT2}}\"></path>\n<path fill=\"#7FF0E0\" d=\"{{gr.RN}}\"></path>\n<path fill=\"#2E3B55\" d=\"{{gr.Io}}\"></path>\n<path fill=\"#E5484D\" d=\"{{gr.Ir}}\"></path>\n<path fill=\"#FFFFFF\" d=\"{{gr.Iw}}\"></path>\n<path fill=\"#F27A8E\" d=\"{{gr.Ip}}\"></path>\n<path fill=\"#C9577A\" d=\"{{gr.Iq}}\"></path>\n<path fill=\"#B07A45\" d=\"{{gr.Ib}}\"></path>\n<path fill=\"#E8C08A\" d=\"{{gr.Ic}}\"></path>\n<path fill=\"#FFD25E\" d=\"{{gr.Iy}}\"></path>\n<path fill=\"#7DBB4C\" d=\"{{gr.Ig}}\"></path>\n<path fill=\"#F28C38\" d=\"{{gr.Ik}}\"></path>\n<path fill=\"#8EC5F0\" d=\"{{gr.Ia}}\"></path>\n<path fill=\"#FFF6E8\" d=\"{{gr.MW}}\"></path>\n<path fill=\"#EADBC8\" d=\"{{gr.MS}}\"></path>\n<path fill=\"#E6EEF8\" d=\"{{gr.SN}}\"></path>\n<path fill=\"#CCDAEA\" d=\"{{gr.SN2}}\"></path>\n";
+const MP_PX_FRONT = "\n\n<path fill=\"#FFE08A\" opacity=\"0.55\" d=\"{{fx.GL}}\"></path>\n<path fill=\"#FFFFFF\" class=\"mp-px-flash\" d=\"{{fx.RP}}\"></path>\n<g class=\"mp-a mp-px-rain\">\n<path fill=\"#5F7896\" d=\"{{fx.R}}\"></path>\n</g>\n<g class=\"mp-a mp-px-snow\">\n<path fill=\"#FFFFFF\" d=\"{{fx.SF}}\"></path>\n</g>\n";
 
-/* ---------- Morae pets export API (geometric style) ---------- */
-const MP_VERSION = '1.0.0';
+/* ---------- Morae pets export API: geometric, pixel and isometric ---------- */
+const MP_VERSION = '1.1.0';
 const MP_GROUND = 448;          // ground line on the 512 canvas
-const MP_SHIFT = MP_GROUND - 446; // engine ground is 446
+const MP_SHIFT = MP_GROUND - 446; // geometric engine ground is 446
+const MP_STYLES = ['geometric', 'pixel', 'isometric'];
 const MP_STATE = { idle: 'normal', focus: 'focus', happy: 'happy', rest: 'sleepy', cold: 'cold', celebrate: 'celebrate', hungry: 'hungry' };
 const MP_ISLAND = { meadow: 'meadow', dunes: 'desert', lake: 'lake', cave: 'cave', grove: 'grove' };
 const MP_WEATHER = ['clear', 'cloudy', 'rain', 'snow', 'night'];
@@ -1430,26 +5420,6 @@ const MP_TOYS = ['ball', 'yarn', 'donut', 'meat', 'juice', 'cake'];
 
 const mpEsc = (s) => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/"/g, '&quot;');
 const mpNum = (v) => String(Math.round(v * 10) / 10);
-
-// Shapes from the engine: [d, fill, stroke?, width?] or nested lists of them.
-const mpPaths = (list, pal) => {
-  const flat = [];
-  const walk = (it) => { if (Array.isArray(it) && Array.isArray(it[0])) it.forEach(walk); else if (Array.isArray(it) && typeof it[0] === 'string') flat.push(it); };
-  (list || []).forEach(walk);
-  let out = '';
-  let cur = null;
-  const flush = () => { if (cur && cur.d) out += '<path d="' + cur.d + '" fill="' + cur.f + '"' + (cur.s !== 'none' ? ' stroke="' + cur.s + '" stroke-width="' + cur.w + '"' : '') + '/>'; };
-  flat.forEach((sh) => {
-    const f = colr(sh[1], pal);
-    const s = sh[2] ? colr(sh[2], pal) : 'none';
-    const w = sh[2] ? sh[3] : 0;
-    if (cur && cur.f === f && cur.s === s && cur.w === w) { cur.d += sh[0]; return; }
-    flush();
-    cur = { d: sh[0], f, s, w };
-  });
-  flush();
-  return out;
-};
 
 // Remove every element whose display attribute is "none" (the canvas template uses explicit end tags).
 const mpPrune = (html) => {
@@ -1478,6 +5448,7 @@ const mpFill = (tpl, vals) => tpl.replace(/\{\{([\w.]+)\}\}/g, (_, path) => {
   return v == null ? '' : String(v);
 });
 
+// Every keyframe has a fixed name and fixed content, so many SVGs can share one page safely.
 const MP_KEYFRAMES = [
   '.mp-a{transform-origin:0 0}',
   '@keyframes mp-breathe{0%,100%{scale:1 1}50%{scale:var(--mp-bx,1.015) var(--mp-by,1.03)}}',
@@ -1510,6 +5481,52 @@ const MP_RULES = [
   '.mp-snow{animation:mp-snow 10s linear infinite}',
   '.mp-ripple{animation:mp-ripple 1.5s ease-out infinite}'
 ].join('');
+// Extra motion for the isometric sun and for pixel art (pixel art moves in whole pixels).
+const MP_KEYFRAMES_ISO = '@keyframes mp-spin{to{rotate:360deg}}';
+const MP_RULES_ISO = '.mp-spin{animation:mp-spin 60s linear infinite}';
+const MP_KEYFRAMES_PX = [
+  '.mp-a{transform-origin:0 0}',
+  '@keyframes mp-px-bob{0%{translate:0 0}50%{translate:0 1px}}',
+  '@keyframes mp-px-shiver{0%{translate:0 0}25%{translate:1px 0}50%{translate:0 0}75%{translate:-1px 0}}',
+  '@keyframes mp-px-hop{0%,25%,50%,75%,100%{translate:0 0}12.5%,37.5%,62.5%,87.5%{translate:0 -2px}}',
+  '@keyframes mp-px-cheer{0%,25%,50%,75%,100%{translate:0 0}6.25%,18.75%,31.25%,43.75%,56.25%,68.75%,81.25%,93.75%{translate:0 -2px}12.5%,37.5%,62.5%,87.5%{translate:0 -4px}}',
+  '@keyframes mp-px-blink{0%{opacity:0}90%{opacity:1}96%{opacity:0}}',
+  '@keyframes mp-px-float{0%{translate:0 0}50%{translate:0 -1px}}',
+  '@keyframes mp-px-twinkle{0%{opacity:1}33%{opacity:.2}66%{opacity:1}}',
+  '@keyframes mp-px-cloud{0%{translate:0 0}16.7%{translate:1px 0}33.3%{translate:2px 0}50%{translate:3px 0}66.7%{translate:2px 0}83.3%{translate:1px 0}}',
+  '@keyframes mp-px-flash{0%{opacity:0}25%{opacity:1}50%{opacity:0}75%{opacity:1}}',
+  '@keyframes mp-px-rain{from{translate:0 0}to{translate:0 88px}}',
+  '@keyframes mp-px-snow{from{translate:0 0}to{translate:0 82px}}'
+].join('');
+const MP_RULES_PX = [
+  '.mp-px-bob{animation:mp-px-bob var(--mp-d,2s) step-end infinite}',
+  '.mp-px-shiver{animation:mp-px-shiver .3s step-end infinite}',
+  '.mp-px-hop{animation:mp-px-hop 2s step-end 1}',
+  '.mp-px-cheer{animation:mp-px-cheer 2s step-end 1}',
+  '.mp-px-blink{animation:mp-px-blink 4s step-end infinite}',
+  '.mp-px-float{animation:mp-px-float 1.6s step-end infinite}',
+  '.mp-px-twinkle{animation:mp-px-twinkle 2.4s step-end infinite}',
+  '.mp-px-cloud{animation:mp-px-cloud 9s step-end infinite}',
+  '.mp-px-flash{animation:mp-px-flash 1s step-end infinite}',
+  '.mp-px-rain{animation:mp-px-rain .8s steps(11,jump-end) infinite}',
+  '.mp-px-snow{animation:mp-px-snow 10s steps(41,jump-end) infinite}'
+].join('');
+const mpStyle = (motion, kf, rules) => (motion ? '<style>' + kf + '@media (prefers-reduced-motion:no-preference){' + rules + '}</style>' : '');
+// Only the motion this SVG uses (pixel and isometric). Names and contents never change, so SVGs can share a page.
+const mpStyleFor = (motion, body, kf, rules) => {
+  if (!motion) return '';
+  const used = (css) => css.split(/(?=@keyframes|\.mp-)/).filter((r) => {
+    const m = r.match(/^@keyframes (mp-[\w-]+)|^\.(mp-[\w-]+)/);
+    if (!m) return true;
+    const name = m[1] || m[2];
+    if (name === 'mp-a') return /mp-a\b/.test(body);
+    return body.indexOf(name + '"') >= 0 || body.indexOf(name + ' ') >= 0;
+  }).join('');
+  const r = used(rules);
+  return r ? '<style>' + used(kf) + '@media (prefers-reduced-motion:no-preference){' + r + '}</style>' : '';
+};
+
+/* ===== Vector styles (geometric and isometric share one shape system) ===== */
 
 // Motion per state. Calm by default; happy and celebrate play once.
 const MP_MOTION = {
@@ -1522,9 +5539,106 @@ const MP_MOTION = {
   celebrate: { breathe: [1.03, 0.97, 0.9], hop: [-26, 2.7], wag: [14, 2.4], blink: true }
 };
 
-const mpSpec = (id, stage, biome) => {
+// Per-style settings. Geometric shapes live on a 512 grid (ground 446); isometric shapes live in
+// the 600 scene at 0.6 scale (ground 348.8, centre x 280).
+const MP_VEC = {
+  geometric: {
+    eng: MP_GEO, k: 1, ground: 446, accGround: 446, ow: 0.09, self: false, cx: 256,
+    to512: (x, y) => [x, y + MP_SHIFT], from512y: (y) => y - MP_SHIFT,
+    petWrap: (s) => '<g transform="translate(0 ' + MP_SHIFT + ')">' + s + '</g>',
+    sceneWrap: (s) => '<g transform="translate(' + MP_GEO.XF.x + ' ' + MP_GEO.XF.y + ') scale(' + MP_GEO.XF.s + ')">' + s + '</g>',
+    toy: 'translate(436 446) scale(3)', toyScene: 'translate(432 406) scale(2.1)',
+    emPet: 1.9, emScene: 1.1, emSceneAt: (x, y) => [x * MP_GEO.XF.s + MP_GEO.XF.x, y * MP_GEO.XF.s + MP_GEO.XF.y],
+    tpl: () => ({ back: MP_SCENE_BACK, front: MP_SCENE_FRONT, emote: MP_EMOTE_TPL, toys: MP_TOY_ART }),
+    sceneVals: (biome, w) => mpSceneVals(biome, w)
+  },
+  isometric: {
+    eng: MP_ISO, k: 0.6, ground: 348.8, accGround: 350, ow: 0, self: true, cx: 280,
+    to512: (x, y) => [(x - 280) / 0.6 + 256, (y - 348.8) / 0.6 + MP_GROUND], from512y: (y) => (y - MP_GROUND) * 0.6 + 348.8,
+    petWrap: (s) => '<g transform="translate(256 ' + MP_GROUND + ') scale(1.66667) translate(-280 -348.8)">' + s + '</g>',
+    sceneWrap: (s) => s,
+    toy: 'translate(386 346) scale(1.7)', toyScene: 'translate(386 346) scale(1.7)',
+    emPet: 1.1, emScene: 0.9, emSceneAt: (x, y) => [x, y],
+    tpl: () => ({ back: MP_ISO_BACK, front: MP_ISO_FRONT, emote: MP_ISO_EMOTE, toys: MP_ISO_TOYS }),
+    sceneVals: (biome, w) => mpIsoSceneVals(biome, w)
+  }
+};
+
+// Shapes from the engine: [d, fill, stroke?, width?] or nested lists of them.
+// Isometric facets without a stroke get a thin stroke in their own colour, as on the canvas, to hide seams.
+// Polygon path data (M, L and Z with absolute points) rewritten with relative steps: same shapes, fewer characters.
+const mpRel = (d) => {
+  if (!/^(M-?[\d.]+ -?[\d.]+(L-?[\d.]+ -?[\d.]+)*Z?)+$/.test(d)) return d;
+  const r = (v) => { const t = Math.round(v * 10) / 10; return (t === 0 ? '0' : String(t)).replace(/^(-?)0\./, '$1.'); };
+  const join = (a) => a.reduce((o, v) => o + (o && v[0] !== '-' && !(v[0] === '.' && /\.\d*$/.test(o.split(/[ -]/).pop())) ? ' ' : '') + v, '');
+  let out = '';
+  let sx = null; let sy = null; let cx = 0; let cy = 0;
+  d.replace(/M(-?[\d.]+) (-?[\d.]+)((?:L-?[\d.]+ -?[\d.]+)*)(Z?)/g, (m, x, y, rest, z) => {
+    let px = Number(x); let py = Number(y);
+    // after a close the pen is back at the last start; a short relative move is usually shorter than the absolute one
+    const absM = 'M' + x + ' ' + y;
+    const relM = sx === null ? null : 'm' + join([r(px - cx), r(py - cy)]);
+    const mv = relM && relM.length < absM.length ? relM : absM;
+    sx = px; sy = py;
+    const nums = [];
+    (rest.match(/-?[\d.]+/g) || []).forEach((v, i, arr) => {
+      if (i % 2) return;
+      const nx = Number(v); const ny = Number(arr[i + 1]);
+      nums.push(r(nx - px), r(ny - py));
+      px = nx; py = ny;
+    });
+    out += mv + (nums.length ? 'l' + join(nums) : '') + (z ? 'z' : '');
+    if (z) { cx = sx; cy = sy; } else { cx = px; cy = py; }
+    return m;
+  });
+  return out;
+};
+const mpPaths = (list, pal, V) => {
+  const colr = V.eng.colr;
+  if (V.self) {
+    // Isometric: merge facets of the same colour within each part (as the canvas does), so faceted bodies stay small.
+    // Facets carry a thin stroke in their own colour to hide seams; the shared width is set once on the group.
+    let out = '';
+    (list || []).forEach((part) => {
+      const shapes = typeof part[0] === 'string' ? [part] : part;
+      const slots = [];
+      const idx = {};
+      shapes.forEach((sh) => {
+        if (!Array.isArray(sh) || typeof sh[0] !== 'string') return;
+        const f = colr(sh[1], pal);
+        const s = sh[2] ? colr(sh[2], pal) : (f !== 'none' ? f : 'none');
+        const w = sh[2] ? sh[3] : (f !== 'none' ? 1.2 : 0);
+        const key = f + '|' + s + '|' + w;
+        if (idx[key] === undefined) { idx[key] = slots.length; slots.push({ d: '', f, s, w }); }
+        slots[idx[key]].d += sh[0];
+      });
+      slots.forEach((c) => { if (c.d) out += '<path d="' + mpRel(c.d) + '" fill="' + c.f + '"' + (c.s !== 'none' ? ' stroke="' + c.s + '"' + (c.w === 1.2 ? '' : ' stroke-width="' + c.w + '"') : '') + '/>'; });
+    });
+    return out;
+  }
+  const flat = [];
+  const walk = (it) => { if (Array.isArray(it) && Array.isArray(it[0])) it.forEach(walk); else if (Array.isArray(it) && typeof it[0] === 'string') flat.push(it); };
+  (list || []).forEach(walk);
+  let out = '';
+  let cur = null;
+  const flush = () => { if (cur && cur.d) out += '<path d="' + cur.d + '" fill="' + cur.f + '"' + (cur.s !== 'none' ? ' stroke="' + cur.s + '" stroke-width="' + cur.w + '"' : '') + '/>'; };
+  flat.forEach((sh) => {
+    const f = colr(sh[1], pal);
+    let s = sh[2] ? colr(sh[2], pal) : 'none';
+    let w = sh[2] ? sh[3] : 0;
+    if (!sh[2] && V.self && f !== 'none') { s = f; w = 1.2; }
+    if (cur && cur.f === f && cur.s === s && cur.w === w) { cur.d += sh[0]; return; }
+    flush();
+    cur = { d: sh[0], f, s, w };
+  });
+  flush();
+  return out;
+};
+
+const mpSpec = (V, id, stage, biome) => {
+  const G = V.eng;
   const green = biome === 'meadow' || biome === 'lake' || biome === 'grove';
-  return stage < 3 && FORMS[id] ? formSpec(id, stage, PETS[id]) : tintSpec(PETS[id], green ? (id === 'spike' ? TINTS.teal : (id === 'bo' ? TINTS.blossom : null)) : null);
+  return stage < 3 && G.FORMS[id] ? G.formSpec(id, stage, G.PETS[id]) : G.tintSpec(G.PETS[id], green ? (id === 'spike' ? G.TINTS.teal : (id === 'bo' ? G.TINTS.blossom : null)) : null);
 };
 
 const mpFace = (fc, motion) => {
@@ -1544,48 +5658,61 @@ const mpFace = (fc, motion) => {
   return '<g id="face" stroke-linecap="round" stroke-linejoin="round">' + s + '</g>';
 };
 
-const mpItems = (spec, id, items, pal) => {
-  const neck = spec.neck || NECK[id];
-  const deco = spec.deco || LIGHTS[id] || neck;
+const mpItems = (V, spec, id, items, pal) => {
+  const G = V.eng;
+  const neck = spec.neck || G.NECK[id];
+  const deco = spec.deco || G.LIGHTS[id] || neck;
   let back = '';
   let front = '';
   const seenHead = { v: false };
   items.forEach((it) => {
     if (MP_TOYS.includes(it)) return;
-    if (HEAD_ACC.includes(it)) { if (seenHead.v) return; seenHead.v = true; }
-    const a = accShapes(spec, neck, deco, [it], 0.09, 446);
-    const b = mpPaths(a.back, pal);
-    const f = mpPaths(a.front, pal);
-    if (b) back += '<g id="item-' + it + '-back">' + b + '</g>';
-    if (f) front += '<g id="item-' + it + '">' + f + '</g>';
+    if (G.HEAD_ACC.includes(it)) { if (seenHead.v) return; seenHead.v = true; }
+    const a = G.accShapes(spec, neck, deco, [it], V.ow, V.accGround);
+    const b = mpPaths(a.back, pal, V);
+    const f = mpPaths(a.front, pal, V);
+    // A tall hat on a tall pet would cross the top of the canvas: shrink just the hat, about its base.
+    let fit = '';
+    if (G.HEAD_ACC.includes(it)) {
+      const bb = mpBBox((a.front || []).concat(a.back || []));
+      const [hx, hy] = spec.hat;
+      const lim = V.from512y(6);
+      if (bb && bb.y0 < lim && hy > bb.y0) {
+        const k = (hy - lim) / (hy - bb.y0);
+        fit = ' transform="translate(' + mpNum(hx) + ' ' + mpNum(hy) + ') scale(' + k.toFixed(3) + ') translate(' + mpNum(-hx) + ' ' + mpNum(-hy) + ')"';
+      }
+    }
+    if (b) back += '<g id="item-' + it + '-back"' + fit + '>' + b + '</g>';
+    if (f) front += '<g id="item-' + it + '"' + fit + '>' + f + '</g>';
   });
   return { back, front };
 };
 
-const mpToy = (items) => {
+const mpToy = (V, items, scene) => {
   const t = items.find((it) => MP_TOYS.includes(it));
   if (!t) return '';
-  const g = MP_TOY_ART[t] || '';
-  return '<g id="item-' + t + '" transform="translate(436 446) scale(3)">' + g + '</g>';
+  const g = V.tpl().toys[t] || '';
+  return '<g id="item-' + t + '" transform="' + (scene ? V.toyScene : V.toy) + '">' + g + '</g>';
 };
 
-const mpEmote = (spec, mood, x, y, k, motion) => {
+const mpEmote = (V, spec, mood, x, y, k, motion) => {
   const key = { happy: 'happy', sleepy: 'sleepy', hungry: 'hungry', focus: 'focus', cold: 'cold', celebrate: 'celebrate' }[mood];
   if (!key) return '';
   const show = (on) => (on ? 'inline' : 'none');
   const vals = { em: { happy: show(key === 'happy'), sad: 'none', mad: 'none', sick: 'none', sleepy: show(key === 'sleepy'), hungry: show(key === 'hungry'), focus: show(key === 'focus'), cold: show(key === 'cold'), celebrate: show(key === 'celebrate'),
     fish: show(spec.food === 'fish'), bone: show(spec.food === 'bone'), berry: show(spec.food === 'berry'), drop: show(spec.food === 'drop'), leaf: show(spec.food === 'leaf'), carrot: show(spec.food === 'carrot'), seed: show(spec.food === 'seed'), chili: show(spec.food === 'chili') } };
-  const inner = mpPrune(mpFill(MP_EMOTE_TPL, vals));
+  const inner = mpPrune(mpFill(V.tpl().emote, vals));
   return '<g id="emote" transform="translate(' + mpNum(x) + ' ' + mpNum(y) + ') scale(' + k + ')"><g class="' + (motion ? 'mp-a mp-float' : '') + '">' + inner + '</g></g>';
 };
 
-const mpPet = (o) => {
+const mpPet = (V, o) => {
   const { id, spec, mood, pal, items, motion, snow } = o;
+  const G = V.eng;
   const mo = MP_MOTION[mood] || MP_MOTION.normal;
-  const fc = face({ ...spec.face }, mood);
-  const it = mpItems(spec, id, items, pal);
-  const tail = mpPaths(spec.tail, pal);
-  const body = mpPaths(spec.body, pal);
+  const fc = G.face({ ...spec.face }, mood);
+  const it = mpItems(V, spec, id, items, pal);
+  const tail = mpPaths(spec.tail, pal, V);
+  const body = mpPaths(spec.body, pal, V);
   const [px, py] = spec.pivot || [256, 400];
   let tailG = tail;
   if (tail && motion && (mo.wag || mood === 'normal')) {
@@ -1593,20 +5720,24 @@ const mpPet = (o) => {
     tailG = '<g transform="translate(' + px + ' ' + py + ')"><g class="' + cls + '"><g transform="translate(' + (-px) + ' ' + (-py) + ')">' + tail + '</g></g></g>';
   }
   const [hx, hy, ha] = spec.hat;
-  const cap = snow && !items.some((x) => HEAD_ACC.includes(x)) ? '<path d="' + E(hx, hy - ha * 0.05, ha * 0.85, ha * 0.26) + '" fill="#F4F7FB"/>' : '';
-  let inner = '<g id="pet" stroke-linejoin="round" stroke-linecap="round">' + it.back + (tail ? '<g id="tail">' + tailG + '</g>' : '') + '<g id="body">' + body + '</g>' + mpFace(fc, motion) + cap + '</g>' + (it.front ? '<g id="items" stroke-linejoin="round" stroke-linecap="round">' + it.front + '</g>' : '');
+  const cap = snow && !items.some((x) => G.HEAD_ACC.includes(x)) ? '<path d="' + G.E(hx, hy - ha * 0.05, ha * 0.85, ha * 0.26) + '" fill="#F4F7FB"/>' : '';
+  const sw = V.self ? ' stroke-width="1.2"' : '';
+  let inner = '<g id="pet" stroke-linejoin="round" stroke-linecap="round"' + sw + '>' + it.back + (tail ? '<g id="tail">' + tailG + '</g>' : '') + '<g id="body">' + body + '</g>' + mpFace(fc, motion) + cap + '</g>' + (it.front ? '<g id="items" stroke-linejoin="round" stroke-linecap="round"' + sw + '>' + it.front + '</g>' : '');
   if (motion) {
     const [bx, by, bd] = mo.breathe;
-    inner = '<g transform="translate(256 446)"><g class="mp-a mp-breathe" style="--mp-d:' + bd + 's;--mp-bx:' + bx + ';--mp-by:' + by + '"><g transform="translate(-256 -446)">' + inner + '</g></g></g>';
-    if (mo.hop) inner = '<g class="mp-a mp-hop" style="--mp-d:' + mo.hop[1] + 's;--mp-hop:' + mo.hop[0] + 'px">' + inner + '</g>';
+    const gx = V.cx;
+    const gy = V.ground;
+    inner = '<g transform="translate(' + gx + ' ' + gy + ')"><g class="mp-a mp-breathe" style="--mp-d:' + bd + 's;--mp-bx:' + bx + ';--mp-by:' + by + '"><g transform="translate(-' + gx + ' -' + gy + ')">' + inner + '</g></g></g>';
+    if (mo.hop) inner = '<g class="mp-a mp-hop" style="--mp-d:' + mo.hop[1] + 's;--mp-hop:' + mpNum(mo.hop[0] * V.k) + 'px">' + inner + '</g>';
     if (mo.shiver) inner = '<g class="mp-a mp-shiver">' + inner + '</g>';
   }
   return inner;
 };
 
-const mpIsland = (biome, w, motion, vals) => {
-  const back = mpPrune(mpFill(MP_SCENE_BACK, vals));
-  const front = mpPrune(mpFill(MP_SCENE_FRONT, vals));
+const mpIsland = (V, vals, motion) => {
+  const t = V.tpl();
+  const back = mpPrune(mpFill(t.back, vals));
+  const front = mpPrune(mpFill(t.front, vals));
   const strip = (s) => (motion ? s : s.replace(/\sclass="mp-[^"]*"/g, '').replace(/\sstyle="--mp-[^"]*"/g, ''));
   return { back: strip(back), front: strip(front) };
 };
@@ -1637,6 +5768,32 @@ const mpSceneVals = (biome, w) => {
   };
 };
 
+const mpIsoSceneVals = (biome, w) => {
+  const cave = biome === 'cave';
+  const lake = biome === 'lake';
+  const grove = biome === 'grove';
+  const show = (on) => (on ? 'inline' : 'none');
+  const GROUND = {
+    desert: { top: '#DDB070', inner: '#E6BE80', qL: '#D6A866', qR: '#D3A463', bandL: '#C99858', bandR: '#B8874A', sideL: '#C97A4E', sideR: '#A65A36', st1: '#B8693F', st2: '#8E4A2C', peb: '#A65A36', pebR: '#8E4A2C' },
+    grove: { top: '#3A8A76', inner: '#4FA58C', qL: '#367F6D', qR: '#337B69', bandL: '#2C6E60', bandR: '#245E52', sideL: '#5A4470', sideR: '#46355A', st1: '#6E5788', st2: '#33264A', peb: '#7FF0E0', pebR: '#5FE0D0' },
+    lake: { top: '#7FBCE0', inner: '#8CC6E6', qL: '#78B6DA', qR: '#74B2D6', bandL: '#5FA3CC', bandR: '#4F93BC', sideL: '#B9A27E', sideR: '#9A8462', st1: '#A8916C', st2: '#7E6A4E', peb: '#7E6A4E', pebR: '#6A583E' },
+    cave: { top: '#7A7690', inner: '#8480A0', qL: '#726E88', qR: '#6E6A84', bandL: '#5E5A74', bandR: '#524E68', sideL: '#58546A', sideR: '#46425A', st1: '#6E6A80', st2: '#38344A', peb: '#9D7FD6', pebR: '#6FD3D8' },
+    meadow: { top: '#9BD36A', inner: '#A5D874', qL: '#94CE64', qR: '#92CC62', bandL: '#7DBB4C', bandR: '#6AA63F', sideL: '#C98A55', sideR: '#A86B3E', st1: '#B87A48', st2: '#956031', peb: '#A9703F', pebR: '#87532D' }
+  };
+  const c = { rain: ['#C2CCD8', '#A8B4C3', '#8E9BAC'], snow: ['#FFFFFF', '#E9EEF4', '#CBD5E0'] }[w] || ['#FFFFFF', '#EEF2F6', '#D5DDE6'];
+  return {
+    cloudLit: c[0], cloudMid: c[1], cloudShade: c[2],
+    showSun: show(w === 'clear' && !cave), showNight: show(w === 'night' && !cave), lampGlow: show(w === 'night' || cave),
+    showCloudA: show(w !== 'night' && !cave), showCloudB: show((w === 'cloudy' || w === 'rain' || w === 'snow') && !cave), showCloudC: show((w === 'cloudy' || w === 'rain') && !cave),
+    showRain: show(w === 'rain'), showSnow: show(w === 'snow'), showGrass: show(w !== 'snow' && biome === 'meadow'),
+    meadowOn: show(biome === 'meadow' || grove), pondOn: show(!lake), groveOn: show(grove),
+    tc: grove ? { c0: '#6A58C0', c1: '#8E7CE0', c2: '#4E3F9C', c3: '#7F6CD0', c4: '#B5A8F0', c5: '#5A4AAE', c6: '#9C8CE6' } : { c0: '#6FB04A', c1: '#8CCB5E', c2: '#5A9A3C', c3: '#7DBB4C', c4: '#9BD36A', c5: '#5E9E40', c6: '#84C456' },
+    desertOn: show(biome === 'desert'), lakeOn: show(lake), lilyOn: show(lake && w !== 'snow'), caveOn: show(cave),
+    g: GROUND[biome] || GROUND.meadow, palm: MP_ISO.palmLeaves(),
+    water: w === 'snow' ? '#DCEAF4' : (w === 'night' ? '#6E93B8' : '#A6D6EE'), flower: w === 'snow' ? '#FFFFFF' : '#FFD66B',
+    lamp: w === 'night' || cave ? '#FFE08A' : '#E9E4CC', lampXf: lake ? 'translate(30 18)' : 'translate(0 0)'
+  };
+};
 
 // Rough bounding box of engine shapes (control points and arc radii, so it never undershoots).
 const mpBBox = (list) => {
@@ -1681,11 +5838,12 @@ const mpBBox = (list) => {
   return x0 === Infinity ? null : { x0, y0, x1, y1 };
 };
 
-const mpIconBox = (spec) => {
+// Head-shot frame in engine units: [x, y, size].
+const mpIconBox = (spec, k) => {
   const eyes = spec.face.eyes;
   const fx = eyes.reduce((a, e) => a + e[0], 0) / eyes.length;
   const fy = eyes.reduce((a, e) => a + e[1], 0) / eyes.length;
-  const er = spec.face.er || 14;
+  const er = spec.face.er || 14 * k;
   const shapes = [];
   const walk = (it) => { if (Array.isArray(it) && Array.isArray(it[0])) it.forEach(walk); else if (Array.isArray(it) && typeof it[0] === 'string') shapes.push(it); };
   (spec.body || []).forEach(walk);
@@ -1702,20 +5860,21 @@ const mpIconBox = (spec) => {
     if (ov < 0.5 * (b.x1 - b.x0) && !(b.x0 <= fx && fx <= b.x1)) return;
     hx0 = Math.min(hx0, b.x0); hx1 = Math.max(hx1, b.x1); top = Math.min(top, b.y0);
   });
-  if (top === Infinity) { top = spec.hat[1] - 20; hx0 = fx - 120; hx1 = fx + 120; }
+  if (top === Infinity) { top = spec.hat[1] - 20 * k; hx0 = fx - 120 * k; hx1 = fx + 120 * k; }
   const chin = Math.max(fy + er * 5, spec.face.mouth ? spec.face.mouth[1] + er * 2.5 : 0);
-  const size = Math.max(chin - top + 20, hx1 - hx0 + 24);
+  const size = Math.max(chin - top + 20 * k, hx1 - hx0 + 24 * k);
   const cx = Math.abs((hx0 + hx1) / 2 - fx) < size * 0.25 ? (hx0 + hx1) / 2 : fx;
-  return [cx - size / 2, top - 10, size];
+  return [cx - size / 2, top - 10 * k, size];
 };
 
-const mpAnchors = (id, spec) => {
-  const sh = (p) => [Math.round(p[0]), Math.round(p[1] + MP_SHIFT)];
+const mpAnchors = (V, id, spec) => {
+  const G = V.eng;
+  const sh = (p) => V.to512(p[0], p[1]).map(Math.round);
   const [hx, hy] = spec.hat;
   const eyes = spec.face.eyes;
   const fx = eyes.reduce((a, e) => a + e[0], 0) / eyes.length;
   const fy = eyes.reduce((a, e) => a + e[1], 0) / eyes.length;
-  const neck = spec.neck || NECK[id] || [hx, hy + spec.hat[2] * 1.6, spec.hat[2]];
+  const neck = spec.neck || G.NECK[id] || [hx, hy + spec.hat[2] * 1.6, spec.hat[2]];
   let back = [neck[0], neck[1] + neck[2] * 0.3];
   if (spec.capeShell) {
     const nums = (spec.capeShell[0].match(/-?\d+(\.\d+)?/g) || []).map(Number);
@@ -1723,61 +5882,259 @@ const mpAnchors = (id, spec) => {
     for (let i = 0; i + 1 < nums.length; i += 2) { top = Math.min(top, nums[i + 1]); x0 = Math.min(x0, nums[i]); x1 = Math.max(x1, nums[i]); }
     back = [(x0 + x1) / 2, top];
   }
-  const box = xRange(spec.body, 446 - 140) || [hx - 60, hx + 60];
-  return { head: sh([hx, hy]), face: sh([fx, fy]), neck: sh([neck[0], neck[1]]), back: sh(back), hand: sh([(box[0] + box[1]) / 2, 446]) };
+  const box = G.xRange(spec.body, V.ground - 140 * V.k) || [hx - 60 * V.k, hx + 60 * V.k];
+  return { head: sh([hx, hy]), face: sh([fx, fy]), neck: sh([neck[0], neck[1]]), back: sh(back), hand: sh([(box[0] + box[1]) / 2, V.ground]) };
+};
+
+const mpVectorSvg = (style, o) => {
+  const V = MP_VEC[style];
+  const G = V.eng;
+  const { id, stage, state, mood, island, w, motion, items } = o;
+  const home = (MP_PETS.find((p) => p.id === id) || {}).island || 'meadow';
+  const biome = MP_ISLAND[island || home] || 'meadow';
+  const spec = mpSpec(V, id, stage, biome);
+  const coat = o.colour && G.COATS[o.colour] ? o.colour : spec.coat;
+  const pal = G.COATS[coat];
+  const pet = mpPet(V, { id, spec, mood, pal, items, motion, snow: !!island && w === 'snow' });
+  const label = 'Morae pet ' + spec.name + (style === 'geometric' ? '' : ', ' + style) + ', stage ' + stage + ', ' + state + (island ? ', on the ' + island + ' island, ' + w : '');
+  let body;
+  let vb = '0 0 512 512';
+  if (o.frame === 'icon') {
+    const [ix, iy, isz] = mpIconBox(spec, V.k);
+    const [x512, y512] = V.to512(ix, iy);
+    vb = mpNum(x512) + ' ' + mpNum(y512) + ' ' + mpNum(isz / V.k) + ' ' + mpNum(isz / V.k);
+  }
+  if (island) {
+    const sc = mpIsland(V, V.sceneVals(biome, w), motion);
+    const [ex, ey] = V.emSceneAt(spec.em[0], spec.em[1]);
+    const em = mpEmote(V, spec, mood, ex, ey, V.emScene, motion);
+    body = '<g transform="scale(' + (512 / 600).toFixed(5) + ')"><g id="island">' + sc.back + '</g>' + V.sceneWrap(pet) + mpToy(V, items, true) + em + '<g id="weather">' + sc.front + '</g></g>';
+  } else {
+    const em = mpEmote(V, spec, mood, spec.em[0], spec.em[1], V.emPet, motion);
+    body = V.petWrap(pet + mpToy(V, items, false) + em);
+  }
+  const css = style === 'isometric' ? mpStyleFor(motion, body, MP_KEYFRAMES + MP_KEYFRAMES_ISO, MP_RULES + MP_RULES_ISO) : mpStyle(motion, MP_KEYFRAMES, MP_RULES);
+  return '<svg xmlns="http://www.w3.org/2000/svg" viewBox="' + vb + '" role="img" aria-label="' + mpEsc(label) + '">' + css + body + '</svg>';
+};
+
+/* ===== Pixel style: a 32 x 32 sprite, drawn 10 units per pixel on the 512 canvas ===== */
+const PX_S = 10;
+const PX_X = 256 - 16 * PX_S;
+const PX_ITEM_ORDER = ['scarf', 'collar', 'bowtie', 'cape', 'lights', 'starshades', 'glasses', 'sunglasses', 'headphones', 'lamp', 'mug', 'book'];
+const PX_GC = {
+  meadow: { G1: '#9BD36A', G2: '#7DBB4C', G3: '#5E9A3C', T1: '#C98A55', T2: '#A86B3E', T3: '#7A4A2A', F0: '#3F6E2C', F1: '#6FB04A', F2: '#8CCB5E', F3: '#4F8A36', FC: '#E59A3C', LV: '#9D7FD6', MR: '#E5484D' },
+  grove: { G1: '#4FA58C', G2: '#3A8A76', G3: '#2C6E60', T1: '#5A4470', T2: '#46355A', T3: '#33264A', F0: '#241A4E', F1: '#6A58C0', F2: '#8E7CE0', F3: '#4E3F9C', FC: '#7FF0E0', LV: '#B5F2FF', MR: '#5FE0D0' }
+};
+const PX_LEAVES = { base: { E: '#A5D874', F: '#7DBB4C', H: '#5A9A3C' }, teal: { E: '#A8E3D3', F: '#5FB3A0', H: '#3F8A7C' }, blossom: { E: '#FFE1EA', F: '#F7B3C8', H: '#DE87A3' }, deep: { E: '#6FB04A', F: '#4F8A36', H: '#37702A' } };
+const PX_GLYPH_MAP = { h: 'eh', c: 'ec', d: 'ed', a: 'ea', s: 'es', z: 'ez', y: 'ey', w: 'ew', f: 'ef', e: 'ee', b: 'eb', g: 'eg', r: 'er', o: 'eo', n: 'en', m: 'em' };
+
+const pxSpec = (id, stage) => (stage < 3 && MP_PX.FORMS[id] ? MP_PX.pixelForm(id, stage) : MP_PX.PETS[id]);
+const pxBottom = (spec) => { let b = 31; while (b > 0 && !/[^.]/.test(spec.art[b])) b--; return b; };
+const pxCells = (g) => { const out = []; for (let i = 0; i < g.c.length; i++) if (g.c[i]) out.push([i % g.w, Math.floor(i / g.w) - g.oy, g.c[i]]); return out; };
+const pxClone = (g) => ({ w: g.w, h: g.h, oy: g.oy, c: g.c.slice() });
+const pxDiff = (a, b) => { const out = []; for (let i = 0; i < b.c.length; i++) if (b.c[i] && b.c[i] !== a.c[i]) out.push([i % b.w, Math.floor(i / b.w) - b.oy, b.c[i]]); return out; };
+// Cells [x, y, key] to one path per colour, one run per row.
+const pxPaths = (cells, colour) => {
+  const by = {};
+  cells.forEach(([x, y, k]) => { const f = colour(k); if (!f) return; (by[f] = by[f] || {}); (by[f][y] = by[f][y] || []).push(x); });
+  let out = '';
+  Object.keys(by).forEach((f) => {
+    let d = '';
+    Object.keys(by[f]).map(Number).sort((a, b) => a - b).forEach((y) => {
+      const xs = by[f][y].sort((a, b) => a - b);
+      for (let i = 0; i < xs.length;) {
+        let j = i;
+        while (j + 1 < xs.length && xs[j + 1] === xs[j] + 1) j++;
+        d += 'M' + xs[i] + ' ' + y + 'h' + (j - i + 1) + 'v1h-' + (j - i + 1) + 'z';
+        i = j + 1;
+      }
+    });
+    out += '<path fill="' + f + '" d="' + d + '"/>';
+  });
+  return out;
+};
+const pxColour = (pal, leaf) => (k) => {
+  const v = MP_PX_KEYS[k];
+  if (!v) return null;
+  if (v.indexOf('coat.') === 0) return pal[v.slice(5)];
+  if (v.indexOf('leaf.') === 0) return leaf[v.slice(5)];
+  return v;
+};
+
+const pxPet = (id, spec, mood, items, pal, leaf, motion) => {
+  const P = MP_PX;
+  const col = pxColour(pal, leaf);
+  // body, then the face (eyes, mouth and anything the state changes), then each item on top
+  const art = P.makeGrid(32, 42, 10);
+  P.stamp(art, spec.art, 0, 0);
+  const moodG = pxClone(art);
+  P.applyMood(moodG, spec, mood);
+  const faceKeys = new Set();
+  const mark = (x, y) => faceKeys.add(x + ',' + y);
+  spec.eyes.forEach(([x, y]) => { for (let dy = 0; dy < 2; dy++) for (let dx = 0; dx < 2; dx++) mark(x + dx, y + dy); });
+  if (spec.mouth) for (let dy = 0; dy < 2; dy++) for (let dx = 0; dx < 4; dx++) mark(spec.mouth[0] + dx, spec.mouth[1] + dy);
+  pxDiff(art, moodG).forEach(([x, y]) => mark(x, y));
+  const all = pxCells(moodG);
+  const bodyCells = all.filter(([x, y]) => !faceKeys.has(x + ',' + y));
+  const faceCells = all.filter(([x, y]) => faceKeys.has(x + ',' + y));
+  // items, applied one at a time so each gets its own group
+  const head = items.find((it) => P.HEAD_KEYS.includes(it));
+  const list = PX_ITEM_ORDER.filter((it) => items.includes(it));
+  if (head) list.push(head);
+  let capeBack = '';
+  let front = '';
+  let g = moodG;
+  list.forEach((it) => {
+    if (it === 'cape' && !spec.shellCape) {
+      const cg = P.makeGrid(32, 42, 10);
+      P.drawCape(cg, spec);
+      capeBack = '<g id="item-cape-back">' + pxPaths(pxCells(cg), col) + '</g>';
+    }
+    const next = pxClone(g);
+    P.applyAcc(next, spec, [it]);
+    const d = pxDiff(g, next);
+    if (d.length) front += '<g id="item-' + it + '">' + pxPaths(d, col) + '</g>';
+    g = next;
+  });
+  let blink = '';
+  const shades = items.includes('glasses') || items.includes('sunglasses') || items.includes('starshades');
+  if (motion && (mood === 'normal' || mood === 'hungry') && !shades) {
+    const bc = [];
+    spec.eyes.forEach(([x, y], i) => { bc.push([x, y, spec.eyeBg[i]], [x + 1, y, spec.eyeBg[i]]); });
+    blink = '<g class="mp-px-blink" opacity="0">' + pxPaths(bc, col) + '</g>';
+  }
+  let inner = '<g id="pet">' + capeBack + '<g id="body">' + pxPaths(bodyCells, col) + '</g><g id="face">' + pxPaths(faceCells, col) + blink + '</g></g>' + (front ? '<g id="items">' + front + '</g>' : '');
+  if (motion) {
+    const bob = { normal: ['mp-px-bob', 2], hungry: ['mp-px-bob', 2], sleepy: ['mp-px-bob', 2.4], happy: ['mp-px-hop'], celebrate: ['mp-px-cheer'], cold: ['mp-px-shiver'] }[mood];
+    if (bob) inner = '<g class="mp-a ' + bob[0] + '"' + (bob[1] ? ' style="--mp-d:' + bob[1] + 's"' : '') + '>' + inner + '</g>';
+  }
+  return inner;
+};
+
+const pxToy = (items, bottom) => {
+  const t = items.find((it) => MP_TOYS.includes(it));
+  if (!t) return '';
+  const cells = [];
+  MP_PX.ITEMS[t].forEach((row, y) => { for (let x = 0; x < row.length; x++) if (row[x] !== '.') cells.push([32 + x, bottom - 7 + y, row[x]]); });
+  return '<g id="item-' + t + '">' + pxPaths(cells, (k) => MP_PX_TOY_KEYS[k]) + '</g>';
+};
+
+const pxEmote = (spec, mood, motion, minRow) => {
+  const glyph = mood === 'hungry' ? MP_PX.GLYPHS[spec.food] : MP_PX.GLYPHS[mood];
+  if (!glyph || mood === 'normal') return '';
+  const gx = spec.em[0] - 1;
+  const gy = Math.max(minRow, spec.em[1] - glyph.length - 1);
+  const cells = [];
+  glyph.forEach((row, y) => { for (let x = 0; x < row.length; x++) if (row[x] !== '.') cells.push([gx + x, gy + y, PX_GLYPH_MAP[row[x]] || row[x]]); });
+  return '<g id="emote"><g class="' + (motion ? 'mp-a mp-px-float' : '') + '">' + pxPaths(cells, (k) => MP_PX_EMOTE_KEYS[k]) + '</g></g>';
+};
+
+const pxSvg = (o) => {
+  const P = MP_PX;
+  const { id, stage, state, mood, island, w, motion, items } = o;
+  const spec = pxSpec(id, stage);
+  const home = (MP_PETS.find((p) => p.id === id) || {}).island || 'meadow';
+  const biome = MP_ISLAND[island || home] || 'meadow';
+  const coat = o.colour && P.COATS[o.colour] ? o.colour : spec.coat;
+  const pal = P.COATS[coat];
+  const green = biome === 'meadow' || biome === 'lake' || biome === 'grove';
+  const leaf = PX_LEAVES[id === 'mac' ? 'deep' : (green && id === 'spike' ? 'teal' : (green && id === 'bo' ? 'blossom' : 'base'))];
+  const bottom = pxBottom(spec);
+  const label = 'Morae pet ' + spec.name + ', pixel, stage ' + stage + ', ' + state + (island ? ', on the ' + island + ' island, ' + w : '');
+  const pet = pxPet(id, spec, mood, items, pal, leaf, motion);
+  let body;
+  let vb = '0 0 512 512';
+  if (island) {
+    const oy = P.TOP - 1 - bottom;
+    const sky = P.buildSky(w, biome);
+    const cc = { rain: ['#C2CCD8', '#8E9BAC'], snow: ['#FFFFFF', '#CBD5E0'] }[w] || ['#FFFFFF', '#D5DDE6'];
+    const gr = P.buildGround(w, biome, '');
+    // the cave ceiling (top rows) only works on the canvas's dark cave sky; leave it out on a transparent background
+    if (biome === 'cave') ['C4', 'C5', 'C6'].forEach((k) => { gr[k] = (gr[k] || '').replace(/M(\d+) (\d+)h\d+v1h-?\d+z/g, (m, x, y) => (Number(y) < 8 ? '' : m)); });
+    const vals = { sk: sky.sk, cl: sky.cl, cloudLit: cc[0], cloudShade: cc[1], gr, gc: PX_GC[biome] || PX_GC.meadow, fx: P.buildFx(w, biome), lamp: w === 'night' || biome === 'cave' ? '#FFE08A' : '#E9E4CC', flower: w === 'snow' ? '#FFFFFF' : '#FFD66B' };
+    const clean = (s) => { const t = mpFill(s, vals).replace(/<path fill="[^"]*"( class="[^"]*")? d=""><\/path>/g, ''); return motion ? t : t.replace(/\sclass="mp-[^"]*"/g, ''); };
+    body = '<g transform="scale(6.4)"><g id="island">' + clean(MP_PX_BACK) + '</g><g transform="translate(24 ' + oy + ')">' + pet + pxToy(items, bottom) + pxEmote(spec, mood, motion, -oy) + '</g><g id="weather">' + clean(MP_PX_FRONT) + '</g></g>';
+  } else {
+    body = '<g transform="translate(' + PX_X + ' ' + (MP_GROUND - (bottom + 1) * PX_S) + ') scale(' + PX_S + ')">' + pet + pxToy(items, bottom) + pxEmote(spec, mood, motion, -10) + '</g>';
+  }
+  if (o.frame === 'icon') {
+    const [bx, by, side] = pxIconBox(spec);
+    const y0 = MP_GROUND - (bottom + 1) * PX_S;
+    vb = mpNum(PX_X + bx * PX_S) + ' ' + mpNum(y0 + by * PX_S) + ' ' + mpNum(side * PX_S) + ' ' + mpNum(side * PX_S);
+  }
+  return '<svg xmlns="http://www.w3.org/2000/svg" viewBox="' + vb + '" shape-rendering="crispEdges" role="img" aria-label="' + mpEsc(label) + '">' + mpStyleFor(motion, body, MP_KEYFRAMES_PX, MP_RULES_PX) + body + '</svg>';
+};
+
+// Head-shot frame in sprite pixels: the head's width at eye level, everything above it (ears, leaves), down past the mouth.
+const pxIconBox = (spec) => {
+  const on = (x, y) => y >= 0 && y < 32 && x >= 0 && x < 32 && spec.art[y][x] !== '.';
+  const ey = Math.round(spec.eyes.reduce((a, e) => a + e[1], 0) / spec.eyes.length);
+  const ex0 = Math.min(...spec.eyes.map((e) => e[0]));
+  const ex1 = Math.max(...spec.eyes.map((e) => e[0] + 1));
+  let hl = ex0; let hr = ex1;
+  for (let dy = 0; dy < 2; dy++) {
+    let l = ex0; while (on(l - 1, ey + dy)) l--;
+    let r = ex1; while (on(r + 1, ey + dy)) r++;
+    hl = Math.min(hl, l); hr = Math.max(hr, r);
+  }
+  let top = ey;
+  for (let y = 0; y < ey; y++) { let hit = false; for (let x = hl - 1; x <= hr + 1; x++) if (on(x, y)) hit = true; if (hit) { top = y; break; } }
+  const bot = Math.max(ey + 4, spec.mouth ? spec.mouth[1] + 3 : 0);
+  const side = Math.max(hr - hl + 1, bot - top + 1) + 2;
+  return [(hl + hr + 1) / 2 - side / 2, (top + bot + 1) / 2 - side / 2, side];
+};
+const pxAnchors = (id, stage) => {
+  const spec = pxSpec(id, stage);
+  const bottom = pxBottom(spec);
+  const y0 = MP_GROUND - (bottom + 1) * PX_S;
+  const at = (x, y) => [Math.round(PX_X + x * PX_S), Math.round(y0 + y * PX_S)];
+  const [hcx, htop] = spec.head;
+  const eyes = spec.eyes;
+  const fx = eyes.reduce((a, e) => a + e[0] + 1, 0) / eyes.length;
+  const fy = eyes.reduce((a, e) => a + e[1] + 1, 0) / eyes.length;
+  const [nx0, nx1, ny] = spec.neck;
+  let l = 31; let r = 0;
+  for (let y = Math.max(0, bottom - 3); y <= bottom; y++) { const row = spec.art[y]; for (let x = 0; x < 32; x++) if (row[x] !== '.') { l = Math.min(l, x); r = Math.max(r, x); } }
+  const back = spec.shellCape ? [(spec.shellCape[0] + spec.shellCape[1] + 1) / 2, spec.shellCape[2]] : [(nx0 + nx1 + 1) / 2, ny + 1];
+  return { head: at(hcx, htop), face: at(fx, fy), neck: at((nx0 + nx1 + 1) / 2, ny), back: at(back[0], back[1]), hand: at((l + r + 1) / 2, bottom + 1) };
+};
+
+/* ===== Public API ===== */
+const mpOpts = (opts) => {
+  const o = opts || {};
+  const id = MP_GEO.PETS[o.pet] && MP_PETS.some((p) => p.id === o.pet) ? o.pet : 'mochi';
+  const style = o.style || 'geometric';
+  if (!MP_STYLES.includes(style)) throw new Error('MoraePets: style must be geometric, pixel or isometric');
+  const state = MP_STATE[o.state] ? o.state : 'idle';
+  return {
+    id, style, state, mood: MP_STATE[state],
+    stage: [1, 2, 3].includes(Number(o.stage)) ? Number(o.stage) : 2,
+    island: o.island && MP_ISLAND[o.island] ? o.island : null,
+    w: MP_WEATHER.includes(o.weather) ? o.weather : 'clear',
+    motion: o.animate !== false,
+    items: Array.isArray(o.items) ? o.items.filter((x) => MP_ITEM_IDS.includes(x)) : [],
+    colour: o.colour, frame: o.frame
+  };
 };
 
 window.MoraePets = {
   version: MP_VERSION,
+  styles: MP_STYLES,
   pets: MP_PETS,
   items: MP_ITEMS,
-  colours: Object.keys(COATS),
-  events: [{"id": "new-year", "name": "New Year", "when": "Jan 1", "items": ["party", "bowtie"]}, {"id": "lunar-new-year", "name": "Lunar New Year", "when": "Jan or Feb", "items": ["knot", "scarf"]}, {"id": "family-day", "name": "Family Day", "when": "Feb, 3rd Monday", "items": ["beanie", "scarf"]}, {"id": "valentines-day", "name": "Valentine’s Day", "when": "Feb 14", "items": ["heartband"]}, {"id": "st-patricks-day", "name": "St. Patrick’s Day", "when": "Mar 17", "items": ["shamrock", "bowtie"]}, {"id": "easter", "name": "Easter", "when": "Mar or Apr", "items": ["bunnyears", "collar"]}, {"id": "earth-day", "name": "Earth Day", "when": "Apr 22", "items": ["flowers"]}, {"id": "pride", "name": "Pride", "when": "June", "items": ["rainbow", "bowtie"]}, {"id": "canada-day", "name": "Canada Day", "when": "Jul 1", "items": ["maple", "bowtie"]}, {"id": "back-to-school", "name": "Back to school", "when": "Sep", "items": ["glasses", "book"]}, {"id": "thanksgiving", "name": "Thanksgiving", "when": "Oct, 2nd Monday", "items": ["leafcrown", "scarf"]}, {"id": "halloween", "name": "Halloween", "when": "Oct 31", "items": ["witch", "cape"]}, {"id": "christmas", "name": "Christmas", "when": "Dec 25", "items": ["santa", "collar"]}, {"id": "exam-season", "name": "Exam season", "when": "Around the exam date the person sets", "items": ["glasses", "mug"]}, {"id": "busy-season", "name": "Busy season", "when": "Weeks the person marks", "items": ["headphones", "lamp"]}],
+  colours: Object.keys(MP_GEO.COATS),
+  events: [{"id": "new-year", "name": "New Year", "when": "Jan 1", "items": ["party", "bowtie"], "batch": 4}, {"id": "lunar-new-year", "name": "Lunar New Year", "when": "Jan or Feb", "items": ["knot", "scarf"], "batch": 4}, {"id": "family-day", "name": "Family Day", "when": "Feb, 3rd Monday", "items": ["beanie", "scarf"], "batch": 4}, {"id": "valentines-day", "name": "Valentine’s Day", "when": "Feb 14", "items": ["heartband"], "batch": 4}, {"id": "st-patricks-day", "name": "St. Patrick’s Day", "when": "Mar 17", "items": ["shamrock", "bowtie"], "batch": 4}, {"id": "easter", "name": "Easter", "when": "Mar or Apr", "items": ["bunnyears", "collar"], "batch": 4}, {"id": "earth-day", "name": "Earth Day", "when": "Apr 22", "items": ["flowers"], "batch": 4}, {"id": "pride", "name": "Pride", "when": "June", "items": ["rainbow", "bowtie"], "batch": 4}, {"id": "canada-day", "name": "Canada Day", "when": "Jul 1", "items": ["maple", "bowtie"], "batch": 4}, {"id": "back-to-school", "name": "Back to school", "when": "Sep", "items": ["glasses", "book"], "batch": 4}, {"id": "thanksgiving", "name": "Thanksgiving", "when": "Oct, 2nd Monday", "items": ["leafcrown", "scarf"], "batch": 4}, {"id": "halloween", "name": "Halloween", "when": "Oct 31", "items": ["witch", "cape"], "batch": 4}, {"id": "christmas", "name": "Christmas", "when": "Dec 25", "items": ["santa", "collar"], "batch": 4}, {"id": "exam-season", "name": "Exam season", "when": "Around the exam date the person sets", "items": ["glasses", "mug"], "batch": 4}, {"id": "busy-season", "name": "Busy season", "when": "Weeks the person marks", "items": ["headphones", "lamp"], "batch": 4}],
+  batches: [{"batch": 1, "name": "First release", "status": "live in Morae Timers", "what": "Geometric pets for every student.", "styles": ["geometric"], "pets": ["mochi", "bao", "kite", "sunny", "pebble", "dune", "lotl", "puddle", "ember", "sprout", "sol", "spike", "mora"], "states": ["idle", "focus", "happy", "rest", "cold", "celebrate"], "islands": ["meadow", "dunes"], "weather": ["clear", "night"], "items": ["beanie", "sunhat", "crown", "flowers", "headphones", "glasses", "sunglasses", "starshades", "scarf", "collar", "bowtie", "cape", "lights"], "events": [], "needs": "Nothing new. Already built."}, {"batch": 2, "name": "Plus styles and more pets", "status": "next", "what": "Pixel and isometric styles (Morae Plus and earned styles), the 18 pets that unlock at 30, 60 and 100 study days, and the lake, cave and grove islands, so Lotl, Puddle and Ember get their own homes.", "styles": ["pixel", "isometric"], "pets": ["pip", "rook", "pom", "clover", "nib", "peep", "zephyr", "mesa", "zig", "dart", "hop", "kit", "daisy", "tuli", "tomo", "kabo", "mac", "bo"], "states": [], "islands": ["lake", "cave", "grove"], "weather": [], "items": [], "events": [], "needs": "Stripe passes for Plus; glow and style tickets for earned styles; the weekly pick. The 30-day pets are needed before the first beta student reaches 30 study days."}, {"batch": 3, "name": "Rare pets, care and rewards", "status": "later", "what": "The 6 rare pets and their eggs, the hungry state for care, study items (the graduation cap is the finish-line gift), and toys and treats.", "styles": [], "pets": ["ripple", "cinder", "flare", "cap", "gust", "moss"], "states": ["hungry"], "islands": [], "weather": [], "items": ["book", "mug", "lamp", "visor", "gradcap", "ball", "yarn", "donut", "meat", "juice", "cake"], "events": [], "needs": "Rare-egg odds shown on screen; care and feeding; marking a goal as done."}, {"batch": 4, "name": "Seasons and live weather", "status": "later", "what": "The 15 event sets and their event items, and live weather beyond clear and night.", "styles": [], "pets": [], "states": [], "islands": [], "weather": ["cloudy", "rain", "snow"], "items": ["party", "knot", "heartband", "shamrock", "bunnyears", "rainbow", "maple", "leafcrown", "witch", "santa"], "events": ["new-year", "lunar-new-year", "family-day", "valentines-day", "st-patricks-day", "easter", "earth-day", "pride", "canada-day", "back-to-school", "thanksgiving", "halloween", "christmas", "exam-season", "busy-season"], "needs": "A calendar of event dates; a small server piece for weather (Environment Canada or MET Norway) and an optional city."}, {"batch": 5, "name": "Not in this code yet", "status": "future", "what": "Home-screen widgets (need a phone app), animated idle quirks (written in pets.json), the four focus-journey special items and the starlit colour (not designed yet), and the ideas on the Future ideas board.", "styles": [], "pets": [], "states": [], "islands": [], "weather": [], "items": [], "events": [], "needs": "Design work first."}],
   svg(opts) {
-    const o = opts || {};
-    const id = PETS[o.pet] && MP_PETS.some((p) => p.id === o.pet) ? o.pet : 'mochi';
-    const style = o.style || 'geometric';
-    if (style !== 'geometric') throw new Error('MoraePets: only the geometric style is in this batch');
-    const stage = [1, 2, 3].includes(Number(o.stage)) ? Number(o.stage) : 2;
-    const state = MP_STATE[o.state] ? o.state : 'idle';
-    const mood = MP_STATE[state];
-    const island = o.island && MP_ISLAND[o.island] ? o.island : null;
-    const w = MP_WEATHER.includes(o.weather) ? o.weather : 'clear';
-    const motion = o.animate !== false;
-    const items = Array.isArray(o.items) ? o.items.filter((x) => MP_ITEM_IDS.includes(x)) : [];
-    const home = (MP_PETS.find((p) => p.id === id) || {}).island || 'meadow';
-    const biome = MP_ISLAND[island || home] || 'meadow';
-    const spec = mpSpec(id, stage, biome);
-    const coat = o.colour && COATS[o.colour] ? o.colour : spec.coat;
-    const pal = COATS[coat];
-    const pet = mpPet({ id, spec, mood, pal, items, motion, snow: !!island && w === 'snow' });
-    const toy = mpToy(items);
-    const label = 'Morae pet ' + spec.name + ', stage ' + stage + ', ' + state + (island ? ', on the ' + island + ' island, ' + w : '');
-    let body;
-    let vb = '0 0 512 512';
-    if (o.frame === 'icon') {
-      const [ix, iy, isz] = mpIconBox(spec);
-      vb = mpNum(ix) + ' ' + mpNum(iy + MP_SHIFT) + ' ' + mpNum(isz) + ' ' + mpNum(isz);
-    }
-    if (island) {
-      const vals = mpSceneVals(biome, w);
-      const sc = mpIsland(biome, w, motion, vals);
-      const em = mpEmote(spec, mood, spec.em[0] * XF.s + XF.x, spec.em[1] * XF.s + XF.y, 1.1, motion);
-      const toyScene = toy ? toy.replace('translate(436 446) scale(3)', 'translate(432 406) scale(2.1)') : '';
-      body = '<g transform="scale(' + (512 / 600).toFixed(5) + ')"><g id="island">' + sc.back + '</g><g transform="translate(' + XF.x + ' ' + XF.y + ') scale(' + XF.s + ')">' + pet + '</g>' + toyScene + em + '<g id="weather">' + sc.front + '</g></g>';
-    } else {
-      const em = mpEmote(spec, mood, spec.em[0], spec.em[1], 1.9, motion);
-      body = '<g transform="translate(0 ' + MP_SHIFT + ')">' + pet + toy + em + '</g>';
-    }
-    const css = motion ? '<style>' + MP_KEYFRAMES + '@media (prefers-reduced-motion:no-preference){' + MP_RULES + '}</style>' : '';
-    return '<svg xmlns="http://www.w3.org/2000/svg" viewBox="' + vb + '" role="img" aria-label="' + mpEsc(label) + '">' + css + body + '</svg>';
+    const o = mpOpts(opts);
+    return o.style === 'pixel' ? pxSvg(o) : mpVectorSvg(o.style, o);
   },
   anchors(opts) {
-    const o = opts || {};
-    const id = PETS[o.pet] ? o.pet : 'mochi';
-    const stage = [1, 2, 3].includes(Number(o.stage)) ? Number(o.stage) : 2;
-    const home = (MP_PETS.find((p) => p.id === id) || {}).island || 'meadow';
-    return mpAnchors(id, mpSpec(id, stage, MP_ISLAND[home]));
+    const o = mpOpts(opts);
+    if (o.style === 'pixel') return pxAnchors(o.id, o.stage);
+    const V = MP_VEC[o.style];
+    const home = (MP_PETS.find((p) => p.id === o.id) || {}).island || 'meadow';
+    return mpAnchors(V, o.id, mpSpec(V, o.id, o.stage, MP_ISLAND[home]));
   }
 };
 

@@ -4,237 +4,271 @@
     "name": "Beanie",
     "anchor": "head",
     "kind": "everyday",
-    "event": null
+    "event": null,
+    "batch": 1
   },
   {
     "id": "sunhat",
     "name": "Sun hat",
     "anchor": "head",
     "kind": "everyday",
-    "event": null
+    "event": null,
+    "batch": 1
   },
   {
     "id": "crown",
     "name": "Crown",
     "anchor": "head",
     "kind": "everyday",
-    "event": null
+    "event": null,
+    "batch": 1
   },
   {
     "id": "flowers",
     "name": "Flower crown",
     "anchor": "head",
     "kind": "everyday",
-    "event": null
+    "event": null,
+    "batch": 1
   },
   {
     "id": "headphones",
     "name": "Headphones",
     "anchor": "head",
     "kind": "everyday",
-    "event": null
+    "event": null,
+    "batch": 1
   },
   {
     "id": "glasses",
     "name": "Study glasses",
     "anchor": "face",
     "kind": "everyday",
-    "event": null
+    "event": null,
+    "batch": 1
   },
   {
     "id": "sunglasses",
     "name": "Shades, round",
     "anchor": "face",
     "kind": "everyday",
-    "event": null
+    "event": null,
+    "batch": 1
   },
   {
     "id": "starshades",
     "name": "Star shades, sharp",
     "anchor": "face",
     "kind": "everyday",
-    "event": null
+    "event": null,
+    "batch": 1
   },
   {
     "id": "scarf",
     "name": "Scarf",
     "anchor": "neck",
     "kind": "everyday",
-    "event": null
+    "event": null,
+    "batch": 1
   },
   {
     "id": "collar",
     "name": "Collar and tag",
     "anchor": "neck",
     "kind": "everyday",
-    "event": null
+    "event": null,
+    "batch": 1
   },
   {
     "id": "bowtie",
     "name": "Bow tie",
     "anchor": "neck",
     "kind": "everyday",
-    "event": null
+    "event": null,
+    "batch": 1
   },
   {
     "id": "cape",
     "name": "Cape",
     "anchor": "back",
     "kind": "everyday",
-    "event": null
+    "event": null,
+    "batch": 1
   },
   {
     "id": "lights",
     "name": "Fairy lights (plants)",
     "anchor": "neck",
     "kind": "everyday",
-    "event": null
+    "event": null,
+    "batch": 1
   },
   {
     "id": "book",
     "name": "Book",
     "anchor": "hand",
     "kind": "study",
-    "event": null
+    "event": null,
+    "batch": 3
   },
   {
     "id": "mug",
     "name": "Mug",
     "anchor": "hand",
     "kind": "study",
-    "event": null
+    "event": null,
+    "batch": 3
   },
   {
     "id": "lamp",
     "name": "Desk lamp",
     "anchor": "hand",
     "kind": "study",
-    "event": null
+    "event": null,
+    "batch": 3
   },
   {
     "id": "visor",
     "name": "Sun visor",
     "anchor": "head",
     "kind": "study",
-    "event": null
+    "event": null,
+    "batch": 3
   },
   {
     "id": "gradcap",
     "name": "Graduation cap",
     "anchor": "head",
     "kind": "study",
-    "event": null
+    "event": null,
+    "batch": 3
   },
   {
     "id": "party",
     "name": "Party hat",
     "anchor": "head",
     "kind": "event",
-    "event": "new-year"
+    "event": "new-year",
+    "batch": 4
   },
   {
     "id": "knot",
     "name": "Lucky knot",
     "anchor": "head",
     "kind": "event",
-    "event": "lunar-new-year"
+    "event": "lunar-new-year",
+    "batch": 4
   },
   {
     "id": "heartband",
     "name": "Heart band",
     "anchor": "head",
     "kind": "event",
-    "event": "valentines-day"
+    "event": "valentines-day",
+    "batch": 4
   },
   {
     "id": "shamrock",
     "name": "Shamrock band",
     "anchor": "head",
     "kind": "event",
-    "event": "st-patricks-day"
+    "event": "st-patricks-day",
+    "batch": 4
   },
   {
     "id": "bunnyears",
     "name": "Bunny ears",
     "anchor": "head",
     "kind": "event",
-    "event": "easter"
+    "event": "easter",
+    "batch": 4
   },
   {
     "id": "rainbow",
     "name": "Rainbow band",
     "anchor": "head",
     "kind": "event",
-    "event": "pride"
+    "event": "pride",
+    "batch": 4
   },
   {
     "id": "maple",
     "name": "Maple band",
     "anchor": "head",
     "kind": "event",
-    "event": "canada-day"
+    "event": "canada-day",
+    "batch": 4
   },
   {
     "id": "leafcrown",
     "name": "Autumn leaves",
     "anchor": "head",
     "kind": "event",
-    "event": "thanksgiving"
+    "event": "thanksgiving",
+    "batch": 4
   },
   {
     "id": "witch",
     "name": "Witch hat",
     "anchor": "head",
     "kind": "event",
-    "event": "halloween"
+    "event": "halloween",
+    "batch": 4
   },
   {
     "id": "santa",
     "name": "Santa hat",
     "anchor": "head",
     "kind": "event",
-    "event": "christmas"
+    "event": "christmas",
+    "batch": 4
   },
   {
     "id": "ball",
     "name": "Ball",
     "anchor": "hand",
     "kind": "toy",
-    "event": null
+    "event": null,
+    "batch": 3
   },
   {
     "id": "yarn",
     "name": "Yarn",
     "anchor": "hand",
     "kind": "toy",
-    "event": null
+    "event": null,
+    "batch": 3
   },
   {
     "id": "donut",
     "name": "Donut",
     "anchor": "hand",
     "kind": "treat",
-    "event": null
+    "event": null,
+    "batch": 3
   },
   {
     "id": "meat",
     "name": "Meat",
     "anchor": "hand",
     "kind": "treat",
-    "event": null
+    "event": null,
+    "batch": 3
   },
   {
     "id": "juice",
     "name": "Juice box",
     "anchor": "hand",
     "kind": "treat",
-    "event": null
+    "event": null,
+    "batch": 3
   },
   {
     "id": "cake",
     "name": "Cake",
     "anchor": "hand",
     "kind": "treat",
-    "event": null
+    "event": null,
+    "batch": 3
   }
 ]
