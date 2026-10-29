@@ -21,6 +21,7 @@
   --f-display:'Bricolage Grotesque','IBM Plex Sans',system-ui,sans-serif;
   --f-body:'IBM Plex Sans',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;
   --f-mono:'IBM Plex Mono',ui-monospace,'SF Mono',Menlo,Consolas,monospace;
+  --sky-day:#D4E8F2; --sky-night:#1C2334;
   --r:10px; --shadow:0 1px 2px rgba(59,47,37,.06),0 8px 24px rgba(59,47,37,.07);
 }
 @media (prefers-color-scheme: dark){
@@ -304,6 +305,53 @@ textarea.out{font:13px/1.5 var(--f-mono);min-height:180px}
 .medal{display:inline-grid;place-items:center;width:16px;height:16px;border-radius:50%;font:700 9px var(--f-mono);color:#3a2a10}
 .medal.g{background:#E8B931}.medal.s{background:#C7CDD4}.medal.b{background:#C98B5A}
 
+
+/* pet beside the timer, full screen, pet room */
+.tm-row{display:flex;align-items:center;justify-content:center;gap:10px;max-width:100%}
+.tm-row:has(.tm-pet) .ring{width:min(210px,52vw)}
+.tm-pet{display:grid;justify-items:center;gap:2px;border:0;background:none;padding:0;cursor:pointer;color:var(--ink-2);width:min(120px,30vw)}
+.tm-pet .pet-art{width:100%}
+.tm-full{margin-left:8px;vertical-align:middle;font-family:var(--f-body);letter-spacing:0;text-transform:none}
+.fs-back{position:fixed;inset:0;z-index:28;background:var(--paper);display:grid;place-items:center;overflow:auto;padding:calc(24px + env(safe-area-inset-top,0px)) max(16px, env(safe-area-inset-right,0px)) calc(24px + env(safe-area-inset-bottom,0px)) max(16px, env(safe-area-inset-left,0px))}
+.fs-in{display:grid;justify-items:center;gap:24px;text-align:center;width:100%;max-width:1200px}
+.fs-main{display:flex;align-items:center;justify-content:center;gap:4vw;flex-wrap:wrap;width:100%}
+.fs-ring{width:min(60vh,80vw)}
+.fs-main.with-pet .fs-ring{width:min(56vh,60vw)}
+.fs-ring .t{font-size:clamp(48px,11vh,120px)}
+.fs-ring .p{font-size:clamp(13px,2vh,18px)}
+.fs-pet{display:grid;justify-items:center;gap:8px;width:min(34vh,70vw);color:var(--ink-2);font-size:clamp(14px,2vh,18px)}
+.fs-pet .pet-art{width:100%}
+.fs-what{font-family:var(--f-display);font-size:clamp(18px,3vh,28px);font-weight:600}
+.pet-room2{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.1fr);gap:20px;align-items:start}
+.pet-widget{background:var(--paper);border-radius:16px;padding:16px;display:grid;gap:12px}
+.pw-top{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1fr);gap:14px;align-items:center}
+.pw-art{background:var(--sky-day);border-radius:12px;padding:6px}
+.pw-art.night{background:var(--sky-night)}
+.pw-art svg{width:100%;height:auto;display:block}
+.pw-txt{display:grid;gap:6px;min-width:0}
+.pw-title{font-family:var(--f-display);font-size:20px;line-height:1.2}
+.pet-heat{display:grid;grid-template-rows:repeat(7,1fr);gap:3px}
+.pet-heat i{aspect-ratio:1;border-radius:3px;background:var(--rule)}
+.pet-heat i.h1{background:color-mix(in oklab, var(--accent) 30%, var(--paper))}
+.pet-heat i.h2{background:color-mix(in oklab, var(--accent) 55%, var(--paper))}
+.pet-heat i.h3{background:color-mix(in oklab, var(--accent) 78%, var(--paper))}
+.pet-heat i.h4{background:var(--accent)}
+.pet-heat i.hf{background:transparent;box-shadow:inset 0 0 0 1px var(--rule)}
+.pw-go{width:100%}
+.pr-side{display:grid;gap:12px;min-width:0}
+.pr-name h3,.pr-name p{margin:0}
+.pr-row{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:10px;align-items:center;font-weight:600}
+.pr-meter{display:grid;gap:4px}
+.pr-meter p{margin:0}
+.pet-opt.add{border-style:dashed;color:var(--accent)}
+.pet-plus{width:56px;height:56px;display:grid;place-items:center;font-size:28px;font-weight:300}
+.pr-plus{border:1.5px solid var(--accent);border-radius:12px;padding:12px 14px;display:grid;gap:6px}
+.pr-plus h3,.pr-plus p{margin:0}
+.pr-plus .chip{justify-self:start}
+.pr-plus ul{margin:0;padding-left:18px;display:grid;gap:3px;color:var(--ink-2)}
+.pr-plus li.on{color:var(--ink)}
+@media (max-width:760px){ .pet-room2{grid-template-columns:minmax(0,1fr)} }
+@media (max-width:420px){ .pw-top{grid-template-columns:minmax(0,1fr)} }
 /* study pet */
 .pet-card,.pet-invite{display:grid;grid-template-columns:200px minmax(0,1fr);gap:18px;align-items:center}
 .pet-invite{grid-template-columns:110px minmax(0,1fr)}
@@ -2083,8 +2131,9 @@ function tmTick(){
       const b = curBlock(); if (b) (D.done[TODAY] = D.done[TODAY] || {})[b.id] = true;
       TM.phase = 'break'; TM.lenMs = TM.brk * 60e3; TM.endsAt = Date.now() + TM.lenMs; save(); toast(b ? `“${b.t}” done. Take your break.` : 'Focus done. Take your break.');
     } else { TM.phase = 'idle'; TM.block = null; TM.blockMin = 0; toast('Break’s over.'); }
-    if (D.view === 'today') render(); return;
+    if (D.view === 'today') render(); if (FS.open) fsDraw(); return;
   }
+  if (FS.open) fsTick();
   if (D.view !== 'today' || !$('#tmT')) return;
   $('#tmT').textContent = tmText(); $('#tmRing').style.strokeDashoffset = CIRC * (1 - tmFrac());
   if (TM.mode === 'laps' && TM.phase === 'run') $('#tmRing').style.stroke = Date.now() - TM.lapAt > lapTarget() ? 'var(--bad)' : 'var(--accent)';
@@ -2262,10 +2311,10 @@ V.today = () => {
         <p class="small ${tl.over > 0 ? 'bad' : 'muted'}">${fmtH(tl.need)} of blocks left${tl.over > 0 ? ` · ${fmtH(tl.over)} more than you have` : ''}</p>
       </section>
       <section class="card">
-        <div class="card-head"><h3>Timer</h3>${!running ? `<div class="seg" id="tmMode"><button data-v="focus" aria-pressed="${TM.mode === 'focus'}">Focus</button><button data-v="laps" aria-pressed="${TM.mode === 'laps'}">Passage laps</button></div>` : ''}</div>
+        <div class="card-head"><h3>Timer <button class="btn btn-sm tm-full" id="tmFull" type="button" title="Full screen">Full screen</button></h3>${!running ? `<div class="seg" id="tmMode"><button data-v="focus" aria-pressed="${TM.mode === 'focus'}">Focus</button><button data-v="laps" aria-pressed="${TM.mode === 'laps'}">Passage laps</button></div>` : ''}</div>
         <div class="timer">
-          <div class="ring"><svg viewBox="0 0 120 120" aria-hidden="true"><circle cx="60" cy="60" r="54" fill="none" stroke="var(--rule)" stroke-width="4"/><circle id="tmRing" cx="60" cy="60" r="54" fill="none" stroke="${TM.phase === 'break' ? 'var(--ok)' : 'var(--accent)'}" stroke-width="4" stroke-linecap="round" stroke-dasharray="${CIRC}" stroke-dashoffset="${CIRC * (1 - tmFrac())}"/></svg>
-            <div class="in"><span class="p">${TM.mode === 'laps' ? (running ? `Passage ${TM.laps.length + 1}` : 'Passage laps') : TM.phase === 'break' ? 'Break' : TM.paused ? 'Paused' : running ? 'Focus' : 'Ready'}</span><span class="t" id="tmT" role="timer">${tmText()}</span><span class="p sm">${TM.mode === 'laps' ? `target ${lapTarget() / 60e3}:00 a passage` : TM.blockMin ? `${TM.blockMin} min block` : esc(PRESETS[TM.preset].label)}</span></div></div>
+          <div class="tm-row"><div class="ring"><svg viewBox="0 0 120 120" aria-hidden="true"><circle cx="60" cy="60" r="54" fill="none" stroke="var(--rule)" stroke-width="4"/><circle id="tmRing" cx="60" cy="60" r="54" fill="none" stroke="${TM.phase === 'break' ? 'var(--ok)' : 'var(--accent)'}" stroke-width="4" stroke-linecap="round" stroke-dasharray="${CIRC}" stroke-dashoffset="${CIRC * (1 - tmFrac())}"/></svg>
+            <div class="in"><span class="p">${TM.mode === 'laps' ? (running ? `Passage ${TM.laps.length + 1}` : 'Passage laps') : TM.phase === 'break' ? 'Break' : TM.paused ? 'Paused' : running ? 'Focus' : 'Ready'}</span><span class="t" id="tmT" role="timer">${tmText()}</span><span class="p sm">${TM.mode === 'laps' ? `target ${lapTarget() / 60e3}:00 a passage` : TM.blockMin ? `${TM.blockMin} min block` : esc(PRESETS[TM.preset].label)}</span></div></div>${petBesideTimer()}</div>
           <div class="what">${cb ? `${secTag(cb.sec)} ${esc(cb.t)} ${openLink(blockLink(cb), 'linkish small')}` : '<span class="muted">Press ▶ on a block, or just start</span>'}</div>
           ${TM.mode === 'focus' ? `
             ${running || TM.blockMin ? '' : `<div class="seg" id="tmPreset">${Object.entries(PRESETS).map(([id, p]) => `<button data-v="${id}" aria-pressed="${TM.preset === id}">${p.label}</button>`).join('')}</div>`}
@@ -2275,7 +2324,6 @@ V.today = () => {
             ${!running && TM.laps.length ? `<button class="btn" id="lapLog">Log ${TM.laps.length} passage${TM.laps.length > 1 ? 's' : ''} · ${Math.round(sum(TM.laps) / 60e3)} min</button>` : ''}`}
         </div>
       </section>` : ''}
-      ${isT ? petToday() : ''}
       <section class="card">
         <h3>${isT ? 'Up next' : 'Blocks'}</h3>
         <div class="upnext" id="upnext">${(isT ? upNext : blocks.filter(b => b.kind !== 'rest')).map(b => `<div class="un-row" style="--c:${b.sec ? `var(${SECS[b.sec]})` : 'var(--rule-2)'}"><span class="tm">${b.s || ''}</span><span class="sw"></span><span class="nm">${esc(b.t)}<small>${b.mins ? fmtH(b.mins) : ''}</small></span>
@@ -2425,6 +2473,7 @@ V.today.bind = () => {
   if (q('tmMode')) q('tmMode').onclick = e => { const b = e.target.closest('button'); if (!b) return; TM.mode = b.dataset.v; render(); };
   if (q('tmPreset')) q('tmPreset').onclick = e => { const b = e.target.closest('button'); if (b) { TM.preset = b.dataset.v; render(); } };
   if (q('tmClear')) q('tmClear').onclick = () => { TM.block = null; TM.blockMin = 0; render(); };
+  if (q('tmFull')) q('tmFull').onclick = fsOpen;
   if (q('tmStart')) q('tmStart').onclick = () => gateThen(() => { TM.phase = 'focus'; TM.paused = false; TM.lenMs = focusMin() * 60e3; TM.endsAt = Date.now() + TM.lenMs; TM.startedAt = Date.now(); TM.brk = curBlock() ? (focusMin() >= 90 ? 15 : 10) : PRESETS[TM.preset].b; render(); });
   if (q('tmPause')) q('tmPause').onclick = () => { if (TM.paused) { TM.endsAt = Date.now() + TM.rem; TM.paused = false; TM.startedAt = Date.now(); } else { TM.rem = TM.endsAt - Date.now(); TM.paused = true; if (TM.phase === 'focus') { logSession(TM.startedAt, Date.now()); save(); } } render(); };
   if (q('tmStop')) q('tmStop').onclick = () => { if (TM.phase === 'focus' && !TM.paused) { logSession(TM.startedAt, Date.now()); save(); } TM.phase = 'idle'; TM.paused = false; render(); };
@@ -3846,6 +3895,39 @@ V.welcome.bind = () => {
 
 /* ---------- render ---------- */
 /* =========================================================
+   Full-screen focus: big timer (and the pet, if on) over the whole page. Buttons drive the Today timer's own buttons.
+   ========================================================= */
+const FS = { open: false };
+function fsOpen(){
+  FS.open = true; let o = $('#fsBack');
+  if (!o) { o = document.createElement('div'); o.id = 'fsBack'; o.className = 'fs-back'; o.setAttribute('role', 'dialog'); o.setAttribute('aria-label', 'Full-screen timer'); document.body.appendChild(o); }
+  fsDraw(); document.body.style.overflow = 'hidden';
+  try { const el = document.documentElement, r = el.requestFullscreen || el.webkitRequestFullscreen; if (r) { const pr = r.call(el); if (pr && pr.catch) pr.catch(() => {}); } } catch (e) { /* the window-sized view still works */ }
+}
+function fsClose(){
+  FS.open = false; const o = $('#fsBack'); if (o) o.remove(); document.body.style.overflow = '';
+  try { if (document.fullscreenElement && document.exitFullscreen) document.exitFullscreen().catch(() => {}); } catch (e) { /* not in full screen */ }
+  if (D.view === 'today') render();
+}
+function fsDraw(){
+  const o = $('#fsBack'); if (!o) return;
+  const running = TM.phase !== 'idle', cb = curBlock(), p = P(), withPet = p.on && p.active && !(p.hideFocus && petState() === 'focus');
+  const ph = TM.mode === 'laps' ? 'Passage laps' : TM.phase === 'break' ? 'Break' : TM.paused ? 'Paused' : running ? 'Focus' : 'Ready';
+  o.innerHTML = `<div class="fs-in">
+    <div class="fs-main ${withPet ? 'with-pet' : ''}">
+      <div class="ring fs-ring"><svg viewBox="0 0 120 120" aria-hidden="true"><circle cx="60" cy="60" r="54" fill="none" stroke="var(--rule)" stroke-width="3"/><circle id="fsRing" cx="60" cy="60" r="54" fill="none" stroke="${TM.phase === 'break' ? 'var(--ok)' : 'var(--accent)'}" stroke-width="3" stroke-linecap="round" stroke-dasharray="${CIRC}" stroke-dashoffset="${CIRC * (1 - tmFrac())}"/></svg>
+        <div class="in"><span class="p">${ph}</span><span class="t" id="fsT" role="timer">${tmText()}</span></div></div>
+      ${withPet ? `<div class="fs-pet"><div class="pet-art">${petSvg(p.active, { state: petState(), island: true })}</div><span>${esc(PET_TITLE[petState()](petInfo(p.active).name))}</span></div>` : ''}
+    </div>
+    <div class="fs-what">${cb ? `${secTag(cb.sec)} ${esc(cb.t)}` : 'Focus'}</div>
+    <div class="btns">${TM.mode !== 'focus' ? '' : !running ? '<button class="btn btn-primary" data-fs="tmStart">Start focus</button>' : `<button class="btn btn-primary" data-fs="tmPause">${TM.paused ? 'Resume' : 'Pause'}</button><button class="btn" data-fs="tmStop">Stop</button>`}<button class="btn" data-fs="exit">Exit full screen</button></div>
+  </div>`;
+  o.onclick = e => { const b = e.target.closest('[data-fs]'); if (!b) return; if (b.dataset.fs === 'exit') return fsClose(); const t = $('#' + b.dataset.fs); if (t) t.click(); setTimeout(fsDraw, 60); };
+}
+function fsTick(){ const t = $('#fsT'), r = $('#fsRing'); if (t) t.textContent = tmText(); if (r) r.style.strokeDashoffset = CIRC * (1 - tmFrac()); }
+document.addEventListener('keydown', e => { if (FS.open && e.key === 'Escape' && !document.fullscreenElement) fsClose(); });
+
+/* =========================================================
    Study pet (optional, off until the student turns it on). Art: pets/morae-pets.js (window.MoraePets).
    A study day = a day with logged study (timer sessions or + Actual). Pets grow by study days while active:
    young at 7, grown at 30. Every 7 study days since pets were turned on, one new pet can be chosen from
@@ -3853,12 +3935,46 @@ V.welcome.bind = () => {
    Cold: 3+ days without study since the last study day, not counting the plan's rest days.
    ========================================================= */
 const PET_STAGE = [0, 7, 30], PET_UNLOCK = [0, 30, 60, 100];
+const PLUS_BETA = true; // Morae Plus is free for everyone during the beta
+function petPlusMonths(){ const since = P().since; if (!PLUS_BETA || !since) return 0; const [y1, m1] = since.split('-').map(Number), [y2, m2] = TODAY.split('-').map(Number); return Math.max(0, (y2 - y1) * 12 + (m2 - m1)) + 1; }
 const PET_STATE_LINE = {
   idle: n => `${n} is here when you’re ready.`, focus: n => `${n} is focusing with you.`, rest: n => `${n} is taking a break too.`,
   happy: n => `Nice session. ${n} is happy.`, celebrate: n => `${n} is celebrating!`, cold: n => `${n} is a little cold. One session warms it up.`,
 };
 const PET_EVERYDAY = ['beanie', 'sunhat', 'crown', 'flowers', 'headphones', 'glasses', 'sunglasses', 'starshades', 'scarf', 'collar', 'bowtie', 'cape', 'lights'];
 let petFlashState = null;
+const PET_TITLE = { idle: n => `${n} is here`, focus: n => `Focusing with ${n}`, rest: n => `${n} is resting`, happy: n => `${n} is happy`, celebrate: n => `${n} is celebrating`, cold: () => 'A little chilly' };
+const fmtHM = h => { const m = Math.round(h * 60); return m >= 60 ? `${Math.floor(m / 60)} h ${m % 60} m` : `${m} m`; };
+function petHeat(weeks){
+  const start = addDays(TODAY, -wdOf(TODAY) - (weeks - 1) * 7); let cells = '';
+  for (let w = 0; w < weeks; w++) for (let d = 0; d < 7; d++) { const k = addDays(start, w * 7 + d), h = hoursOn(k);
+    const lv = k > TODAY ? 'f' : !h ? 0 : h < 1 ? 1 : h < 2.5 ? 2 : h < 4 ? 3 : 4;
+    cells += `<i class="h${lv}" style="grid-column:${w + 1};grid-row:${d + 1}" title="${fmtLong(k)}${h ? ' · ' + fmtHM(h) : ''}"></i>`; }
+  return `<div class="pet-heat" style="grid-template-columns:repeat(${weeks},1fr)" role="img" aria-label="Study days in the last ${weeks} weeks">${cells}</div>`;
+}
+function petNextBlock(){ const b = planDay(TODAY).find(x => !isDone(TODAY, x) && x.kind !== 'rest' && x.kind !== 'fixed' && x.s && (!x.e || toMin(x.e) > nowMin())); return b ? `${b.t}, ${b.s}` : 'Nothing else planned today'; }
+function petWidget(id){
+  const p = P(), info = petInfo(id), s = id === p.active ? petState() : 'idle', h = new Date().getHours(), night = h >= 19 || h < 6;
+  const bl = planDay(TODAY).filter(b => b.kind !== 'rest' && b.kind !== 'fixed' && b.kind !== 'blank'), doneN = bl.filter(b => isDone(TODAY, b)).length;
+  const pk = petPicks(), ph = plannedH(TODAY), hrs = hoursOn(TODAY);
+  return `<div class="pet-widget">
+    <div class="pw-top"><div class="pw-art ${night ? 'night' : ''}">${petSvg(id, { state: s, island: true })}</div>
+      <div class="pw-txt"><b class="pw-title">${esc(PET_TITLE[s](info.name))}</b>
+        <span class="small">Focus today · <b>${fmtHM(hrs)}</b></span>
+        <span class="tbar"><span style="width:${ph ? Math.min(100, hrs / ph * 100) : 0}%"></span></span>
+        <span class="small muted">${doneN} of ${bl.length} plan blocks</span>
+        <span class="small">Next · ${esc(petNextBlock())}</span></div></div>
+    ${petHeat(15)}
+    <span class="small muted">${pk.n} study day${pk.n === 1 ? '' : 's'} with pets · ${pk.can ? 'a new pet is ready to choose' : pk.pool.length ? `next new pet in ${pk.nextIn} study day${pk.nextIn === 1 ? '' : 's'}` : 'every pet so far is yours'}</span>
+    <button class="btn btn-primary pw-go" data-pet="focus">Start focus</button>
+  </div>`;
+}
+function petBesideTimer(){
+  const p = P(); if (!p.on || !p.active) return '';
+  const s = petState(); if (p.hideFocus && s === 'focus') return '';
+  petNeedLib();
+  return `<button type="button" class="tm-pet" data-pet="room" title="Open the pet room" aria-label="${esc(PET_STATE_LINE[s](petInfo(p.active).name))} Open the pet room"><span class="pet-art">${petSvg(p.active, { state: s, island: true })}</span><span class="small">${esc(PET_TITLE[s](petInfo(p.active).name))}</span></button>`;
+}
 function P(){
   if (!D.pet || typeof D.pet !== 'object') D.pet = {};
   const p = D.pet;
@@ -3881,7 +3997,7 @@ const petStage = days => days >= PET_STAGE[2] ? 3 : days >= PET_STAGE[1] ? 2 : 1
 const PET_STAGE_NAME = ['', 'First home', 'Young', 'Grown'];
 function petUnlocked(n){ return window.MoraePets ? window.MoraePets.pets.filter(x => !x.rare && x.unlockDays != null && x.unlockDays <= n) : []; }
 function petPicks(){
-  const p = P(), n = petStudyDays().length, earned = Math.floor(n / 7), used = Math.max(0, p.owned.length - 1);
+  const p = P(), n = petStudyDays().length, earned = Math.floor(n / 7) + petPlusMonths(), used = Math.max(0, p.owned.length - 1);
   const pool = petUnlocked(n).filter(x => !p.owned.includes(x.id));
   return { n, earned, used, can: !!p.owned.length && earned > used && pool.length > 0, pool, nextIn: 7 - (n % 7) };
 }
@@ -3947,13 +4063,6 @@ function petDash(){
     </div>
   </section>`;
 }
-function petToday(){
-  const p = P(); if (!p.on || !p.active) return '';
-  const s = petState(); if (p.hideFocus && s === 'focus') return '';
-  petNeedLib();
-  const info = petInfo(p.active);
-  return `<section class="card pet-mini"><div class="pet-art xs">${petSvg(p.active, { state: s, island: true })}</div><p class="small">${esc(PET_STATE_LINE[s](info.name))}</p><button class="btn btn-sm" data-pet="room" aria-label="Open the pet room">Pet room</button></section>`;
-}
 function petSettingsCard(){
   const p = P();
   return `<section class="card s6">
@@ -3975,7 +4084,7 @@ async function petPicker(){
   const pool = first ? petUnlocked(0) : pk.pool;
   if (!first && !pk.can) return toast(`Your next new pet comes in ${pk.nextIn} study day${pk.nextIn === 1 ? '' : 's'}`);
   openModal(`<div class="modal-head"><h2>${first ? 'Choose your study pet' : 'Choose a new pet'}</h2><button class="x" data-close aria-label="Close">×</button></div>
-    <p class="lead">${first ? 'Pick the one you like. More pets unlock as you study: a new choice every 7 study days.' : `You’ve studied ${pk.n} days. Pick one more; your other pets stay with you.`}</p>
+    <p class="lead">${first ? 'Pick the one you like. More pets unlock as you study: a new choice every 7 study days, plus one a month with Morae Plus (free during the beta).' : `You’ve studied ${pk.n} days. Pick one more; your other pets stay with you.`}</p>
     <div class="pet-pick">${pool.map(x => `<button class="pet-opt" data-choose="${esc(x.id)}"><span class="pet-art icon">${petSvg(x.id, { stage: 3, frame: 'icon', animate: false, noItems: true })}</span><b>${esc(x.name)}</b><span class="small muted">${esc(x.species)}</span><span class="small">${esc((x.words || []).join(' · '))}</span></button>`).join('')}</div>
     <div class="modal-foot">${first ? '<button class="btn" id="petRand">Surprise me</button>' : ''}<button class="btn" data-close>Not now</button></div>`, m => {
     const choose = id => { const q = P(); if (!q.owned.includes(id)) q.owned.push(id); q.on = true; q.dismissed = false; if (!q.since) q.since = TODAY;
@@ -3987,32 +4096,41 @@ async function petPicker(){
 async function petRoom(){
   const MP = await petLib(); if (!MP) return toast('The pets couldn’t load. Check your connection and try again.');
   const draw = () => {
-    const p = P(), id = p.active, info = petInfo(id), days = petDaysWith(id), st = petStage(days), worn = p.items[id] || [];
+    const p = P(), id = p.active, info = petInfo(id), days = petDaysWith(id), st = petStage(days), worn = p.items[id] || [], pk = petPicks();
     const itemById = x => MP.items.find(i => i.id === x) || { id: x, name: x, anchor: 'head' };
+    const next = st < 3 ? PET_STAGE[st] : PET_STAGE[2], from = st < 3 ? PET_STAGE[st - 1] : 0;
+    const cols = Array.isArray(MP.colours) ? MP.colours : Object.keys(MP.colours);
     return `<div class="modal-head"><h2>Pet room</h2><button class="x" data-close aria-label="Close">×</button></div>
-    <div class="pet-room">
-      <div class="pet-art">${petSvg(id, { state: 'happy', island: true })}</div>
-      <div class="pet-txt"><h3>${esc(info.name)} <span class="muted small">· ${esc(info.species)}</span></h3>
-        <p class="small muted">${esc((info.words || []).join(' · '))}</p>
-        <p class="small">${PET_STAGE_NAME[st]} · ${days} study day${days === 1 ? '' : 's'} together</p></div>
+    <div class="pet-room2">
+      ${petWidget(id)}
+      <div class="pr-side">
+        <div class="pr-name"><h3>${esc(info.name)} <span class="muted small">· ${esc(info.species)}</span></h3><p class="small muted">${esc((info.words || []).join(' · '))}</p></div>
+        <div class="pr-meter"><div class="pr-row"><span>Growth</span><span class="tbar"><span style="width:${st >= 3 ? 100 : Math.round((days - from) / (next - from) * 100)}%"></span></span><span class="mono small">${st >= 3 ? 'grown' : `${days}/${next}`}</span></div>
+          <p class="small muted">${PET_STAGE_NAME[st]}${st < 3 ? ` · ${next - days} more study day${next - days === 1 ? '' : 's'} together until ${PET_STAGE_NAME[st + 1].toLowerCase()}` : ` · ${days} study days together`}</p></div>
+        <div class="msec"><h3>Your pets <small class="muted">${p.owned.length}${pk.can ? ' · a new one is ready' : ''}</small></h3><div class="pet-owned">${p.owned.map(x => `<button class="pet-opt sm" data-act="${esc(x)}" aria-pressed="${x === id}"><span class="pet-art icon">${petSvg(x, { frame: 'icon', animate: false })}</span><span class="small">${esc(petInfo(x).name)}</span></button>`).join('')}${pk.can ? '<button class="pet-opt sm add" data-pet="pick"><span class="pet-plus">+</span><span class="small">Choose</span></button>' : ''}</div></div>
+        <div class="msec"><h3>Wardrobe <small class="muted">one per spot</small></h3><div class="chips">${PET_EVERYDAY.map(x => `<button class="tog" data-item="${x}" aria-pressed="${worn.includes(x)}">${esc(itemById(x).name)}</button>`).join('')}</div></div>
+        <div class="msec"><h3>Colour</h3>${st >= 3 ? `<div class="chips">${cols.map(c => `<button class="tog" data-col="${esc(c)}" aria-pressed="${(p.colour[id] || info.defaultColour) === c}">${esc(c[0].toUpperCase() + c.slice(1))}</button>`).join('')}</div>` : `<p class="small muted">Recolouring unlocks when ${esc(info.name)} is grown (${PET_STAGE[2] - days} more study days together).</p>`}</div>
+        <div class="pr-plus"><span class="chip pill-ok">Free during the beta</span><h3>Morae Plus</h3><p class="small">More style and choice, never more luck.</p>
+          <ul class="small"><li class="on">One extra pet choice every month <b>· on now</b></li><li>Pixel and isometric styles for every pet you own <span class="muted">· coming with the next art batch</span></li><li>New pets and event outfits two weeks early <span class="muted">· coming</span></li><li>A thank-you mark on Mora’s hourglass <span class="muted">· coming</span></li></ul>
+          <p class="small muted">After the beta: 1 month $1.99 · 3 months $3.99 · 6 months $5.99 · lifetime $9.99. Passes never renew on their own. Every pet, item and island stays free in the geometric style.</p></div>
+      </div>
     </div>
-    ${p.owned.length > 1 ? `<div class="msec"><h3>Your pets</h3><div class="pet-owned">${p.owned.map(x => `<button class="pet-opt sm" data-act="${esc(x)}" aria-pressed="${x === id}"><span class="pet-art icon">${petSvg(x, { frame: 'icon', animate: false })}</span><span class="small">${esc(petInfo(x).name)}</span></button>`).join('')}</div></div>` : ''}
-    <div class="msec"><h3>Wardrobe <small class="muted">one per spot: head, face, neck, back</small></h3><div class="chips">${PET_EVERYDAY.map(x => `<button class="tog" data-item="${x}" aria-pressed="${worn.includes(x)}">${esc(itemById(x).name)}</button>`).join('')}</div></div>
-    <div class="msec"><h3>Colour</h3>${st >= 3 ? `<div class="chips">${(Array.isArray(MP.colours) ? MP.colours : Object.keys(MP.colours)).map(c => `<button class="tog" data-col="${esc(c)}" aria-pressed="${(p.colour[id] || info.defaultColour) === c}">${esc(c[0].toUpperCase() + c.slice(1))}</button>`).join('')}</div>` : `<p class="small muted">Recolouring unlocks when ${esc(info.name)} is grown (${PET_STAGE[2] - days} more study days together).</p>`}</div>
     <div class="modal-foot"><button class="btn" data-close>Done</button></div>`;
   };
   const bind = m => {
     m.onclick = e => {
       const p = P(), id = p.active;
+      if (e.target.closest('[data-pet]')) return;
       const a = e.target.closest('[data-act]'); if (a && a.dataset.act !== id) { p.active = a.dataset.act; p.log.push([TODAY, p.active]); save(); m.innerHTML = draw(); return; }
-      const it = e.target.closest('[data-item]'); if (it) { const MP2 = window.MoraePets, anchor = (MP2.items.find(i => i.id === it.dataset.item) || {}).anchor;
+      const it = e.target.closest('[data-item]'); if (it) { const anchor = itemAnchor(it.dataset.item);
         let worn = (p.items[id] || []).slice(); if (worn.includes(it.dataset.item)) worn = worn.filter(x => x !== it.dataset.item);
-        else { worn = worn.filter(x => (MP2.items.find(i => i.id === x) || {}).anchor !== anchor); worn.push(it.dataset.item); }
+        else { worn = worn.filter(x => itemAnchor(x) !== anchor); worn.push(it.dataset.item); }
         p.items[id] = worn; save(); m.innerHTML = draw(); return; }
       const c = e.target.closest('[data-col]'); if (c) { p.colour[id] = c.dataset.col; save(); m.innerHTML = draw(); return; }
       if (e.target.closest('[data-close]')) { closeModal(); render(); }
     };
   };
+  const itemAnchor = x => (MP.items.find(i => i.id === x) || {}).anchor;
   openModal(draw(), bind, true);
 }
 document.addEventListener('click', e => {
@@ -4020,6 +4138,7 @@ document.addEventListener('click', e => {
   const a = b.dataset.pet;
   if (a === 'pick') petPicker();
   else if (a === 'room') petRoom();
+  else if (a === 'focus') { closeModal(); go('today'); setTimeout(() => { const t = $('#tmStart'); if (t) t.click(); }, 60); }
   else if (a === 'dismiss') { P().dismissed = true; save(); render(); toast('No pet. You can turn one on later in Settings → App.'); }
 });
 
@@ -4032,6 +4151,7 @@ function render(){
   $('#page').querySelectorAll('[data-go]').forEach(b => b.addEventListener('click', () => go(b.dataset.go)));
   if (V[v].bind) V[v].bind();
   if (Cloud.on) paintCloud();
+  if (FS.open) fsDraw();
 }
 cloudInit(); if (FRESH) { D = freshData(); save(); }
 applyTheme(); renderHead(); renderIndex(); render(); reportsSync();
