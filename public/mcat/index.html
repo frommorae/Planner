@@ -303,6 +303,28 @@ textarea.out{font:13px/1.5 var(--f-mono);min-height:180px}
 .chk{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:10px;align-items:center;padding:8px 10px;border-radius:9px;background:var(--paper)}
 .medal{display:inline-grid;place-items:center;width:16px;height:16px;border-radius:50%;font:700 9px var(--f-mono);color:#3a2a10}
 .medal.g{background:#E8B931}.medal.s{background:#C7CDD4}.medal.b{background:#C98B5A}
+
+/* study pet */
+.pet-card,.pet-invite{display:grid;grid-template-columns:200px minmax(0,1fr);gap:18px;align-items:center}
+.pet-invite{grid-template-columns:110px minmax(0,1fr)}
+.pet-art{max-width:100%;aspect-ratio:1;display:block}
+.pet-art svg{width:100%;height:auto;display:block}
+.pet-art.icon{width:72px;height:72px}
+.pet-txt{display:grid;gap:8px;min-width:0}
+.pet-txt h3{margin:0}
+.pet-txt p{margin:0}
+.pet-facts{display:flex;flex-wrap:wrap;gap:4px 16px;color:var(--ink-2)}
+.pet-wait{width:100%;aspect-ratio:1;border-radius:50%;background:var(--paper)}
+.pet-mini{grid-template-columns:96px minmax(0,1fr) auto;display:grid;align-items:center;gap:12px}
+.pet-mini p{margin:0}
+.pet-pick{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px}
+.pet-opt{display:grid;justify-items:center;gap:4px;text-align:center;padding:12px 8px;border:1px solid var(--rule);border-radius:12px;background:var(--sheet);color:var(--ink);font:inherit;cursor:pointer}
+.pet-opt:hover,.pet-opt[aria-pressed="true"]{border-color:var(--accent)}
+.pet-opt[aria-pressed="true"]{box-shadow:0 0 0 2px var(--accent-soft)}
+.pet-opt.sm .pet-art.icon{width:56px;height:56px}
+.pet-owned{display:flex;flex-wrap:wrap;gap:8px}
+.pet-room{display:grid;grid-template-columns:180px minmax(0,1fr);gap:16px;align-items:center}
+@media (max-width:620px){ .pet-card,.pet-room{grid-template-columns:minmax(0,1fr);justify-items:center;text-align:center} .pet-card .pet-art,.pet-room .pet-art{width:min(220px,70vw)} .pet-facts,.pet-card .btns{justify-content:center!important} .pet-invite{grid-template-columns:80px minmax(0,1fr)} }
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 
 /* Ink palette (same as Morae Planner) */
@@ -1990,6 +2012,7 @@ V.dash = () => {
       </div>
       ${phaseBar()}
     </section>
+    ${petDash()}
     <section class="card s12">
       <div class="stats" style="grid-template-columns:repeat(auto-fit,minmax(140px,1fr))">
         <div class="stat"><span class="v">${hoursOn(TODAY)}<small> h</small></span><span class="l">Today · ${plannedH(TODAY).toFixed(1)} h planned</span></div>
@@ -2051,6 +2074,7 @@ function logSession(fromMs, toMs){
   const base = parse(TODAY).getTime(), b = curBlock(), sm = Math.round((fromMs - base) / 6e4), em = Math.max(sm + 1, Math.round((toMs - base) / 6e4));
   (D.sess[TODAY] = D.sess[TODAY] || []).push({ s: hm(sm), e: hm(Math.min(28 * 60, em)), t: b ? b.t : 'Focus', sec: b ? b.sec || '' : '', block: b ? b.id : '' });
   D.hours[TODAY] = +(hoursOn(TODAY) + (toMs - fromMs) / 36e5).toFixed(2);
+  petAfterSession();
 }
 function tmTick(){
   if (TM.mode === 'focus' && TM.phase !== 'idle' && !TM.paused && Date.now() >= TM.endsAt) {
@@ -2251,6 +2275,7 @@ V.today = () => {
             ${!running && TM.laps.length ? `<button class="btn" id="lapLog">Log ${TM.laps.length} passage${TM.laps.length > 1 ? 's' : ''} · ${Math.round(sum(TM.laps) / 60e3)} min</button>` : ''}`}
         </div>
       </section>` : ''}
+      ${isT ? petToday() : ''}
       <section class="card">
         <h3>${isT ? 'Up next' : 'Blocks'}</h3>
         <div class="upnext" id="upnext">${(isT ? upNext : blocks.filter(b => b.kind !== 'rest')).map(b => `<div class="un-row" style="--c:${b.sec ? `var(${SECS[b.sec]})` : 'var(--rule-2)'}"><span class="tm">${b.s || ''}</span><span class="sw"></span><span class="nm">${esc(b.t)}<small>${b.mins ? fmtH(b.mins) : ''}</small></span>
@@ -2928,7 +2953,7 @@ function flEditor(id, pre = {}){
       if (Object.values(vals).some(v => v == null)) return toast('Enter all four sections');
       if (mode === 'raw') { f.raw = vals; f.est = true; Object.keys(SECS).forEach(s => f[SEC_KEYS[s]] = scaled(s, vals[SEC_KEYS[s]])); }
       else { if (Object.values(vals).some(v => v < 118 || v > 132)) return toast('Scaled scores run from 118 to 132'); f.raw = null; f.est = false; Object.assign(f, vals); }
-      if (old) Object.assign(old, f); else D.fls.push(f);
+      if (old) Object.assign(old, f); else { D.fls.push(f); if (P().on && P().active) petFlash('celebrate', 10000); }
       save(); closeModal(); render(); toast('Saved');
     };
   }, true);
@@ -3238,6 +3263,7 @@ V.settings = () => {
        ['Plan', `${esc(tName)}${S.finalized ? ` · finalized ${fmtDay(S.finalized)}` : ''}`, 5]].map(([h, txt, i]) => `<section class="card s6 su-card"><div class="card-head"><h3>${h}</h3><button class="linkish small" data-su="${i}">Edit</button></div><p class="small">${txt}</p></section>`).join('')}
     <section class="card s6 su-card"><div class="card-head"><h3>Preview</h3><button class="linkish small" data-su="6">Open</button></div><p class="small">Hours per week, full lengths, and what each resource gets.</p></section>`;
   const appTab = `${accountCard()}
+    ${petSettingsCard()}
     <section class="card s6">
       <h3>Appearance</h3>
       <div class="srow"><span>Colours</span><div class="seg" id="aPal"><button data-v="sahara" aria-pressed="${a.palette === 'sahara'}">Sahara</button><button data-v="ink" aria-pressed="${a.palette === 'ink'}">Ink</button></div></div>
@@ -3269,6 +3295,7 @@ V.settings.bind = () => {
   if (setTab === 'plan') {
     document.querySelectorAll('[data-su]').forEach(b => b.onclick = () => openSetup(+b.dataset.su));
   } else {
+    petBindSettings();
     $('#aPal').onclick = e => { const b = e.target.closest('button'); if (b) { a.palette = b.dataset.v; save(); applyTheme(); render(); } };
     $('#aMode').onclick = e => { const b = e.target.closest('button'); if (b) { a.mode = b.dataset.v; save(); applyTheme(); render(); } };
     $('#aSec').onclick = e => { const b = e.target.closest('button'); if (b) { a.secColors = b.dataset.v === '1'; save(); applyTheme(); render(); } };
@@ -3818,6 +3845,184 @@ V.welcome.bind = () => {
 };
 
 /* ---------- render ---------- */
+/* =========================================================
+   Study pet (optional, off until the student turns it on). Art: pets/morae-pets.js (window.MoraePets).
+   A study day = a day with logged study (timer sessions or + Actual). Pets grow by study days while active:
+   young at 7, grown at 30. Every 7 study days since pets were turned on, one new pet can be chosen from
+   those unlocked (13 starters, +6 at 30, 60 and 100 study days). Rare pets are not in release 1.
+   Cold: 3+ days without study since the last study day, not counting the plan's rest days.
+   ========================================================= */
+const PET_STAGE = [0, 7, 30], PET_UNLOCK = [0, 30, 60, 100];
+const PET_STATE_LINE = {
+  idle: n => `${n} is here when you’re ready.`, focus: n => `${n} is focusing with you.`, rest: n => `${n} is taking a break too.`,
+  happy: n => `Nice session. ${n} is happy.`, celebrate: n => `${n} is celebrating!`, cold: n => `${n} is a little cold. One session warms it up.`,
+};
+const PET_EVERYDAY = ['beanie', 'sunhat', 'crown', 'flowers', 'headphones', 'glasses', 'sunglasses', 'starshades', 'scarf', 'collar', 'bowtie', 'cape', 'lights'];
+let petFlashState = null;
+function P(){
+  if (!D.pet || typeof D.pet !== 'object') D.pet = {};
+  const p = D.pet;
+  if (!Array.isArray(p.owned)) p.owned = [];
+  if (!Array.isArray(p.log)) p.log = [];
+  ['items', 'colour', 'seen'].forEach(k => { if (!p[k] || typeof p[k] !== 'object') p[k] = {}; });
+  return p;
+}
+function petLib(){
+  if (window.MoraePets) return Promise.resolve(window.MoraePets);
+  if (!petLib.p) petLib.p = new Promise((ok, no) => { const s = document.createElement('script'); s.src = 'pets/morae-pets.js'; s.onload = () => window.MoraePets ? ok(window.MoraePets) : no(); s.onerror = no; document.head.appendChild(s); })
+    .catch(() => { petLib.p = null; petLib.failed = true; return null; });
+  return petLib.p;
+}
+const petInfo = id => (window.MoraePets && window.MoraePets.pets.find(x => x.id === id)) || { id, name: id, species: '', words: [], island: 'meadow', unlockDays: 0 };
+function petStudyDays(){ const since = P().since || TODAY; return Object.keys(D.hours).filter(k => k >= since && k <= TODAY && hoursOn(k) > 0).sort(); }
+function petActiveOn(k){ let id = ''; for (const [d, x] of P().log) if (d <= k) id = x; return id; }
+function petDaysWith(id){ return petStudyDays().filter(k => petActiveOn(k) === id).length; }
+const petStage = days => days >= PET_STAGE[2] ? 3 : days >= PET_STAGE[1] ? 2 : 1;
+const PET_STAGE_NAME = ['', 'First home', 'Young', 'Grown'];
+function petUnlocked(n){ return window.MoraePets ? window.MoraePets.pets.filter(x => !x.rare && x.unlockDays != null && x.unlockDays <= n) : []; }
+function petPicks(){
+  const p = P(), n = petStudyDays().length, earned = Math.floor(n / 7), used = Math.max(0, p.owned.length - 1);
+  const pool = petUnlocked(n).filter(x => !p.owned.includes(x.id));
+  return { n, earned, used, can: !!p.owned.length && earned > used && pool.length > 0, pool, nextIn: 7 - (n % 7) };
+}
+function petRestDay(k){
+  if (!D.plan) return false;
+  const bl = planDay(k);
+  return !bl.length || bl.every(b => b.kind === 'rest' || b.kind === 'fixed');
+}
+function petCold(){
+  const days = petStudyDays(); if (!days.length || hoursOn(TODAY) > 0) return false;
+  let miss = 0;
+  for (let k = addDays(days[days.length - 1], 1); k < TODAY; k = addDays(k, 1)) if (!petRestDay(k)) miss++;
+  return miss >= 3;
+}
+function petState(){
+  if (TM.mode === 'focus' && TM.phase === 'focus' && !TM.paused) return 'focus';
+  if (petFlashState && Date.now() < petFlashState.until) return petFlashState.s;
+  if (TM.phase === 'break') return 'rest';
+  return petCold() ? 'cold' : 'idle';
+}
+function petFlash(s, ms){ petFlashState = { s, until: Date.now() + (ms || 9000) }; setTimeout(() => { if (['dash', 'today'].includes(D.view) && !$('#modalBack')) render(); }, (ms || 9000) + 50); }
+function petAfterSession(){ if (P().on && P().active) petFlash('happy'); }
+function petCheckGrowth(){
+  const p = P(); if (!p.on || !p.active) return;
+  const st = petStage(petDaysWith(p.active)), was = +p.seen[p.active] || 1;
+  if (st > was) { p.seen[p.active] = st; save(); petFlash('celebrate', 10000); toast(`${petInfo(p.active).name} grew: ${PET_STAGE_NAME[st].toLowerCase()} now`); }
+}
+function petSvg(id, opts){
+  const MP = window.MoraePets; if (!MP) return '<div class="pet-wait" aria-hidden="true"></div>';
+  const p = P(), info = petInfo(id), h = new Date().getHours();
+  try {
+    return MP.svg({ pet: id, stage: opts.stage || petStage(petDaysWith(id)), state: opts.state || 'idle', colour: (opts.stage || petStage(petDaysWith(id))) >= 3 && p.colour[id] ? p.colour[id] : info.defaultColour,
+      items: opts.noItems ? [] : (p.items[id] || []), island: opts.island ? info.island : null, weather: h >= 19 || h < 6 ? 'night' : 'clear', animate: opts.animate !== false, frame: opts.frame || 'full' });
+  } catch (e) { return ''; }
+}
+function petNeedLib(){ if (!window.MoraePets && !petLib.failed) petLib().then(MP => { if (MP && ['dash', 'today', 'settings'].includes(D.view)) render(); }); }
+function petDash(){
+  const p = P();
+  if (!p.on) {
+    if (p.dismissed) return '';
+    petNeedLib();
+    return `<section class="card s12 pet-invite">
+      <div class="pet-art sm">${petSvg('mora', { stage: 3, state: 'happy', island: false, noItems: true })}</div>
+      <div class="pet-txt"><h3>Meet a study pet?</h3><p class="muted small">An optional companion that sits beside your timer and grows with your study days. It never gets sick or sad, and your plan’s rest days never count against it. You can turn it off any time in Settings.</p>
+        <div class="btns" style="justify-content:flex-start"><button class="btn btn-primary" data-pet="pick">Choose a pet</button><button class="btn" data-pet="dismiss">No thanks</button></div></div>
+    </section>`;
+  }
+  petNeedLib();
+  if (!p.active) return `<section class="card s12"><div class="card-head"><h3>Your study pet</h3></div><p class="muted small">Pick your first pet to start.</p><div class="btns" style="justify-content:flex-start"><button class="btn btn-primary" data-pet="pick">Choose a pet</button></div></section>`;
+  petCheckGrowth();
+  const info = petInfo(p.active), days = petDaysWith(p.active), st = petStage(days), s = petState(), pk = petPicks();
+  const nextStage = st < 3 ? `${PET_STAGE[st] - days} more study day${PET_STAGE[st] - days === 1 ? '' : 's'} with ${esc(info.name)} until ${PET_STAGE_NAME[st + 1].toLowerCase()}` : 'Fully grown';
+  const nextUnlock = PET_UNLOCK.find(u => u > pk.n);
+  return `<section class="card s12 pet-card">
+    <div class="pet-art">${petSvg(p.active, { state: s, island: true })}</div>
+    <div class="pet-txt">
+      <div class="card-head"><h3>${esc(info.name)} <span class="muted small">· ${esc(info.species)}</span></h3><span class="chip">${PET_STAGE_NAME[st]}</span></div>
+      <p class="small muted">${esc((info.words || []).join(' · '))}</p>
+      <p>${esc(PET_STATE_LINE[s](info.name))}</p>
+      <div class="pet-facts small"><span><b>${pk.n}</b> study day${pk.n === 1 ? '' : 's'} with pets</span><span>${nextStage}</span>
+        <span>${pk.can ? `<b>A new pet is ready to choose</b>` : pk.pool.length ? `Next new pet in ${pk.nextIn} study day${pk.nextIn === 1 ? '' : 's'}` : nextUnlock ? `More pets unlock at ${nextUnlock} study days` : 'You have every pet so far'}</span></div>
+      <div class="btns" style="justify-content:flex-start">${pk.can ? '<button class="btn btn-primary" data-pet="pick">Choose a new pet</button>' : ''}<button class="btn" data-pet="room">Pet room</button></div>
+    </div>
+  </section>`;
+}
+function petToday(){
+  const p = P(); if (!p.on || !p.active) return '';
+  const s = petState(); if (p.hideFocus && s === 'focus') return '';
+  petNeedLib();
+  const info = petInfo(p.active);
+  return `<section class="card pet-mini"><div class="pet-art xs">${petSvg(p.active, { state: s, island: true })}</div><p class="small">${esc(PET_STATE_LINE[s](info.name))}</p><button class="btn btn-sm" data-pet="room" aria-label="Open the pet room">Pet room</button></section>`;
+}
+function petSettingsCard(){
+  const p = P();
+  return `<section class="card s6">
+    <h3>Study pet</h3>
+    <p class="muted small">Optional. A companion on Today and the Dashboard that grows with your study days. Nothing is sold.</p>
+    <div class="srow"><span>Pet</span><div class="seg" id="petOn"><button data-v="1" aria-pressed="${!!p.on}">On</button><button data-v="0" aria-pressed="${!p.on}">Off</button></div></div>
+    <div class="srow"><span>Hide while the timer is focusing</span><div class="seg" id="petHide"><button data-v="1" aria-pressed="${!!p.hideFocus}">Yes</button><button data-v="0" aria-pressed="${!p.hideFocus}">No</button></div></div>
+    ${p.on ? `<div class="btns" style="justify-content:flex-start"><button class="btn" data-pet="room">Open the pet room</button></div>` : ''}
+  </section>`;
+}
+function petBindSettings(){
+  const on = $('#petOn'), hide = $('#petHide');
+  if (on) on.onclick = e => { const b = e.target.closest('button'); if (!b) return; const p = P(); p.on = b.dataset.v === '1'; if (p.on) { p.dismissed = false; if (!p.since) p.since = TODAY; } save(); render(); if (p.on && !p.active) petPicker(); };
+  if (hide) hide.onclick = e => { const b = e.target.closest('button'); if (!b) return; P().hideFocus = b.dataset.v === '1'; save(); render(); };
+}
+async function petPicker(){
+  const MP = await petLib(); if (!MP) return toast('The pets couldn’t load. Check your connection and try again.');
+  const p = P(), first = !p.owned.length, pk = petPicks();
+  const pool = first ? petUnlocked(0) : pk.pool;
+  if (!first && !pk.can) return toast(`Your next new pet comes in ${pk.nextIn} study day${pk.nextIn === 1 ? '' : 's'}`);
+  openModal(`<div class="modal-head"><h2>${first ? 'Choose your study pet' : 'Choose a new pet'}</h2><button class="x" data-close aria-label="Close">×</button></div>
+    <p class="lead">${first ? 'Pick the one you like. More pets unlock as you study: a new choice every 7 study days.' : `You’ve studied ${pk.n} days. Pick one more; your other pets stay with you.`}</p>
+    <div class="pet-pick">${pool.map(x => `<button class="pet-opt" data-choose="${esc(x.id)}"><span class="pet-art icon">${petSvg(x.id, { stage: 3, frame: 'icon', animate: false, noItems: true })}</span><b>${esc(x.name)}</b><span class="small muted">${esc(x.species)}</span><span class="small">${esc((x.words || []).join(' · '))}</span></button>`).join('')}</div>
+    <div class="modal-foot">${first ? '<button class="btn" id="petRand">Surprise me</button>' : ''}<button class="btn" data-close>Not now</button></div>`, m => {
+    const choose = id => { const q = P(); if (!q.owned.includes(id)) q.owned.push(id); q.on = true; q.dismissed = false; if (!q.since) q.since = TODAY;
+      q.active = id; q.log.push([TODAY, id]); q.seen[id] = q.seen[id] || 1; save(); closeModal(); petFlash('celebrate', 10000); render(); toast(`${petInfo(id).name} ${first ? 'is your study pet' : 'joined your pets'}`); };
+    m.querySelectorAll('[data-choose]').forEach(b => b.onclick = () => choose(b.dataset.choose));
+    const r = m.querySelector('#petRand'); if (r) r.onclick = () => choose(pool[Math.floor(Math.random() * pool.length)].id);
+  }, true);
+}
+async function petRoom(){
+  const MP = await petLib(); if (!MP) return toast('The pets couldn’t load. Check your connection and try again.');
+  const draw = () => {
+    const p = P(), id = p.active, info = petInfo(id), days = petDaysWith(id), st = petStage(days), worn = p.items[id] || [];
+    const itemById = x => MP.items.find(i => i.id === x) || { id: x, name: x, anchor: 'head' };
+    return `<div class="modal-head"><h2>Pet room</h2><button class="x" data-close aria-label="Close">×</button></div>
+    <div class="pet-room">
+      <div class="pet-art">${petSvg(id, { state: 'happy', island: true })}</div>
+      <div class="pet-txt"><h3>${esc(info.name)} <span class="muted small">· ${esc(info.species)}</span></h3>
+        <p class="small muted">${esc((info.words || []).join(' · '))}</p>
+        <p class="small">${PET_STAGE_NAME[st]} · ${days} study day${days === 1 ? '' : 's'} together</p></div>
+    </div>
+    ${p.owned.length > 1 ? `<div class="msec"><h3>Your pets</h3><div class="pet-owned">${p.owned.map(x => `<button class="pet-opt sm" data-act="${esc(x)}" aria-pressed="${x === id}"><span class="pet-art icon">${petSvg(x, { frame: 'icon', animate: false })}</span><span class="small">${esc(petInfo(x).name)}</span></button>`).join('')}</div></div>` : ''}
+    <div class="msec"><h3>Wardrobe <small class="muted">one per spot: head, face, neck, back</small></h3><div class="chips">${PET_EVERYDAY.map(x => `<button class="tog" data-item="${x}" aria-pressed="${worn.includes(x)}">${esc(itemById(x).name)}</button>`).join('')}</div></div>
+    <div class="msec"><h3>Colour</h3>${st >= 3 ? `<div class="chips">${(Array.isArray(MP.colours) ? MP.colours : Object.keys(MP.colours)).map(c => `<button class="tog" data-col="${esc(c)}" aria-pressed="${(p.colour[id] || info.defaultColour) === c}">${esc(c[0].toUpperCase() + c.slice(1))}</button>`).join('')}</div>` : `<p class="small muted">Recolouring unlocks when ${esc(info.name)} is grown (${PET_STAGE[2] - days} more study days together).</p>`}</div>
+    <div class="modal-foot"><button class="btn" data-close>Done</button></div>`;
+  };
+  const bind = m => {
+    m.onclick = e => {
+      const p = P(), id = p.active;
+      const a = e.target.closest('[data-act]'); if (a && a.dataset.act !== id) { p.active = a.dataset.act; p.log.push([TODAY, p.active]); save(); m.innerHTML = draw(); return; }
+      const it = e.target.closest('[data-item]'); if (it) { const MP2 = window.MoraePets, anchor = (MP2.items.find(i => i.id === it.dataset.item) || {}).anchor;
+        let worn = (p.items[id] || []).slice(); if (worn.includes(it.dataset.item)) worn = worn.filter(x => x !== it.dataset.item);
+        else { worn = worn.filter(x => (MP2.items.find(i => i.id === x) || {}).anchor !== anchor); worn.push(it.dataset.item); }
+        p.items[id] = worn; save(); m.innerHTML = draw(); return; }
+      const c = e.target.closest('[data-col]'); if (c) { p.colour[id] = c.dataset.col; save(); m.innerHTML = draw(); return; }
+      if (e.target.closest('[data-close]')) { closeModal(); render(); }
+    };
+  };
+  openModal(draw(), bind, true);
+}
+document.addEventListener('click', e => {
+  const b = e.target.closest('[data-pet]'); if (!b) return;
+  const a = b.dataset.pet;
+  if (a === 'pick') petPicker();
+  else if (a === 'room') petRoom();
+  else if (a === 'dismiss') { P().dismissed = true; save(); render(); toast('No pet. You can turn one on later in Settings → App.'); }
+});
+
 function render(){
   if (Cloud.on && Cloud.status === 'checking') { document.body.classList.add('gate'); $('#page').innerHTML = '<p class="muted" style="padding:48px 0">Loading…</p>'; return; }
   document.body.classList.toggle('gate', gated());
