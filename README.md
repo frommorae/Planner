@@ -16,7 +16,7 @@ A study planner and focus timer, built for MCAT prep: plan tomorrow on a 10-minu
 - `android/` is a [Capacitor](https://capacitorjs.com) project that wraps the website as an Android app, with real notifications and keep-screen-on.
 - `public/mcat/index.html` is Morae MCAT, an MCAT study planner (plan builder, practice and error logs, full lengths, content map). For now its data stays in each visitor's browser; sign-in sync with the planner account comes next.
 - Sync between devices uses [Supabase](https://supabase.com). The table and its privacy rules are in `supabase/schema.sql`. The key in `config/planner.config.json` is the *publishable* key: it is designed to be public, and the privacy rules keep each person's data private.
-- GitHub Actions rebuild the website on every change. A new APK is built every Sunday if the app changed (or on demand: Actions → Android APK → Run workflow, or a commit message containing `[apk]`). The Android app shows a "new version is ready" banner with a download button.
+- GitHub Actions rebuild the website on every change. Android builds are **paused** (desktop/web first): they run only from Actions → Android APK → Run workflow, and only once a new signing key is saved as repo secrets (see the top of `.github/workflows/android.yml`). Signing keys are never stored in this repo.
 
 ## Version 2 ideas
 See the project backlog: Play Store release, Google Calendar import/export, a Chrome extension for site time, auto-start at planned blocks, accountability summaries, an optional AI weekly review, and an optional pet mode.

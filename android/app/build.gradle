@@ -17,19 +17,25 @@ android {
             ignoreAssetsPattern = '!.svn:!.git:!.ds_store:!*.scc:.*:!CVS:!thumbs.db:!picasa.ini:!*~'
         }
     }
-    // Beta signing key, committed on purpose so every build can update the installed app.
-    // It is only for sideloaded beta APKs. The Play Store version will use Google Play App Signing.
+    // Release signing. The key is never stored in this repo.
+    // GitHub Actions writes it from secrets (ANDROID_KEYSTORE_BASE64, ANDROID_KEYSTORE_PASSWORD,
+    // ANDROID_KEY_ALIAS, ANDROID_KEY_PASSWORD) into android/app/release.jks for the build only.
+    // Without them the release build is unsigned. (The old beta key was public and is retired: never reuse it.)
+    def releaseStore = file("release.jks")
+    def hasReleaseKey = releaseStore.exists() && System.getenv("ANDROID_KEYSTORE_PASSWORD")
     signingConfigs {
-        beta {
-            storeFile file("beta-signing.jks")
-            storePassword "planner-beta"
-            keyAlias "planner-beta"
-            keyPassword "planner-beta"
+        if (hasReleaseKey) {
+            release {
+                storeFile releaseStore
+                storePassword System.getenv("ANDROID_KEYSTORE_PASSWORD")
+                keyAlias System.getenv("ANDROID_KEY_ALIAS")
+                keyPassword System.getenv("ANDROID_KEY_PASSWORD")
+            }
         }
     }
     buildTypes {
         release {
-            signingConfig signingConfigs.beta
+            if (hasReleaseKey) signingConfig signingConfigs.release
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
